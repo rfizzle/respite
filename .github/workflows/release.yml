@@ -1,0 +1,18 @@
+# Thin stub — logic lives in rfizzle/concord (mod-release.yml).
+# Store IDs (modrinth-id / curseforge-id `with:` inputs) are added once the
+# respite-vitality-overhaul store projects are registered.
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    uses: rfizzle/concord/.github/workflows/mod-release.yml@master
+    secrets: inherit
