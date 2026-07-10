@@ -20,7 +20,7 @@ The single motif object is a **hanging lantern** — warm light held against the
 
 ### Logo Description
 
-**Full Logo (`art/logo.png`):** Pixel art per the suite formula — dark stone brickwork, one central glowing motif in a circular medallion, mod name in blocky pixel type below. A full-bleed midnight brickwork wall (corner-vignetted, a handful of dim single-pixel stars scattered sparsely — never arranged into patterns or joined by lines) carries the icon's medallion at center-top: the indigo stone bezel with its Moonlight rim-glow around the hanging lantern. Below, "RESPITE" in beveled blocky pixel type carrying the Moonlight gradient (`#A6B4FF` → `#7C8EE8` → `#5562B8`) over an ink outline and soft glow, with the subtitle "MINECRAFT VITALITY OVERHAUL" in Candleglow. Composed deterministically by `art/glyphs/logo.gen.py` at 320×192 native, shipped at 1280×768 by integer upscale.
+**Full Logo (`art/logo.png`):** Gemini-illustrated pixel art per the suite formula — dark stone brickwork, one central glowing motif in a circular medallion, mod name in blocky pixel type below. A full-bleed midnight-indigo brick wall under sparse single-pixel stars (never arranged into patterns or joined by lines) carries a large circular medallion of carved indigo stone, rim-lit in Moonlight (`#7C8EE8`, glints `#A6B4FF`) with a soft glow radiating onto the wall. Inside, a darker brick alcove holds the iron hanging lantern on a short chain, its panes glowing Candleglow (`#F2C14E`, halo `#FFE29A`) and warming the nearest bricks amber; warm light motes drift near the glass and cool night mist curls at the medallion's base. Below, "RESPITE" in large beveled blocky pixel type carrying the Moonlight gradient over an ink outline and soft glow, with the subtitle "MINECRAFT VITALITY OVERHAUL" in smaller Candleglow pixel type; subtle iron lantern hooks and hanging chains fade into shadow at the corners. Generated from the §4 prompt (master pending per `ASSETS.md`).
 
 **Icon (`art/icon-128.png`, `art/icon-512.png`):** The suite medallion — a circular indigo stone bezel lit from the upper left with a soft Moonlight rim-glow, around a midnight-indigo brickwork field. Centered inside, the hanging lantern: arched iron handle, flared cap brim, three glass panes between iron posts glowing radially from a warm flame core, flared foot slab — the nearest bricks warmed by the light. Composed programmatically by `art/glyphs/icon.gen.py` (true circles, tiling brick, radial glow; lantern structure traced from pixel-art reference renders) into `art/glyphs/icon.glyph`, rendered at 128 native and 512 by integer upscale.
 
@@ -68,13 +68,17 @@ The asset inventory — every source under `art/` and the final file it ships as
 
 ## 4. Generation Prompts
 
-No master is prompt-sourced: the logo and icon are composed deterministically by `art/glyphs/logo.gen.py` and `art/glyphs/icon.gen.py`, and the lantern glyph is `.glyph`-authored (`art/hud-icon-16.glyph`) — re-render any of them by re-running its generator or the pipeline, per DESIGN-SYSTEM §8. A Gemini prompt for an illustrated hero logo is retained as an exploration/upgrade path in `art/exploration/logo-gemini-prompt.md`.
+The full logo is the one prompt-sourced master, Gemini-illustrated like its siblings'. The mod icon is composed deterministically by `art/glyphs/icon.gen.py` and the lantern glyph is `.glyph`-authored (`art/hud-icon-16.glyph`) — re-render either through its generator or the pipeline, per DESIGN-SYSTEM §8.
+
+**`art/logo.png`:**
+
+> Pixel art hero logo for a Minecraft mod named "RESPITE", wide format, on a full-bleed dark midnight-indigo stone brick wall (#141a3d bricks with #232e66 highlights) under sparse, faint single-pixel stars — no constellations, no moon. Centered: a large circular medallion of carved indigo stone blocks, rim-lit in soft periwinkle moonlight (#7C8EE8 with #A6B4FF glints), its glow radiating gently onto the surrounding wall. Inside the medallion, a darker brick alcove holds a detailed iron hanging lantern on a short chain — grey iron frame with an arched handle, glass panes glowing warm golden candlelight (#F2C14E core, #FFE29A halo) that lights the nearest bricks amber. A few warm light motes drift near the lantern; wisps of cool night mist curl at the medallion's base. Below the medallion, "RESPITE" in large beveled blocky pixel letters with an indigo-to-pale-lavender gradient (#7C8EE8 to #A6B4FF), dark outline, and a soft moonlight glow; beneath it, the subtitle "MINECRAFT VITALITY OVERHAUL" in smaller warm gold (#F2C14E) pixel type. Corner flourishes: subtle iron lantern hooks and hanging chains fading into shadow. Crisp pixel art, hard pixels, limited palette, cohesive Minecraft aesthetic, no photorealism, no anti-aliasing.
 
 ---
 
 ## 5. Image References
 
-`art/exploration/` holds the pixel-art lantern reference renders the icon and logo lanterns were traced from — `lantern-ref-iron.png` (traced) and `lantern-ref-wood.png` (rejected variant) — beside the retained Gemini logo prompt. The brand's in-game touchstones are vanilla's lantern sprite (the motif's native form), the dusk sky gradient (the palette's source), and the phantom's pale teal-grey (the antagonist the palette deliberately does not use).
+`art/exploration/` holds the pixel-art lantern reference renders the icon's lantern was traced from — `lantern-ref-iron.png` (traced) and `lantern-ref-wood.png` (rejected variant — the wood cap reads less "iron lantern" against the indigo field). The brand's in-game touchstones are vanilla's lantern sprite (the motif's native form), the dusk sky gradient (the palette's source), and the phantom's pale teal-grey (the antagonist the palette deliberately does not use).
 
 ---
 
