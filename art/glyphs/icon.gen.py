@@ -111,7 +111,10 @@ for y in range(N):
         if d >= R_IN - 1.0:
             continue
         row = int((y - (CY - R_IN)) // BRH)
-        off = (BRW // 2) if (row % 2) else 0
+        # anchor shifted +4 so no vertical joint runs down the icon's center
+        # corridor (through the handle hole / above the handle), where a dark
+        # line half a pixel off-axis reads as an off-center lantern
+        off = 4 + ((BRW // 2) if (row % 2) else 0)
         my = ((y - (CY - R_IN)) % BRH) < 1          # horizontal mortar
         mx = ((x - off) % BRW) < 1                   # vertical mortar
         warm = math.hypot(x - FLAME_X, y - FLAME_Y)
@@ -151,7 +154,7 @@ LANTERN = [
     "......KiiiiK......",   # collar
     ".....KiIIIIiK.....",   # cap dome
     "...KKiIIIIIIiKK...",
-    ".KDiIIIIiiiiIIiDK.",   # flared brim
+    ".KDiIIIiiiiIIIiDK.",   # flared brim
     "KKKKKKKKKKKKKKKKKK",   # brim underside
     "..KggDiggggiDggK..",   # glass: side panes · posts · centre pane
     "..KggDiggggiDggK..",
