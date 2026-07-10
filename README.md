@@ -1,4 +1,6 @@
-<h1 align="center">Respite</h1>
+<p align="center">
+  <img src="art/logo.png" alt="Respite" width="800">
+</p>
 
 <p align="center"><strong>Make the night count.</strong></p>
 
