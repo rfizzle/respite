@@ -22,7 +22,7 @@ The single motif object is a **hanging lantern** — warm light held against the
 
 **Full Logo (`art/logo.png`):** Pixel art per the suite formula — dark stone brickwork frame, one central glowing motif object, mod name in blocky pixel type below. Inside the frame, a deep midnight-indigo night field (`#141a3d` shading up to `#232e66`). At center, a single iron-framed lantern hangs from a short chain anchored to the top of the frame, its panes glowing Candleglow (`#F2C14E`) with a soft pale halo (`#FFE29A`) that warms the nearest bricks. A handful of dim single-pixel stars are scattered sparsely in the field — never arranged into patterns or joined by lines. Below, "RESPITE" in blocky pixel type carrying the Moonlight gradient (`#7C8EE8` → `#A6B4FF`), with the subtitle "MINECRAFT VITALITY OVERHAUL".
 
-**Icon (`art/icon-128.png`):** The hanging lantern — iron frame with rim-lit cap, warm Candleglow panes around a flame core, chain ring above, amber glow-shadow at the glass base — centered on a full-bleed Midnight field with a faint Deep Twilight halo and a few scattered dim stars. Authored at 32×32 (`art/icon-128.glyph`), shipped at 128×128 by integer upscale. Reads cleanly at 128×128.
+**Icon (`art/icon-128.png`, `art/icon-512.png`):** The suite medallion — a circular indigo stone bezel lit from the upper left with a soft Moonlight rim-glow, around a midnight-indigo brickwork field. Centered inside, the hanging lantern: arched iron handle, flared cap brim, three glass panes between iron posts glowing radially from a warm flame core, flared foot slab — the nearest bricks warmed by the light. Composed programmatically by `art/glyphs/icon.gen.py` (true circles, tiling brick, radial glow; lantern structure traced from pixel-art reference renders) into `art/glyphs/icon.glyph`, rendered at 128 native and 512 by integer upscale.
 
 **16×16 glyph (`art/hud-icon-16.png`):** A pixel lantern: 1px `ink` outline, iron-grey frame, 2–3 warm glow tones. Respite has no HUD slot (§2), so this glyph serves Jade/WTHIT and recipe-viewer contexts only — the same role as Meridian's open book.
 
@@ -68,13 +68,13 @@ The asset inventory — every source under `art/` and the final file it ships as
 
 ## 4. Generation Prompts
 
-The committed prompts for the non-glyph masters (Gemini); the mod icon and lantern glyph are `.glyph`-authored (sources beside their masters under `art/`), so the logo is the only prompt-sourced master.
+The committed prompts for the non-glyph masters (Gemini); the mod icon is generated (`art/glyphs/icon.gen.py`) and the lantern glyph is `.glyph`-authored (`art/hud-icon-16.glyph`), so the logo is the only prompt-sourced master.
 
 **`art/logo.png`:**
 
 > Pixel art logo for a Minecraft mod named "RESPITE". A dark stone brickwork frame surrounds a deep midnight-indigo night sky (#141a3d to #232e66). At the center, a single iron-framed hanging lantern on a short chain glows warm golden-yellow (#F2C14E) with a soft pale halo (#FFE29A) that lights the nearest stone bricks. A few faint single-pixel stars are scattered sparsely — no constellations, no moon. Below the frame, "RESPITE" in a blocky pixel font with a soft indigo gradient (#7C8EE8 to #A6B4FF), and the subtitle "MINECRAFT VITALITY OVERHAUL" in small pixel type. Dark background (#0a0a0a). Crisp pixel art, limited palette, no anti-aliasing.
 
-**`art/icon-128.png`** is not prompt-sourced: it is authored natively at 32×32 in `art/icon-128.glyph` and rendered with `--scale-to 128` — re-render through the `.glyph`, per DESIGN-SYSTEM §8.
+**`art/icon-128.png` / `art/icon-512.png`** are not prompt-sourced: they are composed by `art/glyphs/icon.gen.py` into `art/glyphs/icon.glyph` and rendered through the pipeline — re-render by re-running the generator, per DESIGN-SYSTEM §8.
 
 ---
 

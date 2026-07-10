@@ -11,7 +11,7 @@
 
 | Asset | Source | Final / derived copies |
 |---|---|---|
-| Mod icon 128×128 | `art/icon-128.glyph` (authored 32px native, `--scale-to 128`) | `art/icon-128.png` (master) → `assets/respite/icon.png`, store listings (with implementation) |
+| Mod icon (128 + 512) | `art/glyphs/icon.gen.py` → `art/glyphs/icon.glyph` (generated 128px grid; 512 via `--scale-to 512`) | `art/icon-128.png`, `art/icon-512.png` (masters) → `assets/respite/icon.png`, store listings (with implementation) |
 | Lantern glyph 16×16 (Jade/recipe viewers — no HUD slot) | `art/hud-icon-16.glyph` | `art/hud-icon-16.png` (master) → `assets/respite/textures/gui/glyph.png` (with Jade integration) |
 
 ## Not yet created
