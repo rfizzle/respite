@@ -7,15 +7,18 @@
 > for the glyph pipeline (concord `design/DESIGN-SYSTEM.md` §8). Final paths
 > are under `src/main/resources/` unless noted.
 
-No assets are committed yet; everything below is planned.
+## Branding masters
+
+| Asset | Source | Final / derived copies |
+|---|---|---|
+| Mod icon 128×128 | `art/icon-128.glyph` (authored 32px native, `--scale-to 128`) | `art/icon-128.png` (master) → `assets/respite/icon.png`, store listings (with implementation) |
+| Lantern glyph 16×16 (Jade/recipe viewers — no HUD slot) | `art/hud-icon-16.glyph` | `art/hud-icon-16.png` (master) → `assets/respite/textures/gui/glyph.png` (with Jade integration) |
 
 ## Not yet created
 
 | Asset | Intended source | Destination |
 |---|---|---|
 | Full logo | Gemini (prompt in `DESIGN.md` §4) | `art/logo.png` → README embed, `site/assets/logo.png` — (planned, with first art pass) |
-| Mod icon 128×128 | Gemini (prompt in `DESIGN.md` §4) or `/glyph` | `art/icon-128.png` → `assets/respite/icon.png`, store listings — (planned, with first art pass) |
-| Lantern glyph 16×16 (Jade/recipe viewers — no HUD slot) | `/glyph` | `art/hud-icon-16.png` (+ `.glyph`) → `assets/respite/textures/gui/glyph.png` — (planned, with Jade integration) |
 | Chronometer block textures (side, top, 8 dial faces) | `/glyph` | `art/chronometer-*.glyph` → `assets/respite/textures/block/chronometer_*.png` — (planned, with implementation) |
 | Unsteeped Brew item texture | `/glyph` | `art/unsteeped-brew.glyph` → `assets/respite/textures/item/unsteeped_brew.png` — (planned, with implementation) |
 | Caffeinated Brew item texture | `/glyph` | `art/caffeinated-brew.glyph` → `assets/respite/textures/item/caffeinated_brew.png` — (planned, with implementation) |

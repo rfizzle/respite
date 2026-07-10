@@ -1,0 +1,57 @@
+# respite — mod icon master. Authored natively at 32×32, shipped at 128×128 via
+# --scale-to 128 (integer nearest-neighbor). Hanging lantern on a midnight-indigo
+# field with sparse, unpatterned stars (no constellations — that register is
+# Meridian's). Palette maps to design/DESIGN.md: Midnight #141a3d, Deep Twilight
+# #232e66, Candleglow #F2C14E, Candleglow Pale #FFE29A. respite.* tokens are not
+# yet registered in the concord glyph palette — hex used with roles named beside.
+size: 32
+
+legend:
+  B #141a3d        # Midnight — background field
+  M #1a2450        # halo, outer step toward Deep Twilight
+  T #232e66        # Deep Twilight — halo beside the lantern
+  s #4a5590        # dim star pixel
+  K ink            # #0a0a0a outline
+  D #3a3f48        # iron frame, core shadow
+  i #5f6673        # iron frame, midtone
+  I #9aa1ad        # iron frame, highlight
+  R #c7ccd6        # iron rim light
+  w #fff6dc        # flame core
+  p #ffe29a        # Candleglow Pale — inner glow
+  c #f2c14e        # Candleglow — mid glow
+  a #d18f2f        # amber — glow shadow
+  A #a06a1e        # deep amber — glass base occlusion
+
+frame:
+  BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+  BBBBsBBBBBBBBBBKKBBBBBBBBBBBBBBB
+  BBBBBBBBBBBBBBKBBKBBBBBBBBBBBBBB
+  BBBBBBBBBBBBBBBKKBBBBBBBBBBsBBBB
+  BBBBBBBBBBBBBBBKKBBBBBBBBBBBBBBB
+  BBBBBBBBBBBBKKKKKKKKBBBBBBBBBBBB
+  BBsBBBBBBBBKDiIRIIiDKBBBBBBBBBBB
+  BBBBBBBBBBKDDiiIIiiDDKBBBBBBBBBB
+  BBBBBBBBTKKKKKKKKKKKKKKTBBBBBBBB
+  BBBBBBBMTKDccppppppccDKTMBBBBBBB
+  BBBBBBBMTKDcppppppppcDKTMBBBBBBB
+  BBBBBBBMTKDcppppppppcDKTMBBBBBBB
+  BBBBBBBMTKDcpppwwpppcDKTMBBBBBBB
+  BBBBBBBMTKDcppwwwwppcDKTMBBBBBBB
+  BBBBBBBMTKDcppwwwwppcDKTMBBBBBBB
+  BBBBBBBMTKDcppwwwwppcDKTMBBBBBBB
+  BBBBBBBMTKDcppwwwwppcDKTMBBBBBBB
+  BBBBBBBMTKDcppwwwwppcDKTMBBBBBBB
+  BBBBBBBMTKDccpwwwwpccDKTMBBBBBBB
+  BBBBBBBMTKDacppppppcaDKTMBBBBBBB
+  BBBBBBBMTKDaccppppccaDKTMBBBBBBB
+  BBBBBBBMTKDaaccccccaaDKTMBBBBBBB
+  BBBBBBBMTKDAaaccccaaADKTMBBBBBBB
+  BBBBBBBMTKDAAaaaaaaAADKTMBBBBBBB
+  BBBBBBBBTKKKKKKKKKKKKKKTBBBBBBBB
+  BBBBBBBBBBKDiiiiiiiiDKBBBBBBBBBB
+  BBBBBBBBBBBKDiiiiiiDKBBBBBBBBBBB
+  BBBBBBBBBBBBKKKKKKKKBBBBBBBBBBBB
+  BBBBBBBBBBBBBBBBBBBBBBBBBBsBBBBB
+  BBBBBsBBBBBBBBBBBBBBBBBBBBBBBBBB
+  BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+  BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB

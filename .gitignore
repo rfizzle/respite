@@ -60,3 +60,6 @@ art/audio/**/*.ogg
 art/audio/**/*.wav
 art/audio/**/*.report.png
 # concord:gitignore:end
+
+# Repo-owned (outside the concord block): glyph render previews beside art/ masters
+art/*@*x.png
