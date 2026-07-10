@@ -12,8 +12,25 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue"></a>
 </p>
 
-Respite is in design. The player-experience promise lives in
-[`design/VISION.md`](design/VISION.md); this page will describe features as they ship.
+Respite is in development — no features have shipped yet. The player-experience
+promise lives in [`design/VISION.md`](design/VISION.md), the behavioral contract
+in [`design/SPEC.md`](design/SPEC.md); this page will describe features as they
+ship. The website is [respite.rfizzle.com](https://respite.rfizzle.com).
+
+---
+
+## Development
+
+```sh
+./gradlew build          # produces build/libs/respite-<version>.jar
+./gradlew test           # runs unit tests
+./gradlew runGametest    # runs Fabric gametest suite
+./gradlew runClient      # launch dev client
+./gradlew runServer      # launch dev server
+```
+
+See [`AGENTS.md`](AGENTS.md) for source layout, conventions, and the suite-wide
+standards this repo conforms to.
 
 ---
 

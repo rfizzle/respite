@@ -20,6 +20,11 @@
             "com.rfizzle.respite.gametest.RespiteSmokeGameTest"
         ]
     },
+    "suggests": {
+        "modmenu": "*",
+        "jade": "*",
+        "wthit": "*"
+    },
     "mixins": [
         "respite.mixins.json"
     ],

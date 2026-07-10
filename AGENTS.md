@@ -11,12 +11,12 @@ sleep, rest, and the passage of night part of the game: a time-lapse instead of
 the vanilla night skip, overnight healing from saturation, repurposed phantoms,
 a weariness debuff, a time-of-day redstone block, and a campfire-steeped brew.
 
-**The repo is in the design phase: no code exists yet.** The player promise is
-[`design/VISION.md`](design/VISION.md), the behavioral contract is
-[`design/SPEC.md`](design/SPEC.md), and the brand is
+**The repo is pre-implementation: the skeleton builds, no features exist yet.**
+The player promise is [`design/VISION.md`](design/VISION.md), the behavioral
+contract is [`design/SPEC.md`](design/SPEC.md), and the brand is
 [`design/DESIGN.md`](design/DESIGN.md). Implementation follows the spec — an
-implementer builds from it, and a reviewer calls divergence a bug. Work is
-tracked in GitHub Issues — see the
+implementer builds from it, and a reviewer calls divergence a bug. Java 21,
+Fabric Loader 0.16.10, Loom 1.9. Work is tracked in GitHub Issues — see the
 [Development lifecycle](#development-lifecycle) section below.
 
 ## Suite standards (Concord)
@@ -30,15 +30,37 @@ in the local workspace. Normative for this repo:
 - [DESIGN-SYSTEM.md](https://github.com/rfizzle/concord/blob/master/design/DESIGN-SYSTEM.md) — palette, typography, logo rules, texture/audio pipelines
 - [REPO-LAYOUT.md](https://github.com/rfizzle/concord/blob/master/REPO-LAYOUT.md) — where non-code files live (conforms)
 
-## Build
+## Build commands
 
-There is no Gradle scaffold yet — it lands with the first implementation work,
-following the suite standard: Loom with `splitEnvironmentSourceSets()` (`main` /
-`client` / `gametest` source sets plus JUnit in `src/test/java`), Java 21,
-Fabric Loader 0.16.10+. Until then, this repo is documentation-only and there
-is nothing to build. When Gradle lands, read
-[`.ai/skills/mc-gradle-builds/SKILL.md`](.ai/skills/mc-gradle-builds/SKILL.md)
-before running any Gradle command.
+```bash
+./gradlew build          # compile + test + jar
+./gradlew test           # JUnit tests only
+./gradlew runGametest    # Fabric gametests (headless server)
+./gradlew runClient      # launch dev client
+./gradlew runServer      # launch dev server
+./gradlew genSources     # decompile MC sources for IDE nav
+```
+
+Run a single JUnit test:
+`./gradlew test --tests "com.rfizzle.respite.SomeTest"`
+
+Read [`.ai/skills/mc-gradle-builds/SKILL.md`](.ai/skills/mc-gradle-builds/SKILL.md)
+**before running any Gradle command** — it covers how to avoid wasted reruns
+from partial output capture.
+
+## Source layout
+
+Loom's `splitEnvironmentSourceSets()` is enabled — three source sets:
+
+| Source set | Root | Purpose |
+|---|---|---|
+| `main` | `src/main/java` | Server + common logic. Entrypoint: `Respite.java` |
+| `client` | `src/client/java` | Client-only code. Entrypoint: `RespiteClient.java` |
+| `gametest` | `src/gametest/java` | Fabric gametests (run with `runGametest`). Has `main` on its classpath but is NOT included in the jar. Each `*GameTest` class is registered as a `fabric-gametest` entrypoint in `fabric.mod.json`. |
+
+JUnit tests go in the standard `src/test/java` directory. The test classpath
+includes `fabric-loader-junit` but excludes `fabric-api` — tests that need
+Fabric APIs must use gametests instead.
 
 ## Key conventions
 
