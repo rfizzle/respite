@@ -333,15 +333,32 @@ def st_face(row):
 emboss(st_cells, STX, STY, st_face, 'st_ex', None, 'st_glow', ex=1)
 
 # ---- 7. upscale and write -----------------------------------------------------
-px = []
-for y in range(H):
-    for _sy in range(SCALE_OUT):
-        row = []
-        for x in range(W):
-            row.extend([PAL[G[y][x]]] * SCALE_OUT)
-        px.extend(row)
-# px was built row-by-row already expanded; flatten check
-pixels = px
+def emit(scale):
+    px = []
+    for y in range(H):
+        for _sy in range(scale):
+            row = []
+            for x in range(W):
+                row.extend([PAL[G[y][x]]] * scale)
+            px.extend(row)
+    return px
+
+
 OUT = ROOT / "art/logo.png"
-glyph.write_png(OUT, pixels, W * SCALE_OUT, H * SCALE_OUT)
+glyph.write_png(OUT, emit(SCALE_OUT), W * SCALE_OUT, H * SCALE_OUT)
 print(f"wrote {OUT}  ({W * SCALE_OUT}x{H * SCALE_OUT})")
+
+# OG image (DESIGN-SYSTEM §6): the logo on Ink at 1200×630 — the grid at ×3
+# (960×576, integer nearest-neighbor) centered on the ink field.
+OGW, OGH = 1200, 630
+lw, lh = W * 3, H * 3
+ox, oy = (OGW - lw) // 2, (OGH - lh) // 2
+ink = rgba(COL['ink'])
+og = [ink] * (OGW * OGH)
+logo3 = emit(3)
+for y in range(lh):
+    og[(oy + y) * OGW + ox:(oy + y) * OGW + ox + lw] = logo3[y * lw:(y + 1) * lw]
+OG_OUT = ROOT / "site/assets/og-image.png"
+OG_OUT.parent.mkdir(parents=True, exist_ok=True)
+glyph.write_png(OG_OUT, og, OGW, OGH)
+print(f"wrote {OG_OUT}  ({OGW}x{OGH})")

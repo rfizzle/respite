@@ -1,0 +1,47 @@
+{
+  "nav": "FAQ",
+  "metaTitle": "FAQ — Respite",
+  "metaDescription": "Frequently asked questions about Respite: release status, multiplayer fairness, phantom changes, and compatibility.",
+  "title": "FAQ",
+  "lede": "",
+  "width": "4xl",
+  "sections": [
+    {
+      "blocks": [
+        {
+          "type": "faq",
+          "items": [
+            {
+              "q": "Is Respite released?",
+              "a": "Not yet — it is in development. The design is committed (vision, full behavioral spec, brand), the repo builds, and features are being implemented against the spec. Watch <a href='https://github.com/rfizzle/respite/releases' class='text-accent hover:text-accent2 underline'>GitHub Releases</a>."
+            },
+            {
+              "q": "Does sleeping still skip the night?",
+              "a": "No — it accelerates it, up to 60×. The world genuinely lives through the night: furnaces smelt, crops grow, weather runs its course, and you watch dawn arrive in about ten seconds. Nothing is skipped."
+            },
+            {
+              "q": "How does multiplayer sleep work?",
+              "a": "Proportionally: each sleeper adds an equal share of the acceleration. Two of four players in bed run time at half the maximum. Nobody's sleep is wasted and nobody can veto the night — the <code>playersSleepingPercentage</code> all-or-nothing model is replaced."
+            },
+            {
+              "q": "What happened to insomnia?",
+              "a": "Removed by default. Phantoms spawn by territory instead: above Y=100 on any night, and everywhere during a new moon (one night in eight). A server that wants vanilla insomnia back sets <code>enablePhantomRework</code> to <code>false</code>, and <code>doInsomnia</code> stays the master phantom kill-switch."
+            },
+            {
+              "q": "Do I need the other Concord mods?",
+              "a": "No. Respite is complete on its own — with siblings installed some integrations light up (Tribulation-scaled phantoms, cocoa trades, brews in far-flung loot), but none are ever required."
+            },
+            {
+              "q": "Will it work with Sodium / Iris / performance mods?",
+              "a": "Yes by design — Respite does no custom world rendering; the accelerated sky is vanilla rendering fed faster time. Mods that replace the sleep system itself (sleep-vote or night-skip mods) should not be combined with it, and tick-rate manipulators are untested."
+            },
+            {
+              "q": "Client, server, or both?",
+              "a": "Both, like its siblings: the gameplay is server-authoritative, and the client side carries the config screen and action-bar messages."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

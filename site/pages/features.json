@@ -1,0 +1,109 @@
+{
+  "nav": "Features",
+  "metaTitle": "Features — Respite",
+  "metaDescription": "Respite's feature set as specced: continuous time-lapse sleep, restful saturation, phantoms of the heights, weariness, the Chronometer, and the Caffeinated Brew.",
+  "title": "Features",
+  "lede": "The six headline systems, as specced in <a href='https://github.com/rfizzle/respite/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a>. Respite is in development — these are commitments, not yet a shipped jar.",
+  "width": "5xl",
+  "scale": "lg",
+  "sections": [
+    {
+      "id": "time-lapse",
+      "title": "Continuous Time-Lapse",
+      "intro": "Sleeping no longer teleports the world to morning — it accelerates time, up to 60×, while the world keeps genuinely running.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Get into a bed at night and time rushes visibly past: furnaces smelt, crops grow, brewing stands bubble, and the sky wheels overhead. Each sleeper adds an equal share of the speed — alone you get the full 60×; with two of four players in bed, time runs at 30×. A full night passes in about ten seconds with everyone asleep, and a furnace smelts close to a full stack while you dream.",
+            "The acceleration is real ticks under a hard millisecond budget, so a struggling server degrades to a slower night — never a stall. Players still awake share the fast night, and an action-bar line (<code>✦ Time ×30 — 2 of 4 asleep</code>) says why the stars are streaking."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "restful-saturation",
+      "title": "Restful Saturation",
+      "intro": "Going to bed on a full stomach heals you overnight.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Eat until your hunger bar is full, then sleep through the night: every 2 points of saturation restore 1 heart by morning — a supper of steak or golden carrots can carry you from battle-worn to full hearts by dawn. The reserve is spent doing it: you wake healed, but hungrier than you lay down. Cooking well before bed is mechanically worth it."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phantoms",
+      "title": "Phantoms of the Heights",
+      "intro": "Insomnia is gone; phantoms get a territory instead of a grudge.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Phantoms never spawn because you skipped sleep. They are a natural nocturnal hazard with a territory: the high sky above Y=100 on any night, and everywhere under a new moon — one night in eight. Mountains and sky bases have a native guardian, new-moon nights are events worth planning around, and phantom membranes are earned by climbing, not by staying up out of spite.",
+            "Everything about the phantom itself stays vanilla — daylight burning, cat avoidance, drops — and the <code>doInsomnia</code> gamerule remains the master phantom switch."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "weariness",
+      "title": "Weariness",
+      "intro": "Three in-game days without sleep and your healing slows down.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Go three days (about one real hour) without rest and you become Weary: natural health regeneration heals 25% less until you sleep. It shows as an ordinary status-effect icon, and no monsters are ever sent after the sleepless — skipping rest is a choice the game respects, with a gentle, honest cost. Sleeping, or a Caffeinated Brew, clears it."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chronometer",
+      "title": "The Chronometer",
+      "intro": "A copper-and-redstone timepiece block whose signal tracks the sun.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Crafted from copper ingots, redstone, and a clock, the Chronometer emits a redstone signal that climbs with the hour: strength 1 at dawn, 8 at dusk, 15 in the last stretch before sunrise — each level lasting 80 seconds. Doors that bolt at dusk, lanterns that light at nightfall, farms on a schedule: time-of-day automation without daylight-sensor guesswork. Right-click it for the exact time and current signal."
+          ]
+        },
+        {
+          "type": "note",
+          "html": "In dimensions without a day-night cycle the Chronometer honestly emits nothing, and with <code>doDaylightCycle</code> off it freezes at the correct level."
+        }
+      ]
+    },
+    {
+      "id": "caffeinated-brew",
+      "title": "The Caffeinated Brew",
+      "intro": "A bitter campfire-steeped drink for deliberate all-nighters.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Steep two cocoa beans and leaves in a water bottle at a crafting table, then cook the bottle over a campfire for 30 seconds. Drinking it clears Weariness, resets your days-awake count, and grants 90 seconds of Haste I. It postpones rest but never replaces it — only a real night's sleep converts a supper into hearts. The brewing stand is never involved; this is one drink, not a potion system."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Better Together",
+      "intro": "With siblings from the Concord collection installed, Respite lights up further — never required, and with none installed nothing is missing.",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "<strong class='text-bone'>Tribulation</strong> — its difficulty scaling reaches Respite's phantoms automatically; a new-moon summit late in a hardened world is a genuine fight.",
+            "<strong class='text-bone'>Mercantile</strong> — village standing can put cocoa and the makings of the brew on a counter near you.",
+            "<strong class='text-bone'>Prosperity</strong> — a Chronometer or a bottle of the brew may turn up in a far-flung chest."
+          ]
+        }
+      ]
+    }
+  ]
+}

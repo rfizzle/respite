@@ -1,0 +1,86 @@
+{
+  "type": "home",
+  "nav": "Home",
+  "metaTitle": "Respite — Vitality Overhaul for Minecraft",
+  "metaDescription": "Respite is a Minecraft 1.21.1 Fabric mod in development that makes the night worth living through: sleep accelerates time instead of skipping it, supper heals you overnight, and phantoms guard the heights and the new moon.",
+  "ogTitle": "Respite — Vitality Overhaul for Minecraft",
+  "ogDescription": "A vitality overhaul for Minecraft 1.21.1 Fabric, in development. Sleep accelerates time instead of skipping it; the night becomes part of the game.",
+  "hero": {
+    "lede": "Make the night count.",
+    "sub": "Respite takes over the night: sleeping rushes time visibly past while furnaces smelt and crops grow, a hearty supper heals you overnight, and phantoms trade their insomnia grudge for a territory — the high peaks and the new moon.",
+    "buttons": [
+      { "label": "Read the Design", "href": "https://github.com/rfizzle/respite/blob/master/design/VISION.md", "primary": true, "external": true },
+      { "label": "Features", "href": "/features.html" },
+      { "label": "GitHub", "href": "https://github.com/rfizzle/respite", "external": true }
+    ]
+  },
+  "sections": [
+    {
+      "band": true,
+      "blocks": [
+        {
+          "type": "note",
+          "center": true,
+          "html": "Respite is <span class='text-accent2'>in development</span> — the behavior below is the committed spec, not yet a shipped jar. Watch <a href='https://github.com/rfizzle/respite/releases' class='text-accent hover:text-accent2 underline'>GitHub Releases</a> for the first build."
+        }
+      ]
+    },
+    {
+      "title": "The Night, Overhauled",
+      "band": true,
+      "lede": "Six systems that turn sleep from a skip button into part of the game. <a href='/features.html' class='text-accent hover:text-accent2 underline'>Full feature list →</a>",
+      "blocks": [
+        {
+          "type": "cards",
+          "mdColumns": 2,
+          "lgColumns": 3,
+          "hoverAccent": true,
+          "items": [
+            {
+              "icon": "&#127772;",
+              "title": "Continuous Time-Lapse",
+              "html": ["Sleeping accelerates time up to 60× instead of jumping to morning — furnaces smelt, crops grow, and the stars streak by while you rest."]
+            },
+            {
+              "icon": "&#127859;",
+              "title": "Restful Saturation",
+              "html": ["Go to bed on a full stomach and saturation converts to healing overnight — every 2 saturation restores a heart by dawn."]
+            },
+            {
+              "icon": "&#129415;",
+              "title": "Phantoms of the Heights",
+              "html": ["Insomnia is gone. Phantoms patrol above Y=100 on any night, and everywhere under a new moon — one night in eight."]
+            },
+            {
+              "icon": "&#128564;",
+              "title": "Weariness",
+              "html": ["Three days without rest slows your natural healing by 25% until you sleep. No monsters are ever sent after you."]
+            },
+            {
+              "icon": "&#128347;",
+              "title": "The Chronometer",
+              "html": ["A copper-and-redstone timepiece emitting signal 1–15 by time of day — doors that bolt at dusk, lamps at nightfall."]
+            },
+            {
+              "icon": "&#127861;",
+              "title": "The Caffeinated Brew",
+              "html": ["A campfire-steeped cocoa drink that clears Weariness and grants 90 seconds of Haste — all-nighters, done deliberately."]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Fair by Construction",
+      "lede": "On a server, every sleeper adds an equal share of the acceleration — two of four players in bed run the night at half the maximum. Nobody's sleep is wasted, and nobody's insomnia holds the whole server's night hostage.",
+      "ledeNarrow": true,
+      "blocks": [
+        {
+          "type": "note",
+          "center": true,
+          "html": "Part of <a href='https://concord.rfizzle.com' class='text-accent hover:text-accent2 underline'>Concord</a> — a modular collection of system overhauls. Install any, combine all; Respite is complete on its own."
+        }
+      ]
+    }
+  ]
+}

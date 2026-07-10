@@ -1,0 +1,55 @@
+{
+  "nav": "Developers",
+  "metaTitle": "Developers — Respite",
+  "metaDescription": "Respite's public API surface as specced: read-only accessors for time-lapse rate, rest state, and the Chronometer signal, plus two Fabric events.",
+  "title": "For Developers",
+  "lede": "Respite publishes a stable integration surface under <code>com.rfizzle.respite.api</code>, per the suite <a href='https://github.com/rfizzle/concord/blob/master/API-STANDARD.md' class='text-accent hover:text-accent2 underline'>API standard</a>: read-only static accessors, array-backed Fabric events, server-authoritative. Specced, pre-implementation — it lands with the first release.",
+  "width": "5xl",
+  "sections": [
+    {
+      "title": "Accessors",
+      "blocks": [
+        {
+          "type": "table",
+          "headers": ["Accessor", "Returns"],
+          "rows": [
+            ["<code>getTimeLapseRate(ServerLevel)</code>", "Effective time-lapse rate for the level; 1 when inactive"],
+            ["<code>isTimeLapseActive(ServerLevel)</code>", "True while extra ticks are running"],
+            ["<code>getTicksSinceRest(ServerPlayer)</code>", "The player's time-since-rest in ticks"],
+            ["<code>isWeary(ServerPlayer)</code>", "True if the player currently has the Weary effect"],
+            ["<code>getChronometerSignal(Level)</code>", "The Chronometer signal (1–15) for the level's day time; 0 in fixed-time dimensions"]
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Events",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "<code>RespiteTimeLapseCallback</code> — fires on every effective-rate change, including start and end, with sleeper counts.",
+            "<code>RespiteRestCallback</code> — fires when a player wakes at dawn having slept, with ticks slept and health restored."
+          ]
+        },
+        {
+          "type": "prose",
+          "html": [
+            "Consumption is the suite pattern: compile against the jar with <code>modCompileOnly</code> and guard every call site with <code>FabricLoader.getInstance().isModLoaded(\"respite\")</code>. Respite ships no HUD element and therefore no HUD accessors."
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Item IDs for integrations",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Respite is a provider in every current suite integration — sibling mods reference these stable IDs from their own datapacks: <code>respite:chronometer</code>, <code>respite:caffeinated_brew</code>, <code>respite:unsteeped_brew</code>."
+          ]
+        }
+      ]
+    }
+  ]
+}

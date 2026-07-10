@@ -1,0 +1,51 @@
+{
+  "nav": "Config",
+  "metaTitle": "Config — Respite",
+  "metaDescription": "Respite's full configuration reference as specced: time-lapse rate and budget, restful saturation, phantom rules, weariness, Chronometer, and brew options.",
+  "title": "Configuration",
+  "lede": "Every option, as specced in <a href='https://github.com/rfizzle/respite/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a> — the file is <code>config/respite.json</code>, created with defaults on first launch and hot-reloaded with <code>/respite reload</code>. Respite is in development; this table is the contract the implementation will ship against.",
+  "width": "5xl",
+  "sections": [
+    {
+      "title": "Server config",
+      "blocks": [
+        {
+          "type": "table",
+          "headers": ["Key", "Type", "Default", "Range", "Feature"],
+          "nowrapHeaders": true,
+          "rows": [
+            ["<code>enableTimeLapse</code>", "bool", "<code>true</code>", "—", "Time-lapse"],
+            ["<code>maxTimeLapseRate</code>", "int", "<code>60</code>", "2–100", "Time-lapse"],
+            ["<code>timeLapseTickBudgetMs</code>", "int", "<code>40</code>", "5–45", "Time-lapse"],
+            ["<code>announceTimeLapse</code>", "bool", "<code>true</code>", "—", "Time-lapse"],
+            ["<code>enableRestfulSaturation</code>", "bool", "<code>true</code>", "—", "Restful saturation"],
+            ["<code>restfulRequiresFullHunger</code>", "bool", "<code>true</code>", "—", "Restful saturation"],
+            ["<code>restfulHealIntervalTicks</code>", "int", "<code>600</code>", "100–2400", "Restful saturation"],
+            ["<code>enablePhantomRework</code>", "bool", "<code>true</code>", "—", "Phantoms"],
+            ["<code>phantomAltitudeMin</code>", "int", "<code>100</code>", "−64–320", "Phantoms"],
+            ["<code>phantomNewMoon</code>", "bool", "<code>true</code>", "—", "Phantoms"],
+            ["<code>enableWeariness</code>", "bool", "<code>true</code>", "—", "Weariness"],
+            ["<code>wearinessThresholdDays</code>", "int", "<code>3</code>", "1–30", "Weariness"],
+            ["<code>wearinessRegenPenalty</code>", "double", "<code>0.25</code>", "0.0–0.95", "Weariness"],
+            ["<code>enableChronometer</code>", "bool", "<code>true</code>", "—", "Chronometer"],
+            ["<code>enableCaffeinatedBrew</code>", "bool", "<code>true</code>", "—", "Brew"],
+            ["<code>brewHasteSeconds</code>", "int", "<code>90</code>", "0–600", "Brew"]
+          ],
+          "note": "Setting <code>enablePhantomRework</code> to <code>false</code> restores full vanilla insomnia. Disabling the Chronometer or brew removes their recipes; placed blocks and held items keep working."
+        }
+      ]
+    },
+    {
+      "title": "Client config",
+      "blocks": [
+        {
+          "type": "table",
+          "headers": ["Key", "Type", "Default", "Description"],
+          "rows": [
+            ["<code>showTimeLapseMessages</code>", "bool", "<code>true</code>", "Show the time-lapse action-bar lines on this client"]
+          ]
+        }
+      ]
+    }
+  ]
+}

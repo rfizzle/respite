@@ -1,0 +1,27 @@
+{
+  "id": "respite",
+  "name": "Respite",
+  "domain": "respite.rfizzle.com",
+  "url": "https://respite.rfizzle.com",
+  "description": "A vitality overhaul for Minecraft 1.21.1 (Fabric) — sleep, rest, and the passage of night. In development.",
+  "metaKeywords": "Minecraft, Fabric mod, sleep mod, time lapse, phantom rework, chronometer, vitality, 1.21.1",
+  "github": "https://github.com/rfizzle/respite",
+  "defaultBranch": "master",
+  "copyright": "© 2026 rfizzle. Respite is not affiliated with Mojang Studios or Microsoft.",
+  "footerMeta": "Minecraft 1.21.1 · Fabric",
+  "nav": [
+    "index",
+    "features",
+    "config",
+    "commands",
+    "developers",
+    "faq"
+  ],
+  "theme": {
+    "accent": "#7C8EE8",
+    "accentDark": "#4d5cb0",
+    "accent2": "#F2C14E",
+    "accent2Bright": "#FFE29A",
+    "glowRgb": "124, 142, 232"
+  }
+}
