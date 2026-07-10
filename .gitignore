@@ -63,3 +63,4 @@ art/audio/**/*.report.png
 
 # Repo-owned (outside the concord block): glyph render previews beside art/ masters
 art/*@*x.png
+__pycache__/

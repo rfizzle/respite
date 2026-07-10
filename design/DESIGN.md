@@ -20,7 +20,7 @@ The single motif object is a **hanging lantern** — warm light held against the
 
 ### Logo Description
 
-**Full Logo (`art/logo.png`):** Pixel art per the suite formula — dark stone brickwork frame, one central glowing motif object, mod name in blocky pixel type below. Inside the frame, a deep midnight-indigo night field (`#141a3d` shading up to `#232e66`). At center, a single iron-framed lantern hangs from a short chain anchored to the top of the frame, its panes glowing Candleglow (`#F2C14E`) with a soft pale halo (`#FFE29A`) that warms the nearest bricks. A handful of dim single-pixel stars are scattered sparsely in the field — never arranged into patterns or joined by lines. Below, "RESPITE" in blocky pixel type carrying the Moonlight gradient (`#7C8EE8` → `#A6B4FF`), with the subtitle "MINECRAFT VITALITY OVERHAUL".
+**Full Logo (`art/logo.png`):** Pixel art per the suite formula — dark stone brickwork, one central glowing motif in a circular medallion, mod name in blocky pixel type below. A full-bleed midnight brickwork wall (corner-vignetted, a handful of dim single-pixel stars scattered sparsely — never arranged into patterns or joined by lines) carries the icon's medallion at center-top: the indigo stone bezel with its Moonlight rim-glow around the hanging lantern. Below, "RESPITE" in beveled blocky pixel type carrying the Moonlight gradient (`#A6B4FF` → `#7C8EE8` → `#5562B8`) over an ink outline and soft glow, with the subtitle "MINECRAFT VITALITY OVERHAUL" in Candleglow. Composed deterministically by `art/glyphs/logo.gen.py` at 320×192 native, shipped at 1280×768 by integer upscale.
 
 **Icon (`art/icon-128.png`, `art/icon-512.png`):** The suite medallion — a circular indigo stone bezel lit from the upper left with a soft Moonlight rim-glow, around a midnight-indigo brickwork field. Centered inside, the hanging lantern: arched iron handle, flared cap brim, three glass panes between iron posts glowing radially from a warm flame core, flared foot slab — the nearest bricks warmed by the light. Composed programmatically by `art/glyphs/icon.gen.py` (true circles, tiling brick, radial glow; lantern structure traced from pixel-art reference renders) into `art/glyphs/icon.glyph`, rendered at 128 native and 512 by integer upscale.
 
@@ -68,19 +68,13 @@ The asset inventory — every source under `art/` and the final file it ships as
 
 ## 4. Generation Prompts
 
-The committed prompts for the non-glyph masters (Gemini); the mod icon is generated (`art/glyphs/icon.gen.py`) and the lantern glyph is `.glyph`-authored (`art/hud-icon-16.glyph`), so the logo is the only prompt-sourced master.
-
-**`art/logo.png`:**
-
-> Pixel art logo for a Minecraft mod named "RESPITE". A dark stone brickwork frame surrounds a deep midnight-indigo night sky (#141a3d to #232e66). At the center, a single iron-framed hanging lantern on a short chain glows warm golden-yellow (#F2C14E) with a soft pale halo (#FFE29A) that lights the nearest stone bricks. A few faint single-pixel stars are scattered sparsely — no constellations, no moon. Below the frame, "RESPITE" in a blocky pixel font with a soft indigo gradient (#7C8EE8 to #A6B4FF), and the subtitle "MINECRAFT VITALITY OVERHAUL" in small pixel type. Dark background (#0a0a0a). Crisp pixel art, limited palette, no anti-aliasing.
-
-**`art/icon-128.png` / `art/icon-512.png`** are not prompt-sourced: they are composed by `art/glyphs/icon.gen.py` into `art/glyphs/icon.glyph` and rendered through the pipeline — re-render by re-running the generator, per DESIGN-SYSTEM §8.
+No master is prompt-sourced: the logo and icon are composed deterministically by `art/glyphs/logo.gen.py` and `art/glyphs/icon.gen.py`, and the lantern glyph is `.glyph`-authored (`art/hud-icon-16.glyph`) — re-render any of them by re-running its generator or the pipeline, per DESIGN-SYSTEM §8. A Gemini prompt for an illustrated hero logo is retained as an exploration/upgrade path in `art/exploration/logo-gemini-prompt.md`.
 
 ---
 
 ## 5. Image References
 
-No exploration images are committed yet; `art/exploration/` is created with the first generation run, and rejected variants land beside their prompts there. The brand's in-game touchstones are vanilla's lantern sprite (the motif's native form), the dusk sky gradient (the palette's source), and the phantom's pale teal-grey (the antagonist the palette deliberately does not use).
+`art/exploration/` holds the pixel-art lantern reference renders the icon and logo lanterns were traced from — `lantern-ref-iron.png` (traced) and `lantern-ref-wood.png` (rejected variant) — beside the retained Gemini logo prompt. The brand's in-game touchstones are vanilla's lantern sprite (the motif's native form), the dusk sky gradient (the palette's source), and the phantom's pale teal-grey (the antagonist the palette deliberately does not use).
 
 ---
 
@@ -107,5 +101,4 @@ Suite standards: concord [`VISION.md`](../../concord/VISION.md), [`design/DESIGN
 
 ## Open Decisions
 
-- **Logo composition:** whether the lantern hangs from the frame's arch or sits on a stone sill — resolved at generation time by whichever silhouette reads better small.
 - **Weary icon:** half-lidded eye (current direction) vs. a guttering candle stub; decided when the glyph is authored against the vanilla effect-icon grid.
