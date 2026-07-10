@@ -1,0 +1,214 @@
+plugins {
+    id 'fabric-loom' version "${loom_version}"
+    id 'jacoco'
+}
+
+jacoco {
+    toolVersion = '0.8.12'
+}
+
+version = computeModVersion()
+group = project.maven_group
+
+tasks.register('printVersion') {
+    doLast { println project.version }
+}
+
+// Derives a SemVer-compliant version from `mod_version` plus the git state:
+//   - exact tag match (e.g. HEAD == v0.0.0) → "0.0.0"
+//   - exact tag, dirty tree                      → "0.0.0+dirty"
+//   - N commits past the last matching tag       → "0.0.0+N.gSHA[.dirty]"
+//   - no matching tag yet                        → "0.0.0+gSHA[.dirty]"
+//   - git unavailable or describe fails          → "0.0.0"
+// The base ("0.0.0") comes from gradle.properties and is bumped via
+// scripts/release.sh. Tag pattern is `v*`.
+def computeModVersion() {
+    def base = project.mod_version
+    def tagPrefix = "v"
+    def described = runGitDescribe(tagPrefix)
+    if (described == null || described.isEmpty()) {
+        return base
+    }
+    if (described == "${tagPrefix}${base}") {
+        return base
+    }
+    if (described == "${tagPrefix}${base}-dirty") {
+        return "${base}+dirty"
+    }
+    def postTag = described =~ /^\Q${tagPrefix}\E(\S+?)-(\d+)-g([0-9a-f]+)(-dirty)?$/
+    if (postTag.matches()) {
+        def commits = postTag[0][2]
+        def sha = postTag[0][3]
+        def dirty = postTag[0][4] ? '.dirty' : ''
+        return "${base}+${commits}.g${sha}${dirty}"
+    }
+    def shaOnly = described =~ /^([0-9a-f]+)(-dirty)?$/
+    if (shaOnly.matches()) {
+        def sha = shaOnly[0][1]
+        def dirty = shaOnly[0][2] ? '.dirty' : ''
+        return "${base}+g${sha}${dirty}"
+    }
+    return base
+}
+
+def runGitDescribe(String tagPrefix) {
+    try {
+        def proc = new ProcessBuilder('git', 'describe', '--tags',
+                '--match', "${tagPrefix}*", '--dirty', '--always')
+                .directory(rootDir)
+                .redirectErrorStream(true)
+                .start()
+        proc.waitFor()
+        def out = proc.inputStream.text.trim()
+        if (proc.exitValue() != 0) return null
+        return out
+    } catch (Exception ignored) {
+        return null
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+loom {
+    splitEnvironmentSourceSets()
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += [ "src/main/generated" ]
+        }
+    }
+    gametest {
+        compileClasspath += sourceSets.main.compileClasspath + sourceSets.main.output
+        runtimeClasspath += sourceSets.main.runtimeClasspath + sourceSets.main.output
+    }
+}
+
+configurations {
+    gametestImplementation.extendsFrom implementation
+    gametestRuntimeOnly.extendsFrom runtimeOnly
+}
+
+// Minecraft's GameTestServer aborts ("No test functions were given!") when zero @GameTest
+// functions are registered, so runGametest would fail CI until the first gametest lands.
+// Skip the run while the gametest source set is empty; it runs normally once tests exist.
+// Loom registers runGametest during afterEvaluate, so match it lazily rather than by name.
+tasks.matching { it.name == 'runGametest' }.configureEach {
+    onlyIf {
+        !sourceSets.gametest.allJava.files.isEmpty()
+    }
+}
+
+loom {
+    runs {
+        datagen {
+            inherit server
+            name "Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
+            vmArg "-Dfabric-api.datagen.modid=respite"
+            runDir "build/datagen"
+            // fabric-gametest-api's initializer eagerly instantiates every `fabric-gametest`
+            // entrypoint class on any server launch, so the datagen server needs the gametest source
+            // set on its classpath or it crashes with ClassNotFoundException before generating. The
+            // gametests only *register* here (they run under -Dfabric-api.gametest, which datagen omits).
+            source sourceSets.gametest
+        }
+        gametest {
+            server()
+            name "Game Test"
+            source sourceSets.gametest
+            vmArg "-Dfabric-api.gametest"
+            vmArg "-Dfabric-api.gametest.report-file=${layout.buildDirectory.file('junit-gametest.xml').get().asFile}"
+            runDir "build/gametest"
+        }
+    }
+}
+
+dependencies {
+    // Minecraft
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+
+    // Fabric
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    // Client source set
+    "clientImplementation"("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+
+    // Tests
+    testImplementation platform("org.junit:junit-bom:${project.junit_version}")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testImplementation "org.junit.jupiter:junit-jupiter-params"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+    // Knot-based classloader that boots Fabric before tests run — registries,
+    // item registrations, and onInitialize are available without Bootstrap.bootStrap().
+    testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
+}
+
+// With splitEnvironmentSourceSets, loom remaps fabric-api to *-common variants for the main
+// runtime classpath but leaves the unmapped fabric-api sibling on testRuntimeClasspath.
+// fabric-loader-junit then reads both the remapped (named) AW and the unmapped (intermediary)
+// AW and aborts on namespace mismatch. Dropping the unmapped sibling keeps the remapped
+// artifacts in place and lets the junit launcher boot.
+configurations.testRuntimeClasspath {
+    exclude group: 'net.fabricmc.fabric-api', module: 'fabric-api'
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+
+    exclude "**/.gitkeep"
+    exclude "**/.cache"
+}
+
+processClientResources {
+    exclude "**/.gitkeep"
+    exclude "**/.cache"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+
+    withSourcesJar()
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archives_base_name}" }
+    }
+    exclude "**/.gitkeep"
+    exclude "**/.cache"
+}
+
+tasks.named('sourcesJar') {
+    exclude "**/.gitkeep"
+    exclude "**/.cache"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

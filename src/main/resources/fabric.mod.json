@@ -1,0 +1,32 @@
+{
+    "schemaVersion": 1,
+    "id": "respite",
+    "version": "${version}",
+    "name": "Respite",
+    "description": "A vitality overhaul for Minecraft. Sleep accelerates time instead of skipping it, a hearty supper heals you overnight, phantoms guard the heights and the new moon, and the night becomes worth living through.",
+    "authors": ["rfizzle"],
+    "contact": {
+        "homepage": "https://respite.rfizzle.com",
+        "sources": "https://github.com/rfizzle/respite",
+        "issues": "https://github.com/rfizzle/respite/issues"
+    },
+    "license": "MIT",
+    "icon": "assets/respite/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": ["com.rfizzle.respite.Respite"],
+        "client": ["com.rfizzle.respite.client.RespiteClient"],
+        "fabric-gametest": [
+            "com.rfizzle.respite.gametest.RespiteSmokeGameTest"
+        ]
+    },
+    "mixins": [
+        "respite.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.16.10",
+        "minecraft": "~1.21.1",
+        "java": ">=21",
+        "fabric-api": "*"
+    }
+}
