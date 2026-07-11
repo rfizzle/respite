@@ -103,14 +103,32 @@ public class WearinessGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wearinessRegen", timeoutTicks = 300)
-    public void naturalRegenScalesByStage(GameTestHelper helper) {
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wearinessRegenFast", timeoutTicks = 300)
+    public void naturalRegenScalesTheFastBranchByStage(GameTestHelper helper) {
+        // Fast regen (food≥20, saturation>0): heals f/6 = 1.0 every 10 ticks.
+        runRegenScalingTest(helper, 20, 6.0f, 40);
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wearinessRegenSlow", timeoutTicks = 600)
+    public void naturalRegenScalesTheSlowBranchByStage(GameTestHelper helper) {
+        // Slow regen (food 18–19, no saturation): heals 1.0 every 80 ticks — the
+        // second FoodData#tick heal call site the un-ordinal'd wrap must also catch
+        // (SPEC §4.3, both natural-regen branches). Guards against a future MC
+        // reorder that would silently leave one call site unscaled.
+        runRegenScalingTest(helper, 19, 0.0f, 120);
+    }
+
+    /**
+     * Drive one fresh player through each stage in turn — rested, Weary, Exhausted —
+     * with {@code food}/{@code saturation} chosen to select a specific regen branch,
+     * and assert the first natural-regen heal's magnitude scales by that stage's
+     * factor. Fresh players per phase so the vanilla regen tick timer starts clean.
+     */
+    private void runRegenScalingTest(GameTestHelper helper, int food, float saturation, int perPhaseBudget) {
         MockPlayers.retireLeaked(helper);
         RespiteConfig config = RespiteConfig.get();
-        float wearyHeal = 1.0f * (float) (1.0 - config.wearinessRegenPenalty); // 0.75 of a full heal
-        float exhaustedHeal = 1.0f * (float) (1.0 - config.exhaustedRegenPenalty); // 0.50
-        // Three windows, each on a fresh player so the fast-regen tick timer starts clean:
-        // measure the first natural-regen heal's magnitude under each stage.
+        float wearyHeal = (float) (1.0 - config.wearinessRegenPenalty);      // 0.75 of a full heal
+        float exhaustedHeal = (float) (1.0 - config.exhaustedRegenPenalty);  // 0.50
         float[] expected = {1.0f, wearyHeal, exhaustedHeal};
         long[] statFor = {0, dayTicks(config.wearinessThresholdDays), dayTicks(config.exhaustedThresholdDays)};
         String[] label = {"rested heals a full 1.0", "Weary heals 0.75", "Exhausted heals 0.50"};
@@ -133,13 +151,15 @@ public class WearinessGameTest implements FabricGameTest {
                     setTimeSinceRest(current[0], statFor[phase[0]]);
                     WearinessHandler.sweepPlayer(current[0], config);
                 }
-                primeForFastRegen(current[0]);
+                current[0].getFoodData().setFoodLevel(food);
+                current[0].getFoodData().setSaturation(saturation);
+                current[0].setHealth(10.0f);
                 budget[0] = 0;
             }
             ServerPlayer player = current[0];
-            // Re-prime the branch's inputs (not health), then drive one awake body tick.
-            player.getFoodData().setFoodLevel(20);
-            player.getFoodData().setSaturation(6.0f);
+            // Re-assert the branch's inputs (not health) so it stays selected to the heal.
+            player.getFoodData().setFoodLevel(food);
+            player.getFoodData().setSaturation(saturation);
             float before = player.getHealth();
             player.doTick();
             float healed = player.getHealth() - before;
@@ -154,10 +174,35 @@ public class WearinessGameTest implements FabricGameTest {
                 }
                 return;
             }
-            if (++budget[0] > 40) {
-                helper.fail(label[phase[0]] + ": no natural-regen heal fired within 40 ticks");
+            if (++budget[0] > perPhaseBudget) {
+                helper.fail(label[phase[0]] + ": no natural-regen heal fired within " + perPhaseBudget + " ticks");
             }
         }));
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wearinessDisableClears", timeoutTicks = 100)
+    public void disablingLiftsAnExistingStage(GameTestHelper helper) {
+        MockPlayers.retireLeaked(helper);
+        RespiteConfig config = RespiteConfig.get();
+        boolean savedEnable = config.enableWeariness;
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
+        Runnable cleanup = () -> {
+            config.enableWeariness = savedEnable;
+            MockPlayers.retire(player);
+        };
+        guarded(cleanup, () -> {
+            config.enableWeariness = true;
+            setTimeSinceRest(player, dayTicks(config.exhaustedThresholdDays));
+            WearinessHandler.sweepPlayer(player, config);
+            assertStage(helper, player, false, true, "an exhausted stat applies Exhausted while enabled");
+            // Feature off must reconcile to none — not leave a stuck indefinite marker
+            // (the vanilla-parity-when-off guarantee).
+            config.enableWeariness = false;
+            WearinessHandler.sweepPlayer(player, config);
+            assertStage(helper, player, false, false, "disabling the feature strips the lingering stage");
+            cleanup.run();
+            helper.succeed();
+        });
     }
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wearinessScope", timeoutTicks = 100)
@@ -202,12 +247,14 @@ public class WearinessGameTest implements FabricGameTest {
                 setTimeSinceRest(player, dayTicks(config.exhaustedThresholdDays));
                 WearinessHandler.sweepPlayer(player, config);
                 assertStage(helper, player, false, false, "the feature off applies neither stage");
-                // A lingering effect (e.g. from a command) must not scale regen while off.
-                player.addEffect(new MobEffectInstance(
-                        RespiteRegistry.EXHAUSTED, MobEffectInstance.INFINITE_DURATION, 0, true, false, true));
                 primeForFastRegen(player);
                 return;
             }
+            // A lingering effect (e.g. from a command) must not scale regen while off.
+            // Re-assert it each tick so the disabled reconcile can't strip it before
+            // the heal — the point is that the penalty is inert, not that the icon shows.
+            player.addEffect(new MobEffectInstance(
+                    RespiteRegistry.EXHAUSTED, MobEffectInstance.INFINITE_DURATION, 0, true, false, true));
             player.getFoodData().setFoodLevel(20);
             player.getFoodData().setSaturation(6.0f);
             float before = player.getHealth();

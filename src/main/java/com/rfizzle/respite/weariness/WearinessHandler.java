@@ -5,6 +5,7 @@ import com.rfizzle.respite.config.RespiteConfig;
 import com.rfizzle.respite.registry.RespiteRegistry;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,8 +24,12 @@ import net.minecraft.world.effect.MobEffectInstance;
  *
  * <p>Interval-gated so a server pays only a counter increment on the other
  * ninety-nine ticks, and gated on {@code enableWeariness} so a server with the
- * feature off pays nothing beyond that. All state is server-thread-only; the
- * counter zeroes on {@code SERVER_STOPPED}.
+ * feature off pays nothing beyond that. Turning the feature off must leave
+ * behaviorally-vanilla state, not a stuck indefinite marker: the effects are
+ * reconciled to none on the enabled→disabled edge and again for any player who
+ * logs in while the feature is off, so a marker never outlives the toggle. All
+ * state is server-thread-only; the counter and the edge latch zero on
+ * {@code SERVER_STOPPED}.
  */
 public final class WearinessHandler {
 
@@ -32,6 +37,13 @@ public final class WearinessHandler {
     static final int SWEEP_INTERVAL_TICKS = 100;
 
     private static int tickCounter;
+
+    /**
+     * The feature's state at the previous sweep, so the enabled→disabled
+     * transition can strip lingering markers exactly once and a stably-disabled
+     * server then pays nothing but the counter increment.
+     */
+    private static boolean wasEnabled;
 
     /**
      * This real tick's config snapshot, per {@code RespiteConfig.get()}'s rule.
@@ -48,8 +60,21 @@ public final class WearinessHandler {
     public static void register() {
         ServerTickEvents.START_SERVER_TICK.register(server -> tickConfig = RespiteConfig.get());
         ServerTickEvents.END_SERVER_TICK.register(WearinessHandler::onEndTick);
+        // A player logging in while the feature is off must not carry a marker
+        // persisted from a session when it was on — reconcile them on join. With
+        // the feature on this also settles the correct stage immediately, rather
+        // than leaving it to the next sweep.
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            try {
+                sweepPlayer(handler.player, RespiteConfig.get());
+            } catch (Exception e) {
+                Respite.LOGGER.error("Weariness join reconcile failed for {}",
+                        handler.player.getName().getString(), e);
+            }
+        });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             tickCounter = 0;
+            wasEnabled = false;
             tickConfig = null;
         });
     }
@@ -67,8 +92,20 @@ public final class WearinessHandler {
         tickCounter = 0;
         RespiteConfig config = config();
         if (!config.enableWeariness) {
+            if (wasEnabled) {
+                // Enabled→disabled edge: strip any lingering markers once, so an
+                // online player mid-stage when the feature was switched off ends up
+                // behaviorally vanilla. A stably-disabled server never reaches here.
+                wasEnabled = false;
+                sweepAll(server, config);
+            }
             return;
         }
+        wasEnabled = true;
+        sweepAll(server, config);
+    }
+
+    private static void sweepAll(MinecraftServer server, RespiteConfig config) {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             try {
                 sweepPlayer(player, config);
@@ -80,14 +117,16 @@ public final class WearinessHandler {
 
     /**
      * Bring one player's effects in line with their {@code TIME_SINCE_REST}. The
-     * live sweep's per-player unit, and the seam gametests drive directly — mock
-     * players never enter the server player list, so the in-world tests apply the
-     * stage through this call rather than the tick loop. Self-contained on the
-     * feature toggle (the tick loop gates too, to skip the whole player scan): with
-     * the feature off it applies nothing, so the effect is never asserted (§4).
+     * live sweep's per-player unit, and the seam gametests and the join reconcile
+     * drive directly. Self-contained on the feature toggle: with the feature off
+     * it reconciles to none (stripping any marker left over from when it was on),
+     * so a toggle-off leaves behaviorally-vanilla state rather than a stuck
+     * indefinite effect (§4). The tick loop still gates before the player scan, so
+     * a stably-disabled server never calls this at all.
      */
     public static void sweepPlayer(ServerPlayer player, RespiteConfig config) {
         if (!config.enableWeariness) {
+            applyStage(player, WearinessStage.NONE);
             return;
         }
         long ticksSinceRest = player.getStats().getValue(Stats.CUSTOM, Stats.TIME_SINCE_REST);

@@ -14,12 +14,12 @@ import org.spongepowered.asm.mixin.injection.At;
 /**
  * Weariness's healing penalty ({@code design/SPEC.md} §4.3): while a player is
  * Weary or Exhausted, food-based natural regeneration heals {@code × (1 − penalty)}.
- * Both natural-regen heal calls in {@code FoodData#tick} — the food≥20 saturated
- * fast regen and the food≥18 slow regen — flow through the same
- * {@code Player#heal(F)} invocation, so one un-ordinal'd wrap scales every
- * natural-regen heal and nothing else: instant health, the Regeneration effect,
- * beacon and peaceful regen, and Restful Saturation's conversion all heal through
- * other call sites and are untouched.
+ * {@code FoodData#tick} has two natural-regen heal call sites — the food≥20
+ * saturated fast regen and the food≥18 slow regen — and both resolve to the same
+ * {@code Player#heal(F)} target, so one un-ordinal'd wrap matches both call sites
+ * and scales every natural-regen heal and nothing else: instant health, the
+ * Regeneration effect, beacon and peaceful regen, and Restful Saturation's
+ * conversion all heal through other call sites and are untouched.
  *
  * <p>{@code @WrapOperation} (not {@code @Redirect}) so the wrap composes with
  * other mods that touch these calls, and so the {@code Player} is in scope to
