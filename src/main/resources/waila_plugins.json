@@ -1,0 +1,11 @@
+{
+    "respite:wthit": {
+        "entrypoints": {
+            "client": "com.rfizzle.respite.compat.wthit.WthitClientPlugin"
+        },
+        "side": "*",
+        "required": {
+            "wthit": "*"
+        }
+    }
+}

@@ -17,6 +17,7 @@
         "main": ["com.rfizzle.respite.Respite"],
         "client": ["com.rfizzle.respite.client.RespiteClient"],
         "modmenu": ["com.rfizzle.respite.compat.modmenu.ModMenuIntegration"],
+        "jade": ["com.rfizzle.respite.compat.jade.RespiteJadePlugin"],
         "fabric-gametest": [
             "com.rfizzle.respite.gametest.RespiteSmokeGameTest"
         ]

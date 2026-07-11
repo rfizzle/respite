@@ -83,6 +83,14 @@ repositories {
             includeGroup 'maven.modrinth'
         }
     }
+    maven {
+        name = 'Bai'
+        url = 'https://maven2.bai.lol'
+        content {
+            includeGroup 'lol.bai'
+            includeGroup 'mcp.mobius.waila'
+        }
+    }
 }
 
 loom {
@@ -163,6 +171,17 @@ dependencies {
 
     modCompileOnly "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
     modLocalRuntime "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
+
+    // Jade — no api split is published; compile-only links the full jar but only the
+    // snownee.jade.api surface is referenced. Full jar in the dev client so the
+    // Chronometer line can be eyeballed in-game.
+    modCompileOnly "maven.modrinth:jade:${project.jade_version}"
+    modLocalRuntime "maven.modrinth:jade:${project.jade_version}"
+
+    // WTHIT — compile against the API split only; discovered via waila_plugins.json at
+    // runtime. No modLocalRuntime: Jade is the probe in the dev client, and two probe
+    // overlays loaded together double-render the same box.
+    modCompileOnly "mcp.mobius.waila:wthit-api:${project.wthit_version}"
 
     // Tests
     testImplementation platform("org.junit:junit-bom:${project.junit_version}")
