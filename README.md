@@ -19,6 +19,16 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
 
 ## Shipped so far
 
+- **Continuous Time-Lapse** — sleeping accelerates time instead of skipping it.
+  Each sleeper adds an equal share of the speed (up to 60× with everyone in
+  bed), and the world genuinely runs through the compressed night: furnaces
+  smelt, crops grow, weather rains itself out, and dawn arrives watched rather
+  than skipped. Awake players keep real time in their own body, a nearby fight
+  holds time at normal pace until it's settled, and a struggling server
+  degrades gracefully under a per-tick millisecond budget. Action-bar lines
+  and a start/settle sound pair mark the lapse — both toggleable.
+  `enableTimeLapse = false` restores the entire vanilla sleep system,
+  `playersSleepingPercentage` included.
 - **The Chronometer** — a copper-and-redstone timepiece block. It emits redstone
   power 1–15 that climbs with the hour (each level lasts 80 seconds; comparators
   read the same value), its dial face sweeps the sun and moon across the day,
