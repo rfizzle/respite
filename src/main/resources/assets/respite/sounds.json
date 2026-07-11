@@ -1,0 +1,10 @@
+{
+  "ui.time_lapse.start": {
+    "sounds": ["respite:ui/time_lapse_start"],
+    "subtitle": "subtitles.respite.time_lapse_start"
+  },
+  "ui.time_lapse.end": {
+    "sounds": ["respite:ui/time_lapse_end"],
+    "subtitle": "subtitles.respite.time_lapse_end"
+  }
+}

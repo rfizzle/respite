@@ -1,6 +1,13 @@
 {
   "block.respite.chronometer": "Chronometer",
 
+  "notification.respite.time_lapse": "✦ Time ×%s — %s of %s asleep",
+  "notification.respite.time_lapse_end": "✦ Time settles",
+  "notification.respite.time_hold": "✦ Time holds — battle nearby",
+
+  "subtitles.respite.time_lapse_start": "Time quickens",
+  "subtitles.respite.time_lapse_end": "Time settles",
+
   "notification.respite.chronometer": "✦ %s — signal %s",
   "notification.respite.chronometer_night": "✦ %s — signal %s — %s, new moon in %s nights",
   "notification.respite.chronometer_new_moon": "✦ %s — signal %s — new moon tonight",
