@@ -2,6 +2,7 @@ package com.rfizzle.respite;
 
 import com.rfizzle.respite.config.RespiteConfig;
 import com.rfizzle.respite.registry.RespiteRegistry;
+import com.rfizzle.respite.restful.RestfulSleepHandler;
 import com.rfizzle.respite.timelapse.TimeLapseEngine;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.ResourceLocation;
@@ -25,6 +26,8 @@ public class Respite implements ModInitializer {
         RespiteRegistry.register();
 
         TimeLapseEngine.register();
+
+        RestfulSleepHandler.register();
 
         LOGGER.info("Respite initialized — make the night count.");
     }
