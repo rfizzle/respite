@@ -5,6 +5,7 @@
     "compatibilityLevel": "JAVA_21",
     "mixins": [
         "FoodDataMixin",
+        "FoodDataRegenMixin",
         "MobMixin",
         "PlayerMixin",
         "ServerLevelMixin",
