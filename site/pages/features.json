@@ -52,12 +52,13 @@
     {
       "id": "weariness",
       "title": "Weariness",
-      "intro": "Three in-game days without sleep and your healing slows down.",
+      "intro": "Sleeplessness wears you down in two honest steps — slower healing, never monsters.",
       "blocks": [
         {
           "type": "prose",
           "html": [
-            "Go three days (about one real hour) without rest and you become Weary: natural health regeneration heals 25% less until you sleep. It shows as an ordinary status-effect icon, and no monsters are ever sent after the sleepless — skipping rest is a choice the game respects, with a gentle, honest cost. Sleeping, or a Caffeinated Brew, clears it."
+            "Go three in-game days (about one real hour) without rest and you become Weary: natural health regeneration heals 25% less. Push on to six and you become Exhausted: regeneration heals 50% less, and every couple of minutes your eyelids droop — the screen dims from top and bottom for about half a second, never full black and never in a fight. Only one stage is ever active, each an ordinary status-effect icon; no monsters are ever sent after the sleepless. Skipping rest is a choice the game respects, with a gentle, honest cost.",
+            "Any night's sleep — a catnap counts — resets your days-awake count and lifts both stages, as does dying or drinking a Caffeinated Brew. Only vanilla's food-driven healing is slowed: potions, beacons, instant health, and overnight Restful Saturation are untouched. The eyelid blink is cosmetic and client-side; it hides with F1 and switches off on its own toggle."
           ]
         }
       ]

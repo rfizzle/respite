@@ -221,7 +221,7 @@ Client: `showExhaustionBlink` (see Configuration).
 ### Implementation Notes
 
 - `WearyEffect` and `ExhaustedEffect` extend `MobEffect` (neutral), registered `respite:weary` / `respite:exhausted`; a 100-tick server task sweeps online players' `Stats.TIME_SINCE_REST` and applies the matching stage, removing the other.
-- The regen scale hooks the natural-regeneration branch of `FoodData#tick` (the `heal` call gated on food ≥ 18), not `LivingEntity#heal` generally — the penalty must never touch potion or beacon healing; the factor resolves from the active stage.
+- The regen scale wraps both natural-regeneration heal calls in `FoodData#tick` — the food≥20 saturated fast regen and the food≥18 slow regen, both `Player#heal(F)` — not `LivingEntity#heal` generally, so the penalty follows every food-driven heal (a well-fed player included) but never touches potion, beacon, instant, or Restful Saturation healing, which all heal through other call sites. The factor resolves from the active stage.
 - The blink is client-only: a screen-space gradient fill (no texture) drawn from a `HudRenderCallback`, keyed off the synced `respite:exhausted` effect instance; the jitter timer and combat-suppression window (local hurt/attack observations) live on the client, and nothing is networked beyond the vanilla effect sync.
 
 ---
