@@ -2,6 +2,8 @@ package com.rfizzle.respite.registry;
 
 import com.rfizzle.respite.Respite;
 import com.rfizzle.respite.block.ChronometerBlock;
+import com.rfizzle.respite.condition.FeatureEnabledCondition;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -52,6 +54,9 @@ public final class RespiteRegistry {
         // components — the vanilla tab, not a one-block mod tab.
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS)
                 .register(entries -> entries.accept(CHRONOMETER));
+
+        // Datapack-side feature gates (recipes and their unlock advancements).
+        ResourceConditions.register(FeatureEnabledCondition.TYPE);
     }
 
     private static <T extends Block> T registerBlock(String name, T block, Item.Properties itemProperties) {

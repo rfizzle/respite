@@ -122,6 +122,43 @@ class ChronometerResourceContractTest {
     }
 
     @Test
+    void recipeMatchesTheSpecGridAndCarriesTheFeatureGate() throws IOException {
+        JsonObject recipe = load(RESOURCES.resolve("data/respite/recipe/chronometer.json"));
+        assertConditionGated(recipe, "recipe");
+        assertEquals("minecraft:crafting_shaped", recipe.get("type").getAsString());
+        var pattern = recipe.getAsJsonArray("pattern");
+        assertEquals("CCC", pattern.get(0).getAsString());
+        assertEquals("RKR", pattern.get(1).getAsString());
+        assertEquals("SSS", pattern.get(2).getAsString());
+        JsonObject key = recipe.getAsJsonObject("key");
+        assertEquals("minecraft:copper_ingot", key.getAsJsonObject("C").get("item").getAsString());
+        assertEquals("minecraft:redstone", key.getAsJsonObject("R").get("item").getAsString());
+        assertEquals("minecraft:clock", key.getAsJsonObject("K").get("item").getAsString());
+        assertEquals("minecraft:smooth_stone", key.getAsJsonObject("S").get("item").getAsString());
+        JsonObject result = recipe.getAsJsonObject("result");
+        assertEquals("respite:chronometer", result.get("id").getAsString());
+        assertEquals(1, result.get("count").getAsInt());
+    }
+
+    @Test
+    void recipeUnlockAdvancementCarriesTheSameFeatureGate() throws IOException {
+        JsonObject advancement =
+                load(RESOURCES.resolve("data/respite/advancement/recipes/redstone/chronometer.json"));
+        assertConditionGated(advancement, "unlock advancement");
+        assertEquals("respite:chronometer",
+                advancement.getAsJsonObject("rewards").getAsJsonArray("recipes").get(0).getAsString(),
+                "the unlock advancement must reward exactly the gated recipe");
+    }
+
+    /** Both datapack entries must gate on {@code respite:feature_enabled} for the chronometer. */
+    private static void assertConditionGated(JsonObject json, String what) {
+        assertTrue(json.has("fabric:load_conditions"), what + " must carry fabric:load_conditions");
+        JsonObject condition = json.getAsJsonArray("fabric:load_conditions").get(0).getAsJsonObject();
+        assertEquals("respite:feature_enabled", condition.get("condition").getAsString(), what);
+        assertEquals("chronometer", condition.get("feature").getAsString(), what);
+    }
+
+    @Test
     void itemModelParentsABlockModel() throws IOException {
         Path itemModel = RESOURCES.resolve("assets/respite/models/item/chronometer.json");
         assertTrue(Files.exists(itemModel), "the BlockItem needs an item model");
