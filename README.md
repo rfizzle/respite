@@ -29,6 +29,15 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
   and a start/settle sound pair mark the lapse — both toggleable.
   `enableTimeLapse = false` restores the entire vanilla sleep system,
   `playersSleepingPercentage` included.
+- **Restful Saturation** — going to bed on a full hunger bar arms the night:
+  while you sleep, every 600 world ticks converts 1 point of saturation into
+  half a heart — up to 10 hearts across a full night, and double per point
+  under a new moon, when sleep runs deepest. Vanilla food regeneration stands
+  down in bed (the conversion replaces it) and the hunger bar never drops
+  overnight; healing stops at the saturation floor, full health, or leaving
+  the bed, and waking three hearts richer earns a quiet action-bar line. The
+  time-lapse compresses the wait, never the totals.
+  `enableRestfulSaturation = false` leaves sleep behaviorally vanilla.
 - **The Chronometer** — a copper-and-redstone timepiece block. It emits redstone
   power 1–15 that climbs with the hour (each level lasts 80 seconds; comparators
   read the same value), its dial face sweeps the sun and moon across the day,
