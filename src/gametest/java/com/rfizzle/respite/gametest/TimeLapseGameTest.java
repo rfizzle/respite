@@ -154,6 +154,8 @@ public class TimeLapseGameTest implements FabricGameTest {
                     cleanup.run();
                     helper.succeed();
                 }
+            } else if (t >= 80) {
+                helper.fail("sampling never completed after 80 real ticks");
             }
         }));
     }
@@ -200,6 +202,8 @@ public class TimeLapseGameTest implements FabricGameTest {
                 helper.assertTrue(now < 23000L, "still night — a skip would have landed at morning");
                 cleanup.run();
                 helper.succeed();
+            } else if (t > 160) {
+                helper.fail("the 140-real-tick checkpoint never fired");
             }
         }));
     }
@@ -221,7 +225,8 @@ public class TimeLapseGameTest implements FabricGameTest {
             if (!newRealTick(lastRealTick)) {
                 return;
             }
-            switch (++realTick[0]) {
+            int t = ++realTick[0];
+            switch (t) {
                 case 2 -> sleepInBed(helper, sleeper);
                 case 6 -> {
                     helper.assertTrue(TimeLapseEngine.getSleeping() == 1,
@@ -246,6 +251,9 @@ public class TimeLapseGameTest implements FabricGameTest {
                     helper.succeed();
                 }
                 default -> {
+                    if (t >= 60) {
+                        helper.fail("the phase machine stalled before tick 13 completed");
+                    }
                 }
             }
         }));
@@ -271,7 +279,8 @@ public class TimeLapseGameTest implements FabricGameTest {
             if (!newRealTick(lastRealTick)) {
                 return;
             }
-            switch (++realTick[0]) {
+            int t = ++realTick[0];
+            switch (t) {
                 case 2 -> sleepInBed(helper, sleeper);
                 case 6 -> {
                     helper.assertTrue(TimeLapseEngine.getEffectiveRate() > 1,
@@ -298,6 +307,9 @@ public class TimeLapseGameTest implements FabricGameTest {
                     helper.succeed();
                 }
                 default -> {
+                    if (t >= 250) {
+                        helper.fail("the phase machine stalled before tick 135 completed");
+                    }
                 }
             }
         }));
@@ -363,6 +375,8 @@ public class TimeLapseGameTest implements FabricGameTest {
                         "an awake player's hunger must not move on extra ticks");
                 cleanup.run();
                 helper.succeed();
+            } else if (t >= 80) {
+                helper.fail("the tick-32 checkpoint never fired");
             }
         }));
     }
