@@ -1,0 +1,58 @@
+# respite — chronometer top/bottom cap (copper ring, redstone core)
+size: 32
+
+legend:
+  K ink                      # #0a0a0a selective outline
+  1 #eb8a5c                  # copper highlight
+  2 #c96a43                  # copper
+  3 #9c4e2f                  # copper shadow
+  4 #7a3a22                  # copper occlusion
+  a #b8b8b8                  # smooth stone highlight
+  b #9e9e9e                  # smooth stone
+  c #808080                  # smooth stone shadow
+  d #636363                  # smooth stone occlusion
+  N #232838                  # dial recess (night slate)
+  n #1a1f2e                  # dial recess deep
+  w #46527e                  # recess star speck
+  S respite.candleglow-pale  # sun highlight
+  s respite.candleglow       # sun body
+  t #d99a2b                  # sun shadow
+  M respite.moonlight-bright # moon highlight
+  m respite.moonlight        # moon body
+  u #5a68b8                  # moon shadow
+  R #e04635                  # redstone inlay bright
+  r #b3271e                  # redstone inlay
+
+grid:
+  11111111111111111111111111111112
+  12222222222222222222222222222234
+  12aaaaaaaaaaaaaaaaaaaaaaaaaaac34
+  12a12bbbbbabbbbbbbbbcbbbbbb12c34
+  12a24bbbbbbbbbcbbbbabbbbbbb24c34
+  12abbbbbcbbabbbbbbbbbbbbbbbcac34
+  12aabbbbbbbbbbbbbbbbacbbbbbbbc34
+  12abbbbbbbbbabbcbbbbbbbbbbbbbc34
+  12ababbbbcbbbbb22bbbbabbbbbbcc34
+  12acbbbbbbbb22222222bbcbbbbbbc34
+  12abbabbbbb222bbcb222babbbbbbc34
+  12abbbbbbb22bbabbbbb33bbbbbbbc34
+  12abcbabb22bbbbbbbbbb33abbbbbc34
+  12abbbbbb22bbbbabcbbb33bbbbbbc34
+  12abbbbab2bcbbbrrbbbbb3babbbbc34
+  12abbcbb22bbbbrRRrbbbb33cbbbbc34
+  12abbbbb22bbbbrRRrcbbb33babbbc34
+  12abbbbbb2bbcbbrrabbbb3bbbbbbc34
+  12abbbcbb22bbbbbbbbbb33bbcabbc34
+  12abbbbbb22bbbbbbbacb33bbbbbbc34
+  12abbbbbbb23bcbbbbbb33bbbbbabc34
+  12abbbbcbbb333bbbb333bbbbbcbbc34
+  12abbbbbbbba33333333cbbbbbbbac34
+  12aabbbbbbbbbbc33bbbabbbbbbbbc34
+  12abbbbbcbbbabbbbbbbbbbbbbbcbc34
+  12ababbbbbbbbbbbbbbbbabbbbbbbc34
+  12abbbbbbbbbbabcbbbbbbbbbbbbbc34
+  12a12abbbcbbbbbbbbbbbbabbbb12c34
+  12a24bbbbbbbbbabbbbbbbcbbbb24c34
+  12dddddddddddddddddddddddddddc34
+  13333333333333333333333333333334
+  24444444444444444444444444444444

@@ -115,6 +115,12 @@ class ChronometerResourceContractTest {
                 String texture = textures.get(slot).getAsString();
                 if (!texture.startsWith("respite:block/chronometer_")) {
                     problems.add(model + " texture slot '" + slot + "' points outside the chronometer set: " + texture);
+                    continue;
+                }
+                Path texturePath = RESOURCES.resolve(
+                        "assets/respite/textures/block/" + texture.substring("respite:block/".length()) + ".png");
+                if (!Files.exists(texturePath)) {
+                    problems.add(model + " references missing texture " + texture);
                 }
             }
         }
