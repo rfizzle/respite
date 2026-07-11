@@ -3,14 +3,17 @@ package com.rfizzle.respite.registry;
 import com.rfizzle.respite.Respite;
 import com.rfizzle.respite.block.ChronometerBlock;
 import com.rfizzle.respite.condition.FeatureEnabledCondition;
+import com.rfizzle.respite.effect.WearinessEffect;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
@@ -45,6 +48,13 @@ public final class RespiteRegistry {
     public static final SoundEvent TIME_LAPSE_END =
             SoundEvent.createVariableRangeEvent(Respite.id("ui.time_lapse.end"));
 
+    // The two weariness stages (design/SPEC.md §4). Muted Moonlight-indigo tint —
+    // ambient with no particles, so the colour only ever shows in the icon frame.
+    // Holders are assigned in register(); the sweep applies them and the regen
+    // mixin reads them off the player to resolve the active stage.
+    public static Holder<MobEffect> WEARY;
+    public static Holder<MobEffect> EXHAUSTED;
+
     private static boolean registered;
 
     private RespiteRegistry() {
@@ -61,6 +71,9 @@ public final class RespiteRegistry {
         registerSound(TIME_LAPSE_START);
         registerSound(TIME_LAPSE_END);
 
+        WEARY = registerEffect("weary", new WearinessEffect(0x5A5A82));
+        EXHAUSTED = registerEffect("exhausted", new WearinessEffect(0x3A3A5A));
+
         // A redstone component belongs where builders look for redstone
         // components — the vanilla tab, not a one-block mod tab.
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS)
@@ -72,6 +85,10 @@ public final class RespiteRegistry {
 
     private static void registerSound(SoundEvent event) {
         Registry.register(BuiltInRegistries.SOUND_EVENT, event.getLocation(), event);
+    }
+
+    private static Holder<MobEffect> registerEffect(String name, MobEffect effect) {
+        return Registry.registerForHolder(BuiltInRegistries.MOB_EFFECT, Respite.id(name), effect);
     }
 
     private static <T extends Block> T registerBlock(String name, T block, Item.Properties itemProperties) {

@@ -1,6 +1,9 @@
 {
   "block.respite.chronometer": "Chronometer",
 
+  "effect.respite.weary": "Weary",
+  "effect.respite.exhausted": "Exhausted",
+
   "notification.respite.time_lapse": "✦ Time ×%s — %s of %s asleep",
   "notification.respite.time_lapse_end": "✦ Time settles",
   "notification.respite.time_hold": "✦ Time holds — battle nearby",
