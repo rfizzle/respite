@@ -38,6 +38,16 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
   the bed, and waking three hearts richer earns a quiet action-bar line. The
   time-lapse compresses the wait, never the totals.
   `enableRestfulSaturation = false` leaves sleep behaviorally vanilla.
+- **Weariness** — sleeplessness wears you down in two stages. Three days without
+  rest makes you Weary (natural healing 25% slower); six makes you Exhausted (50%
+  slower), and your eyelids droop — a cosmetic half-second screen dim every
+  couple of minutes, never full black and never within ten seconds of a fight.
+  Exactly one stage shows at a time as an ordinary status-effect icon; only
+  vanilla's food-driven regen is slowed (potions, beacons, instant health, and
+  Restful Saturation are untouched), and no monsters are ever sent after the
+  sleepless. Sleeping, dying, or a Caffeinated Brew clears both stages. The
+  eyelid blink hides with F1 and toggles off with `showExhaustionBlink`;
+  `enableWeariness = false` removes the effects and the penalty entirely.
 - **The Chronometer** — a copper-and-redstone timepiece block. It emits redstone
   power 1–15 that climbs with the hour (each level lasts 80 seconds; comparators
   read the same value), its dial face sweeps the sun and moon across the day,
