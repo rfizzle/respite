@@ -1,0 +1,33 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "respite:feature_enabled",
+      "feature": "chronometer"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "K": {
+      "item": "minecraft:clock"
+    },
+    "S": {
+      "item": "minecraft:smooth_stone"
+    }
+  },
+  "pattern": [
+    "CCC",
+    "RKR",
+    "SSS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "respite:chronometer"
+  }
+}

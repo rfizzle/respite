@@ -1,4 +1,23 @@
 {
+  "block.respite.chronometer": "Chronometer",
+
+  "notification.respite.chronometer": "✦ %s — signal %s",
+  "notification.respite.chronometer_night": "✦ %s — signal %s — %s, new moon in %s nights",
+  "notification.respite.chronometer_new_moon": "✦ %s — signal %s — new moon tonight",
+
+  "tooltip.respite.chronometer": "%s — signal %s",
+  "tooltip.respite.chronometer_night": "%s — signal %s — %s, new moon in %s nights",
+  "tooltip.respite.chronometer_new_moon": "%s — signal %s — new moon tonight",
+
+  "moon.respite.full": "full moon",
+  "moon.respite.waning_gibbous": "waning gibbous",
+  "moon.respite.third_quarter": "third quarter",
+  "moon.respite.waning_crescent": "waning crescent",
+  "moon.respite.new": "new moon",
+  "moon.respite.waxing_crescent": "waxing crescent",
+  "moon.respite.first_quarter": "first quarter",
+  "moon.respite.waxing_gibbous": "waxing gibbous",
+
   "config.respite.title": "Respite Configuration",
 
   "config.respite.category.time_lapse": "Time-Lapse",

@@ -250,8 +250,8 @@ Vanilla's only time-automation primitive is the daylight detector, which reads *
 
    Each level spans 1,600 ticks (80 real seconds). Anchors: level 1 begins at tick 0 (dawn), level 8 covers 11,200–12,799 (sunset at 12,000 falls inside it), level 12 covers midnight (18,000), level 15 covers 22,400–23,999 (the last stretch before dawn). A comparator reading the block sees the same 1–15 value.
 4. **Updates** — the block re-checks its level on a self-rescheduled 20-tick block tick and emits neighbor updates only when the level changes (at most once per 1,600 world ticks in real time; during a 60× time-lapse a change can land every ~1.3 real seconds — still trivially cheap). Placement sets the correct level immediately.
-5. **Inspect** — right-click (survival, no item consumed, no GUI): action bar `✦ 7:12 pm — signal 8` (`notification.respite.chronometer`) with the 12-hour clock derived as `hours = ((dayTime / 1000) + 6) mod 24`, minutes = `(dayTime mod 1000) × 60 / 1000`. At night (day-time position 12,000–23,999) the line gains the moon: `✦ 7:12 pm — signal 8 — waning crescent, new moon in 2 nights` (`notification.respite.chronometer_night`), with the phase name from `moon.respite.<phase>` and the count computed as `(4 − moonPhase) mod 8`; when the count is 0 the line is `✦ 7:12 pm — signal 8 — new moon tonight` (`notification.respite.chronometer_new_moon`). The Jade/WTHIT line carries the same night addition.
-6. **Dial face** — the block's face texture sweeps through 8 visual phases (blockstate property `phase` 0–7, two signal levels per face). Cosmetic only; the signal keeps full 15-level precision.
+5. **Inspect** — right-click (survival, no item consumed, no GUI): action bar `✦ 7:12 pm — signal 9` (`notification.respite.chronometer`) with the 12-hour clock derived as `hours = ((dayTime / 1000) + 6) mod 24`, minutes = `(dayTime mod 1000) × 60 / 1000`. At night (day-time position 12,000–23,999) the line gains the moon: `✦ 7:12 pm — signal 9 — waning crescent, new moon in 2 nights` (`notification.respite.chronometer_night`), with the phase name from `moon.respite.<phase>` and the count computed as `(4 − moonPhase) mod 8`; when the count is 0 the line is `✦ 7:12 pm — signal 9 — new moon tonight` (`notification.respite.chronometer_new_moon`). The Jade/WTHIT line carries the same night addition.
+6. **Dial face** — the block's face texture sweeps through 8 visual phases, two signal levels per face (the blockstate JSON maps the `power` property onto the eight dial models; `power=0` is the still face). Cosmetic only; the signal keeps full 15-level precision.
 
 ### Edge cases
 
@@ -269,7 +269,7 @@ Vanilla's only time-automation primitive is the daylight detector, which reads *
 
 ### Implementation Notes
 
-- `ChronometerBlock extends Block`: `isSignalSource → true`, `getSignal` returns the level function; `phase` blockstate property drives the face; a scheduled tick re-arms itself every 20 ticks and diffs the level.
+- `ChronometerBlock extends Block`: the current level lives in a `power` blockstate property (0–15, the daylight-detector pattern); a scheduled tick re-arms itself every 20 ticks and swaps the state only when the level changed, which is what makes neighbor updates fire exactly on change. `isSignalSource → true` with `getSignal` reading the property covers wires; `hasAnalogOutputSignal`/`getAnalogOutputSignal` are the separate pair a comparator reads — both return the same value. The dial's 8 faces are the blockstate JSON's mapping of the property.
 - The level function lives in one static, pure method (`ChronometerTime.signalFor(long dayTime, boolean fixedTime)`) shared by the block, the inspect line, `/respite status`, and the API — one formula, one home.
 - Recipe JSON gated by a Fabric resource condition bound to the config (evaluated at datapack load; `/respite reload` + `/reload` re-evaluates).
 
@@ -482,7 +482,7 @@ All user-facing strings are translation keys in `assets/respite/lang/en_us.json`
 | `moon.respite.<phase>` | The eight moon-phase names (indices 0–7: full, waning gibbous, third quarter, waning crescent, new, waxing crescent, first quarter, waxing gibbous) |
 | `command.respite.*` | All command feedback (status lines, reload result, rest set/clear confirmations) |
 | `config.respite.<key>` + `.tooltip` | Every config option, label + tooltip pairs |
-| `tooltip.respite.chronometer` | Jade/WTHIT line |
+| `tooltip.respite.chronometer` (+ `_night`, `_new_moon`) | Jade/WTHIT line — same variants as the inspect notification, without the ✦ |
 | `subtitles.respite.time_lapse_start`, `subtitles.respite.time_lapse_end` | Sound subtitles |
 | `advancements.respite.<id>.title` / `.description` | Advancement pairs (below) |
 | `key.categories.respite` | Reserved; no keybinds ship at v0.1 |
