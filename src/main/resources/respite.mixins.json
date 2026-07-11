@@ -3,7 +3,10 @@
     "minVersion": "0.8",
     "package": "com.rfizzle.respite.mixin",
     "compatibilityLevel": "JAVA_21",
-    "mixins": [],
+    "mixins": [
+        "MobMixin",
+        "ServerLevelMixin"
+    ],
     "injectors": {
         "defaultRequire": 1
     }
