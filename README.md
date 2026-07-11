@@ -12,10 +12,20 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue"></a>
 </p>
 
-Respite is in development — no features have shipped yet. The player-experience
-promise lives in [`design/VISION.md`](design/VISION.md), the behavioral contract
-in [`design/SPEC.md`](design/SPEC.md); this page will describe features as they
-ship. The website is [respite.rfizzle.com](https://respite.rfizzle.com).
+Respite is in development. The player-experience promise lives in
+[`design/VISION.md`](design/VISION.md), the behavioral contract in
+[`design/SPEC.md`](design/SPEC.md); this page describes features as they ship.
+The website is [respite.rfizzle.com](https://respite.rfizzle.com).
+
+## Shipped so far
+
+- **The Chronometer** — a copper-and-redstone timepiece block. It emits redstone
+  power 1–15 that climbs with the hour (each level lasts 80 seconds; comparators
+  read the same value), its dial face sweeps the sun and moon across the day,
+  and a right-click reads out the exact time — plus the moon phase and new-moon
+  countdown at night. In dimensions without a day-night cycle it honestly emits
+  nothing. `enableChronometer = false` removes the recipe; placed blocks keep
+  working.
 
 ---
 

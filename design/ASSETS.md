@@ -15,11 +15,18 @@
 | Mod icon (128 + 512) | `art/glyphs/icon.gen.py` → `art/glyphs/icon.glyph` (generated 128px grid; 512 via `--scale-to 512`) | `art/icon-128.png`, `art/icon-512.png` (masters) → `assets/respite/icon.png` (shipped), `site/assets/icon.png`, store listings |
 | Lantern glyph 16×16 (Jade/recipe viewers — no HUD slot) | `art/hud-icon-16.glyph` | `art/hud-icon-16.png` (master) → `assets/respite/textures/gui/glyph.png` (with Jade integration) |
 
+## Block textures
+
+| Asset | Source | Final / derived copies |
+|---|---|---|
+| Chronometer dial faces (8 phases, 32×32) | `art/glyphs/chronometer-dial-0..7.glyph` | `assets/respite/textures/block/chronometer_dial_0..7.png` |
+| Chronometer still face (fixed-time dimensions) | `art/glyphs/chronometer-dial-still.glyph` | `assets/respite/textures/block/chronometer_dial_still.png` |
+| Chronometer top/bottom cap | `art/glyphs/chronometer-top.glyph` | `assets/respite/textures/block/chronometer_top.png` |
+
 ## Not yet created
 
 | Asset | Intended source | Destination |
 |---|---|---|
-| Chronometer block textures (side, top, 8 dial faces) | `/glyph` | `art/chronometer-*.glyph` → `assets/respite/textures/block/chronometer_*.png` — (planned, with implementation) |
 | Unsteeped Brew item texture | `/glyph` | `art/unsteeped-brew.glyph` → `assets/respite/textures/item/unsteeped_brew.png` — (planned, with implementation) |
 | Caffeinated Brew item texture | `/glyph` | `art/caffeinated-brew.glyph` → `assets/respite/textures/item/caffeinated_brew.png` — (planned, with implementation) |
 | Weary effect icon | `/glyph` | `art/weary-effect.glyph` → `assets/respite/textures/mob_effect/weary.png` — (planned, with implementation) |
