@@ -3,7 +3,7 @@
   "metaTitle": "Config — Respite",
   "metaDescription": "Respite's full configuration reference as specced: time-lapse rate and budget, restful saturation, phantom rules, weariness, Chronometer, and brew options.",
   "title": "Configuration",
-  "lede": "Every option, as specced in <a href='https://github.com/rfizzle/respite/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a> — the file is <code>config/respite.json</code>, created with defaults on first launch and hot-reloaded with <code>/respite reload</code>. Respite is in development; this table is the contract the implementation will ship against.",
+  "lede": "Every option, as specced in <a href='https://github.com/rfizzle/respite/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a> — the file is <code>config/respite.json</code>, created with defaults on first launch, with a ModMenu + Cloth Config screen when those mods are present. Respite is in development; the config surface ships today, and each feature reads its keys as it lands.",
   "width": "5xl",
   "sections": [
     {
@@ -17,16 +17,20 @@
             ["<code>enableTimeLapse</code>", "bool", "<code>true</code>", "—", "Time-lapse"],
             ["<code>maxTimeLapseRate</code>", "int", "<code>60</code>", "2–100", "Time-lapse"],
             ["<code>timeLapseTickBudgetMs</code>", "int", "<code>40</code>", "5–45", "Time-lapse"],
+            ["<code>combatHoldsTime</code>", "bool", "<code>true</code>", "—", "Time-lapse"],
             ["<code>announceTimeLapse</code>", "bool", "<code>true</code>", "—", "Time-lapse"],
             ["<code>enableRestfulSaturation</code>", "bool", "<code>true</code>", "—", "Restful saturation"],
             ["<code>restfulRequiresFullHunger</code>", "bool", "<code>true</code>", "—", "Restful saturation"],
             ["<code>restfulHealIntervalTicks</code>", "int", "<code>600</code>", "100–2400", "Restful saturation"],
+            ["<code>newMoonHealMultiplier</code>", "double", "<code>2.0</code>", "1.0–4.0", "Restful saturation"],
             ["<code>enablePhantomRework</code>", "bool", "<code>true</code>", "—", "Phantoms"],
             ["<code>phantomAltitudeMin</code>", "int", "<code>100</code>", "−64–320", "Phantoms"],
             ["<code>phantomNewMoon</code>", "bool", "<code>true</code>", "—", "Phantoms"],
             ["<code>enableWeariness</code>", "bool", "<code>true</code>", "—", "Weariness"],
             ["<code>wearinessThresholdDays</code>", "int", "<code>3</code>", "1–30", "Weariness"],
             ["<code>wearinessRegenPenalty</code>", "double", "<code>0.25</code>", "0.0–0.95", "Weariness"],
+            ["<code>exhaustedThresholdDays</code>", "int", "<code>6</code>", "2–60", "Weariness"],
+            ["<code>exhaustedRegenPenalty</code>", "double", "<code>0.50</code>", "0.0–0.95", "Weariness"],
             ["<code>enableChronometer</code>", "bool", "<code>true</code>", "—", "Chronometer"],
             ["<code>enableCaffeinatedBrew</code>", "bool", "<code>true</code>", "—", "Brew"],
             ["<code>brewHasteSeconds</code>", "int", "<code>90</code>", "0–600", "Brew"]
@@ -42,7 +46,8 @@
           "type": "table",
           "headers": ["Key", "Type", "Default", "Description"],
           "rows": [
-            ["<code>showTimeLapseMessages</code>", "bool", "<code>true</code>", "Show the time-lapse action-bar lines on this client"]
+            ["<code>showTimeLapseMessages</code>", "bool", "<code>true</code>", "Show the time-lapse action-bar lines on this client"],
+            ["<code>showExhaustionBlink</code>", "bool", "<code>true</code>", "Show the Exhausted eyelid blink on this client"]
           ]
         }
       ]

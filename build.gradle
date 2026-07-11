@@ -69,6 +69,20 @@ def runGitDescribe(String tagPrefix) {
 
 repositories {
     mavenCentral()
+    maven {
+        name = 'Shedaniel'
+        url = 'https://maven.shedaniel.me/'
+        content {
+            includeGroup 'me.shedaniel.cloth'
+        }
+    }
+    maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+        content {
+            includeGroup 'maven.modrinth'
+        }
+    }
 }
 
 loom {
@@ -139,6 +153,16 @@ dependencies {
 
     // Client source set
     "clientImplementation"("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+
+    // ModMenu + Cloth Config — optional config-screen integration, compile-only against
+    // their APIs and present in the dev client, never bundled. The modmenu entrypoint is
+    // only invoked when ModMenu is installed; the Cloth screen builder is guarded on
+    // isModLoaded so a missing Cloth Config costs nothing.
+    modCompileOnly "maven.modrinth:modmenu:${project.modmenu_version}"
+    modLocalRuntime "maven.modrinth:modmenu:${project.modmenu_version}"
+
+    modCompileOnly "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
+    modLocalRuntime "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
 
     // Tests
     testImplementation platform("org.junit:junit-bom:${project.junit_version}")
