@@ -45,6 +45,22 @@ public final class MockPlayers {
         player.discard();
     }
 
+    /**
+     * Retires any mock player a previously failed test left in the helper's
+     * level, so player-count-sensitive tests start from a clean player list.
+     * Call at the top of any test whose assertions depend on who is online.
+     */
+    public static void retireLeaked(GameTestHelper helper) {
+        for (ServerPlayer player : java.util.List.copyOf(helper.getLevel().players())) {
+            if ("test-mock-player".equals(player.getGameProfile().getName())) {
+                if (player.isSleeping()) {
+                    player.stopSleepInBed(true, false);
+                }
+                retire(player);
+            }
+        }
+    }
+
     /** Same replica, with the packet-absorbing channel exposed for outbound assertions. */
     public static Connected connectedServerPlayerInLevel(GameTestHelper helper) {
         GameProfile profile = new GameProfile(UUID.randomUUID(), "test-mock-player");
