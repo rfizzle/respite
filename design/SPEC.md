@@ -443,7 +443,7 @@ Triggers and subtitles only — character and files live with `DESIGN.md` / `ASS
 
 | Event | Sound | Subtitle |
 |---|---|---|
-| Time-lapse starts (effective rate leaves 1) | `respite:ui.time_lapse.start` — custom, `/sfx`, stereo UI cue, ≤1.5 s, played non-positionally to Overworld players | `subtitles.respite.time_lapse_start` — "Time quickens" |
+| Time-lapse starts (effective rate leaves 1) | `respite:ui.time_lapse.start` — custom, `/sfx`, UI cue, ≤1.5 s, played non-positionally to Overworld players | `subtitles.respite.time_lapse_start` — "Time quickens" |
 | Time-lapse ends (effective rate returns to 1) | `respite:ui.time_lapse.end` — custom, `/sfx`, mirror of the start cue | `subtitles.respite.time_lapse_end` — "Time settles" |
 | Chronometer placed / broken | vanilla copper block sounds | vanilla |
 | Chronometer inspected | vanilla `ui.button.click` at low volume, client-side | — (UI feedback, no world sound) |
