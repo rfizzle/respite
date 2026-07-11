@@ -13,19 +13,30 @@ import java.util.UUID;
  * <p>Deliberately not persisted (a restart forgets any live fight — the mobs'
  * aggro re-registers on their next {@code setTarget}) and deliberately free of
  * {@code net.minecraft} types: the mixin and events translate to UUIDs, so the
- * decay and transition logic unit-tests without a Fabric bootstrap. Server
- * thread only; the per-tick read path allocates nothing.
+ * decay and transition logic unit-tests without a Fabric bootstrap.
+ *
+ * <p>Server thread only. The per-tick read path allocates nothing: each
+ * player's targeting count and peril timestamp live in one mutable entry,
+ * allocated when a peril event first touches the player and mutated in place
+ * after. Entries self-prune on the read that finds them expired, drop on
+ * disconnect, and are bounded by the online player count in between (a player
+ * who leaves the Overworld mid-window just stops being queried until then).
  */
 public final class PerilTracker {
+
+    /** No damage window recorded — distinct from any real tick value. */
+    private static final long NO_PERIL = Long.MIN_VALUE;
+
+    private static final class Entry {
+        int targetedCount;
+        long lastPerilTick = NO_PERIL;
+    }
 
     /** Hostile mob → the player it currently targets. */
     private final Map<UUID, UUID> mobTargets = new HashMap<>();
 
-    /** Player → number of hostile mobs currently targeting them. */
-    private final Map<UUID, Integer> targetedCounts = new HashMap<>();
-
-    /** Player → real tick of their last peril signal (damage, or targeted-while-queried). */
-    private final Map<UUID, Long> lastPerilTick = new HashMap<>();
+    /** Player → their live peril state (targeting count + last signal tick). */
+    private final Map<UUID, Entry> perilByPlayer = new HashMap<>();
 
     /**
      * A hostile mob's target changed. {@code playerId} is null when the new
@@ -39,7 +50,7 @@ public final class PerilTracker {
             release(previous);
         }
         if (playerId != null && !playerId.equals(previous)) {
-            targetedCounts.merge(playerId, 1, Integer::sum);
+            perilByPlayer.computeIfAbsent(playerId, id -> new Entry()).targetedCount++;
         }
     }
 
@@ -53,7 +64,7 @@ public final class PerilTracker {
 
     /** The player dealt or took damage on this real tick. */
     public void recordCombat(UUID playerId, long realTick) {
-        lastPerilTick.put(playerId, realTick);
+        perilByPlayer.computeIfAbsent(playerId, id -> new Entry()).lastPerilTick = realTick;
     }
 
     /**
@@ -64,18 +75,18 @@ public final class PerilTracker {
      * entries self-prune on read.
      */
     public boolean isInPeril(UUID playerId, long nowRealTick, int windowTicks) {
-        if (targetedCounts.getOrDefault(playerId, 0) > 0) {
-            lastPerilTick.put(playerId, nowRealTick);
-            return true;
-        }
-        Long last = lastPerilTick.get(playerId);
-        if (last == null) {
+        Entry entry = perilByPlayer.get(playerId);
+        if (entry == null) {
             return false;
         }
-        if (nowRealTick - last <= windowTicks) {
+        if (entry.targetedCount > 0) {
+            entry.lastPerilTick = nowRealTick;
             return true;
         }
-        lastPerilTick.remove(playerId);
+        if (entry.lastPerilTick != NO_PERIL && nowRealTick - entry.lastPerilTick <= windowTicks) {
+            return true;
+        }
+        perilByPlayer.remove(playerId);
         return false;
     }
 
@@ -85,22 +96,38 @@ public final class PerilTracker {
      * or {@link #onMobRemoved} as the mobs retarget or unload.
      */
     public void forgetPlayer(UUID playerId) {
-        lastPerilTick.remove(playerId);
+        Entry entry = perilByPlayer.get(playerId);
+        if (entry == null) {
+            return;
+        }
+        if (entry.targetedCount > 0) {
+            entry.lastPerilTick = NO_PERIL;
+        } else {
+            perilByPlayer.remove(playerId);
+        }
     }
 
     /** Full reset — server stopped, or the feature was toggled off. */
     public void clear() {
         mobTargets.clear();
-        targetedCounts.clear();
-        lastPerilTick.clear();
+        perilByPlayer.clear();
     }
 
     /** True when nothing is tracked — the disable sweep's cheap precheck. */
     public boolean isEmpty() {
-        return mobTargets.isEmpty() && targetedCounts.isEmpty() && lastPerilTick.isEmpty();
+        return mobTargets.isEmpty() && perilByPlayer.isEmpty();
     }
 
     private void release(UUID playerId) {
-        targetedCounts.computeIfPresent(playerId, (id, count) -> count <= 1 ? null : count - 1);
+        Entry entry = perilByPlayer.get(playerId);
+        if (entry == null) {
+            return;
+        }
+        if (entry.targetedCount > 0) {
+            entry.targetedCount--;
+        }
+        if (entry.targetedCount == 0 && entry.lastPerilTick == NO_PERIL) {
+            perilByPlayer.remove(playerId);
+        }
     }
 }
