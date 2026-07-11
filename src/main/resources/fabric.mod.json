@@ -16,6 +16,7 @@
     "entrypoints": {
         "main": ["com.rfizzle.respite.Respite"],
         "client": ["com.rfizzle.respite.client.RespiteClient"],
+        "modmenu": ["com.rfizzle.respite.compat.modmenu.ModMenuIntegration"],
         "fabric-gametest": [
             "com.rfizzle.respite.gametest.RespiteSmokeGameTest"
         ]
