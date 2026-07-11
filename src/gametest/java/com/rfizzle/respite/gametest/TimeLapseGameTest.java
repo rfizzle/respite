@@ -318,12 +318,18 @@ public class TimeLapseGameTest implements FabricGameTest {
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "timeLapseTimers", timeoutTicks = 400)
     public void awakeBodyTimersHoldWhileSleepersAdvance(GameTestHelper helper) {
         int savedRate = setUpNight(helper);
+        // Isolate §1's body-timer split: Restful Saturation (§2) freezes a
+        // sleeper's food tick in bed, which would mask the hunger-drain signal
+        // this test uses to prove sleepers ride the extra ticks.
+        boolean savedRestful = RespiteConfig.get().enableRestfulSaturation;
+        RespiteConfig.get().enableRestfulSaturation = false;
         ServerPlayer sleeper = MockPlayers.serverPlayerInLevel(helper);
         ServerPlayer awake = MockPlayers.serverPlayerInLevel(helper);
         BlockPos awakePos = helper.absolutePos(new BlockPos(2, 2, 2));
         awake.teleportTo(awakePos.getX() + 0.5, awakePos.getY(), awakePos.getZ() + 0.5);
         Runnable cleanup = () -> {
             RespiteConfig.get().maxTimeLapseRate = savedRate;
+            RespiteConfig.get().enableRestfulSaturation = savedRestful;
             MockPlayers.retire(sleeper);
             MockPlayers.retire(awake);
         };

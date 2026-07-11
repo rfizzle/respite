@@ -5,6 +5,9 @@
   "notification.respite.time_lapse_end": "✦ Time settles",
   "notification.respite.time_hold": "✦ Time holds — battle nearby",
 
+  "notification.respite.rested": "✦ You wake refreshed",
+  "notification.respite.deep_rested": "✦ You wake deeply rested",
+
   "subtitles.respite.time_lapse_start": "Time quickens",
   "subtitles.respite.time_lapse_end": "Time settles",
 
