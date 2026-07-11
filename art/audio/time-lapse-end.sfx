@@ -1,0 +1,28 @@
+{
+  "name": "time_lapse_end",
+  "sample_rate": 44100,
+  "peak_dbfs": -1.0,
+  "subtitle": "subtitles.respite.time_lapse_end",
+  "seed": 5,
+  "layers": [
+    {
+      "waveform": "sine",
+      "from": 990, "to": 330, "glide": "exp",
+      "start": 0.0, "duration": 0.9, "gain": 0.75,
+      "env": {"attack": 0.04, "decay": 0.3, "sustain": 0.5, "release": 0.35}
+    },
+    {
+      "waveform": "triangle",
+      "from": 1980, "to": 660, "glide": "exp",
+      "start": 0.05, "duration": 0.75, "gain": 0.3,
+      "env": {"attack": 0.06, "decay": 0.25, "sustain": 0.35, "release": 0.3},
+      "filter": {"type": "lowpass", "cutoff": 4200}
+    },
+    {
+      "waveform": "sine",
+      "freq": 220,
+      "start": 0.75, "duration": 0.3, "gain": 0.5,
+      "env": {"attack": 0.02, "decay": 0.12, "sustain": 0.4, "release": 0.18}
+    }
+  ]
+}

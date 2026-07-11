@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
@@ -37,6 +38,13 @@ public final class RespiteRegistry {
                     .strength(0.5f)
                     .sound(SoundType.COPPER));
 
+    // The lapse-edge cue pair (design/SPEC.md §Sound Design): "time itself is
+    // moving" has no vanilla voice, so these are the one custom synthesis.
+    public static final SoundEvent TIME_LAPSE_START =
+            SoundEvent.createVariableRangeEvent(Respite.id("ui.time_lapse.start"));
+    public static final SoundEvent TIME_LAPSE_END =
+            SoundEvent.createVariableRangeEvent(Respite.id("ui.time_lapse.end"));
+
     private static boolean registered;
 
     private RespiteRegistry() {
@@ -50,6 +58,9 @@ public final class RespiteRegistry {
 
         registerBlock("chronometer", CHRONOMETER, new Item.Properties());
 
+        registerSound(TIME_LAPSE_START);
+        registerSound(TIME_LAPSE_END);
+
         // A redstone component belongs where builders look for redstone
         // components — the vanilla tab, not a one-block mod tab.
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS)
@@ -57,6 +68,10 @@ public final class RespiteRegistry {
 
         // Datapack-side feature gates (recipes and their unlock advancements).
         ResourceConditions.register(FeatureEnabledCondition.TYPE);
+    }
+
+    private static void registerSound(SoundEvent event) {
+        Registry.register(BuiltInRegistries.SOUND_EVENT, event.getLocation(), event);
     }
 
     private static <T extends Block> T registerBlock(String name, T block, Item.Properties itemProperties) {

@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.Util;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
@@ -46,16 +47,6 @@ public final class TimeLapseEngine {
     /** Real ticks a peril signal holds the brake after the fight ends (5 s). */
     public static final int PERIL_WINDOW_TICKS = 100;
 
-    /** What the lapse is doing this real tick. */
-    public enum LapseState {
-        /** Running extra ticks — the effective rate is above 1. */
-        ACTIVE,
-        /** Sleepers would accelerate, but an awake player's peril holds time at ×1. */
-        HELD,
-        /** No lapse: nobody sleeping, not night, or the feature idle. */
-        SETTLED,
-    }
-
     private static final BooleanSupplier HAS_TIME = () -> true;
     private static final PerilTracker PERIL = new PerilTracker();
 
@@ -72,6 +63,9 @@ public final class TimeLapseEngine {
     }
 
     public static void register() {
+        // S2C only; the type must be known on both sides, the receiver is client wiring.
+        PayloadTypeRegistry.playS2C().register(TimeLapsePayload.TYPE, TimeLapsePayload.CODEC);
+
         ServerTickEvents.START_SERVER_TICK.register(server -> tickStartNanos = Util.getNanos());
         ServerTickEvents.END_SERVER_TICK.register(TimeLapseEngine::onEndServerTick);
         ServerLivingEntityEvents.AFTER_DAMAGE.register(TimeLapseEngine::onAfterDamage);
@@ -88,25 +82,32 @@ public final class TimeLapseEngine {
     private static void onEndServerTick(MinecraftServer server) {
         realTickCount++;
         RespiteConfig config = RespiteConfig.get();
+        ServerLevel overworld = server.getLevel(Level.OVERWORLD);
+        if (overworld == null) {
+            return;
+        }
         if (!config.enableTimeLapse) {
             // Vanilla parity while off: no evaluation, no residue from before the toggle.
             if (!PERIL.isEmpty()) {
                 PERIL.clear();
             }
             effectiveRate = 1;
+            sleeping = 0;
+            total = 0;
             state = LapseState.SETTLED;
-            return;
-        }
-        ServerLevel overworld = server.getLevel(Level.OVERWORLD);
-        if (overworld == null) {
-            return;
+        } else {
+            try {
+                evaluateAndRun(overworld, config);
+            } catch (Exception e) {
+                Respite.LOGGER.error("Time-lapse evaluation failed; settling to ×1", e);
+                effectiveRate = 1;
+                state = LapseState.SETTLED;
+            }
         }
         try {
-            evaluateAndRun(overworld, config);
+            TimeLapseNotifier.announce(overworld, config, state, effectiveRate, sleeping, total);
         } catch (Exception e) {
-            Respite.LOGGER.error("Time-lapse evaluation failed; settling to ×1", e);
-            effectiveRate = 1;
-            state = LapseState.SETTLED;
+            Respite.LOGGER.error("Time-lapse announcement failed", e);
         }
     }
 
@@ -238,6 +239,7 @@ public final class TimeLapseEngine {
         sleeping = 0;
         total = 0;
         PERIL.clear();
+        TimeLapseNotifier.reset();
     }
 
     /** The effective rate this real tick — extras actually run, plus one. */
