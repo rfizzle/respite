@@ -13,6 +13,9 @@
   "notification.respite.time_lapse_end": "✦ Time settles",
   "notification.respite.time_hold": "✦ Time holds — battle nearby",
 
+  "message.respite.sleep_vote_enter": "%s is in bed (%s/%s)",
+  "message.respite.sleep_vote_leave": "%s left the bed (%s/%s)",
+
   "notification.respite.rested": "✦ You wake refreshed",
   "notification.respite.deep_rested": "✦ You wake deeply rested",
 
@@ -61,6 +64,8 @@
   "config.respite.combatHoldsTime.tooltip": "Nearby combat holds the lapse at ×1 until the fight ends.",
   "config.respite.announceTimeLapse": "Announce Time-Lapse",
   "config.respite.announceTimeLapse.tooltip": "Announce rate changes on the action bar of Overworld players.",
+  "config.respite.announceSleepVote": "Announce Who's Sleeping",
+  "config.respite.announceSleepVote.tooltip": "Whisper a chat line when a player enters or leaves a bed at night, with the tally of who's asleep.",
 
   "config.respite.enableRestfulSaturation": "Enable Restful Saturation",
   "config.respite.enableRestfulSaturation.tooltip": "Saturation heals sleeping players through the night.",

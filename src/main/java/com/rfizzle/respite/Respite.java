@@ -6,6 +6,7 @@ import com.rfizzle.respite.command.RespiteCommand;
 import com.rfizzle.respite.config.RespiteConfig;
 import com.rfizzle.respite.registry.RespiteRegistry;
 import com.rfizzle.respite.restful.RestfulSleepHandler;
+import com.rfizzle.respite.sleepvote.SleepVoteHandler;
 import com.rfizzle.respite.timelapse.TimeLapseEngine;
 import com.rfizzle.respite.weariness.WearinessHandler;
 import net.fabricmc.api.ModInitializer;
@@ -36,6 +37,8 @@ public class Respite implements ModInitializer {
         TimeLapseEngine.register();
 
         RestfulSleepHandler.register();
+
+        SleepVoteHandler.register();
 
         Bedroll.register();
 

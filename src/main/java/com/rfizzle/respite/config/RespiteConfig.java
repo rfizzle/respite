@@ -36,6 +36,7 @@ public class RespiteConfig {
     public int timeLapseTickBudgetMs = 40;
     public boolean combatHoldsTime = true;
     public boolean announceTimeLapse = true;
+    public boolean announceSleepVote = true;
 
     // Restful saturation (§2)
     public boolean enableRestfulSaturation = true;
