@@ -1,9 +1,9 @@
 {
   "nav": "Commands",
   "metaTitle": "Commands — Respite",
-  "metaDescription": "Respite's command reference as specced: /respite status, reload, and the rest testing levers.",
+  "metaDescription": "Respite's command reference: /respite status, reload, and the rest testing levers.",
   "title": "Commands",
-  "lede": "The <code>/respite</code> command tree, as specced. Respite is in development; this is the surface the implementation will ship.",
+  "lede": "The <code>/respite</code> command tree — a status read for everyone, and op-only levers for reloading config and driving the rest stat.",
   "width": "4xl",
   "sections": [
     {
@@ -13,7 +13,7 @@
           "headers": ["Command", "Permission", "What it does"],
           "nowrapHeaders": true,
           "rows": [
-            ["<code>/respite status</code>", "everyone", "Time-lapse state and effective rate, your time awake in days, Weary yes/no, nights until the next new moon — and the signal of a Chronometer you're looking at"],
+            ["<code>/respite status</code>", "everyone", "Time-lapse state and effective rate, your time awake in days, your rest stage (rested / Weary / Exhausted), nights until the next new moon — and the signal of a Chronometer you're looking at"],
             ["<code>/respite reload</code>", "op (level 2)", "Reloads <code>config/respite.json</code> and re-evaluates recipe conditions"],
             ["<code>/respite rest clear [player]</code>", "op (level 2)", "Resets the target's time-since-rest to zero (clears Weariness)"],
             ["<code>/respite rest set &lt;days&gt; [player]</code>", "op (level 2)", "Sets the target's time-since-rest — the testing lever for phantom and weariness thresholds"]

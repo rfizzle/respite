@@ -1,9 +1,9 @@
 {
   "nav": "Developers",
   "metaTitle": "Developers — Respite",
-  "metaDescription": "Respite's public API surface as specced: read-only accessors for time-lapse rate, rest state, and the Chronometer signal, plus two Fabric events.",
+  "metaDescription": "Respite's public API surface: read-only accessors for time-lapse rate, rest state, and the Chronometer signal, plus two Fabric events.",
   "title": "For Developers",
-  "lede": "Respite publishes a stable integration surface under <code>com.rfizzle.respite.api</code>, per the suite <a href='https://github.com/rfizzle/concord/blob/master/API-STANDARD.md' class='text-accent hover:text-accent2 underline'>API standard</a>: read-only static accessors, array-backed Fabric events, server-authoritative. Specced, pre-implementation — it lands with the first release.",
+  "lede": "Respite publishes a stable integration surface under <code>com.rfizzle.respite.api</code>, per the suite <a href='https://github.com/rfizzle/concord/blob/master/API-STANDARD.md' class='text-accent hover:text-accent2 underline'>API standard</a>: read-only static accessors, array-backed Fabric events, server-authoritative.",
   "width": "5xl",
   "sections": [
     {
@@ -17,6 +17,7 @@
             ["<code>isTimeLapseActive(ServerLevel)</code>", "True while extra ticks are running"],
             ["<code>getTicksSinceRest(ServerPlayer)</code>", "The player's time-since-rest in ticks"],
             ["<code>isWeary(ServerPlayer)</code>", "True if the player currently has the Weary effect"],
+            ["<code>isExhausted(ServerPlayer)</code>", "True if the player currently has the Exhausted effect"],
             ["<code>getChronometerSignal(Level)</code>", "The Chronometer signal (1–15) for the level's day time; 0 in fixed-time dimensions"]
           ]
         }
