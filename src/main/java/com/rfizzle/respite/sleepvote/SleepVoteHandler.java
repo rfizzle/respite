@@ -95,7 +95,20 @@ public final class SleepVoteHandler {
 
         Component line = SleepVoteLines.build(enter, actor.getDisplayName(), sleeping, total);
         for (int i = 0, size = players.size(); i < size; i++) {
-            players.get(i).sendSystemMessage(line);
+            ServerPlayer recipient = players.get(i);
+            // Recipients match the counted population: a spectator is no part of
+            // the negotiation, so it neither counts nor hears the whisper.
+            if (recipient.isSpectator()) {
+                continue;
+            }
+            try {
+                recipient.sendSystemMessage(line);
+            } catch (Exception e) {
+                // Best-effort delivery: one wedged connection never robs the rest
+                // of the room of the line.
+                Respite.LOGGER.error("Sleep whisper delivery failed for {}",
+                        recipient.getName().getString(), e);
+            }
         }
     }
 }

@@ -252,6 +252,78 @@ public class SleepVoteGameTest implements FabricGameTest {
         }));
     }
 
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "sleepVoteSpectator", timeoutTicks = 200)
+    public void spectatorsAreNeitherCountedNorNotified(GameTestHelper helper) {
+        int savedBudget = setUpStillNight(helper);
+        MockPlayers.Connected sleeperC = MockPlayers.connectedServerPlayerInLevel(helper);
+        MockPlayers.Connected awakeC = MockPlayers.connectedServerPlayerInLevel(helper);
+        MockPlayers.Connected spectatorC = MockPlayers.spectatorServerPlayerInLevel(helper);
+        ServerPlayer sleeper = sleeperC.player();
+        BlockPos awakePos = helper.absolutePos(new BlockPos(2, 2, 2));
+        awakeC.player().teleportTo(awakePos.getX() + 0.5, awakePos.getY(), awakePos.getZ() + 0.5);
+        Runnable cleanup = () -> {
+            RespiteConfig.get().timeLapseTickBudgetMs = savedBudget;
+            MockPlayers.retire(sleeper);
+            MockPlayers.retire(awakeC.player());
+            MockPlayers.retire(spectatorC.player());
+        };
+        int[] step = {0};
+        helper.onEachTick(() -> guarded(cleanup, () -> {
+            switch (++step[0]) {
+                case 2 -> {
+                    sleeperC.channel().outboundMessages().clear();
+                    spectatorC.channel().outboundMessages().clear();
+                    sleepInBed(helper, sleeper);
+                    // The spectator is not counted: one asleep of two present, not three.
+                    TranslatableContents enter = chatContents(sleeperC, SleepVoteLines.ENTER_KEY);
+                    helper.assertTrue(enter != null, "entering a bed must whisper a chat line; keys: "
+                            + chatKeys(sleeperC));
+                    assertCounts(helper, enter, 1, 2);
+                    // And the spectator is not a recipient.
+                    helper.assertTrue(!chatKeys(spectatorC).contains(SleepVoteLines.ENTER_KEY),
+                            "a spectator must not receive the whisper; keys: " + chatKeys(spectatorC));
+                    cleanup.run();
+                    helper.succeed();
+                }
+                default -> {
+                    if (step[0] >= 60) {
+                        helper.fail("the spectator phase machine stalled");
+                    }
+                }
+            }
+        }));
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "sleepVoteSolo", timeoutTicks = 200)
+    public void aSoloWorldWhispersNothing(GameTestHelper helper) {
+        int savedBudget = setUpStillNight(helper);
+        MockPlayers.Connected soloC = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer solo = soloC.player();
+        Runnable cleanup = () -> {
+            RespiteConfig.get().timeLapseTickBudgetMs = savedBudget;
+            MockPlayers.retire(solo);
+        };
+        int[] step = {0};
+        helper.onEachTick(() -> guarded(cleanup, () -> {
+            switch (++step[0]) {
+                case 2 -> {
+                    soloC.channel().outboundMessages().clear();
+                    sleepInBed(helper, solo);
+                    // The whisper is a multiplayer signal — a lone occupant hears nothing.
+                    helper.assertTrue(!chatKeys(soloC).contains(SleepVoteLines.ENTER_KEY),
+                            "a lone sleeper must whisper nothing; keys: " + chatKeys(soloC));
+                    cleanup.run();
+                    helper.succeed();
+                }
+                default -> {
+                    if (step[0] >= 60) {
+                        helper.fail("the solo phase machine stalled");
+                    }
+                }
+            }
+        }));
+    }
+
     /** Asserts the whisper's share args are exactly {@code sleeping} of {@code total}. */
     private static void assertCounts(GameTestHelper helper, TranslatableContents contents,
             int sleeping, int total) {

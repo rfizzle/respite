@@ -63,6 +63,18 @@ public final class MockPlayers {
 
     /** Same replica, with the packet-absorbing channel exposed for outbound assertions. */
     public static Connected connectedServerPlayerInLevel(GameTestHelper helper) {
+        return connectedInLevel(helper, false);
+    }
+
+    /**
+     * A connected replica that reports as a spectator — for tests that assert a
+     * spectator is left out of a feature's accounting or its broadcasts.
+     */
+    public static Connected spectatorServerPlayerInLevel(GameTestHelper helper) {
+        return connectedInLevel(helper, true);
+    }
+
+    private static Connected connectedInLevel(GameTestHelper helper, boolean spectator) {
         GameProfile profile = new GameProfile(UUID.randomUUID(), "test-mock-player");
         CommonListenerCookie cookie = CommonListenerCookie.createInitial(profile, false);
 
@@ -71,7 +83,7 @@ public final class MockPlayers {
         ServerPlayer player = new ServerPlayer(server, level, cookie.gameProfile(), cookie.clientInformation()) {
             @Override
             public boolean isSpectator() {
-                return false;
+                return spectator;
             }
 
             @Override
