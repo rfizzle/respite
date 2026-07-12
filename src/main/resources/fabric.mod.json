@@ -28,6 +28,7 @@
             "com.rfizzle.respite.gametest.PhantomGameTest",
             "com.rfizzle.respite.gametest.CaffeinatedBrewGameTest",
             "com.rfizzle.respite.gametest.BedrollGameTest",
+            "com.rfizzle.respite.gametest.SleepVoteGameTest",
             "com.rfizzle.respite.gametest.RespiteCommandGameTest",
             "com.rfizzle.respite.gametest.AdvancementGameTest",
             "com.rfizzle.respite.gametest.RespiteApiGameTest",
