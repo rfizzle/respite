@@ -5,9 +5,11 @@ import com.rfizzle.respite.api.RespiteRestCallback;
 import com.rfizzle.respite.chronometer.ChronometerTime;
 import com.rfizzle.respite.config.RespiteConfig;
 import com.rfizzle.respite.gametest.util.MockPlayers;
+import com.rfizzle.respite.registry.RespiteRegistry;
 import com.rfizzle.respite.rest.RestWakeEvents;
 import com.rfizzle.respite.weariness.WearinessHandler;
 import com.rfizzle.respite.weariness.WearinessMath;
+import com.rfizzle.respite.wellrested.WellRested;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -90,6 +92,13 @@ public class RespiteApiGameTest implements FabricGameTest {
             WearinessHandler.sweepPlayer(player, config);
             helper.assertTrue(!RespiteAPI.isWeary(player) && !RespiteAPI.isExhausted(player),
                     "a reset stat clears both accessors");
+
+            // Well-Rested accessor tracks the granted grace, independent of the stat.
+            helper.assertTrue(!RespiteAPI.isWellRested(player), "a fresh player is not Well-Rested");
+            WellRested.grantOnDawnWake(player, config);
+            helper.assertTrue(RespiteAPI.isWellRested(player), "a granted grace reads isWellRested");
+            player.removeEffect(RespiteRegistry.WELL_RESTED);
+            helper.assertTrue(!RespiteAPI.isWellRested(player), "clearing the effect clears the accessor");
 
             cleanup.run();
             helper.succeed();

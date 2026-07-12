@@ -5,6 +5,7 @@ import com.rfizzle.respite.bedroll.BedrollBlock;
 import com.rfizzle.respite.config.RespiteConfig;
 import com.rfizzle.respite.rest.RestWakeEvents;
 import com.rfizzle.respite.timelapse.TimeLapseEngine;
+import com.rfizzle.respite.wellrested.WellRested;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -173,6 +174,14 @@ public final class RestfulSleepHandler {
         boolean lapseActive = RestWakeEvents.lapseTouchedSleep(
                 TimeLapseEngine.getLastActiveRealTick(), session.startRealTick());
         RestWakeEvents.onDawnWake(player, ticksSlept, healthRestored, lapseActive, session.nightMoonPhase());
+
+        // The positive pole of the weariness ladder (§4): a genuine dawn wake —
+        // bed or bedroll alike — grants the Well-Rested grace. Gated here on the
+        // per-tick config snapshot rather than in RestWakeEvents, which stays
+        // toggle-free. Interrupted wakes never reach this line (the dawn gate
+        // above returned), and the brew's rest reset is not a sleep, so neither
+        // grants the grace.
+        WellRested.grantOnDawnWake(player, config());
     }
 
     /**

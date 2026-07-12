@@ -7,6 +7,7 @@
 
   "effect.respite.weary": "Weary",
   "effect.respite.exhausted": "Exhausted",
+  "effect.respite.well_rested": "Well-Rested",
 
   "notification.respite.time_lapse": "✦ Time ×%s — %s of %s asleep",
   "notification.respite.time_lapse_end": "✦ Time settles",
@@ -83,6 +84,12 @@
   "config.respite.exhaustedThresholdDays.tooltip": "Days awake before a player becomes Exhausted (2–60); always at least one day past the Weary threshold.",
   "config.respite.exhaustedRegenPenalty": "Exhausted Regen Penalty",
   "config.respite.exhaustedRegenPenalty.tooltip": "Fraction of natural regeneration lost while Exhausted (0.0–0.95).",
+  "config.respite.enableWellRested": "Enable Well-Rested",
+  "config.respite.enableWellRested.tooltip": "Waking from a full night's sleep grants a short well-rested grace of faster healing.",
+  "config.respite.wellRestedSeconds": "Well-Rested Duration (Seconds)",
+  "config.respite.wellRestedSeconds.tooltip": "How long the Well-Rested grace lasts after waking, in seconds (0–600).",
+  "config.respite.wellRestedRegenBonus": "Well-Rested Regen Bonus",
+  "config.respite.wellRestedRegenBonus.tooltip": "Fraction of extra natural regeneration while Well-Rested (0.0–2.0).",
 
   "config.respite.enableChronometer": "Enable the Chronometer",
   "config.respite.enableChronometer.tooltip": "The time-of-day redstone block. Off removes its recipe; placed blocks keep working.",

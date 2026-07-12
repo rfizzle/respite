@@ -39,6 +39,7 @@
 |---|---|---|
 | Weary effect icon | `/glyph` | `art/weary-effect.glyph` → `assets/respite/textures/mob_effect/weary.png` |
 | Exhausted effect icon | `/glyph` | `art/exhausted-effect.glyph` → `assets/respite/textures/mob_effect/exhausted.png` |
+| Well-Rested effect icon | `/glyph` | `art/well-rested-effect.glyph` → `assets/respite/textures/mob_effect/well_rested.png` |
 | Time-lapse onset cue | `/sfx` | `art/audio/time-lapse-start.sfx` → `assets/respite/sounds/time_lapse_start.ogg` — (planned, with implementation) |
 | Time-lapse settle cue | `/sfx` | `art/audio/time-lapse-end.sfx` → `assets/respite/sounds/time_lapse_end.ogg` — (planned, with implementation) |
 | OG image, favicons | Gemini / derived from logo | `site/assets/` — (planned, with site phase) |

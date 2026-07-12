@@ -26,6 +26,7 @@ class RespiteConfigTest {
             "restfulHealIntervalTicks", "newMoonHealMultiplier", "enablePhantomRework",
             "phantomAltitudeMin", "phantomNewMoon", "enableWeariness", "wearinessThresholdDays",
             "wearinessRegenPenalty", "exhaustedThresholdDays", "exhaustedRegenPenalty",
+            "enableWellRested", "wellRestedSeconds", "wellRestedRegenBonus",
             "enableChronometer", "enableCaffeinatedBrew", "brewHasteSeconds",
             "enableBedroll", "bedrollRestfulMultiplier",
             "showTimeLapseMessages", "showExhaustionBlink");
@@ -52,6 +53,9 @@ class RespiteConfigTest {
         assertEquals(0.25, config.wearinessRegenPenalty);
         assertEquals(6, config.exhaustedThresholdDays);
         assertEquals(0.50, config.exhaustedRegenPenalty);
+        assertTrue(config.enableWellRested);
+        assertEquals(120, config.wellRestedSeconds);
+        assertEquals(0.5, config.wellRestedRegenBonus);
         assertTrue(config.enableChronometer);
         assertTrue(config.enableCaffeinatedBrew);
         assertEquals(90, config.brewHasteSeconds);
@@ -128,6 +132,8 @@ class RespiteConfigTest {
         config.wearinessRegenPenalty = -0.1;
         config.exhaustedThresholdDays = 1;
         config.exhaustedRegenPenalty = -1.0;
+        config.wellRestedSeconds = -5;
+        config.wellRestedRegenBonus = -0.1;
         config.brewHasteSeconds = -5;
         config.bedrollRestfulMultiplier = -0.1;
 
@@ -143,6 +149,8 @@ class RespiteConfigTest {
         // Range-clamped to 2, then raised to wearinessThresholdDays (1) + 1 = 2.
         assertEquals(2, config.exhaustedThresholdDays);
         assertEquals(0.0, config.exhaustedRegenPenalty);
+        assertEquals(0, config.wellRestedSeconds);
+        assertEquals(0.0, config.wellRestedRegenBonus);
         assertEquals(0, config.brewHasteSeconds);
         assertEquals(0.0, config.bedrollRestfulMultiplier);
     }
@@ -159,6 +167,8 @@ class RespiteConfigTest {
         config.wearinessRegenPenalty = 0.96;
         config.exhaustedThresholdDays = 61;
         config.exhaustedRegenPenalty = 2.0;
+        config.wellRestedSeconds = 601;
+        config.wellRestedRegenBonus = 2.1;
         config.brewHasteSeconds = 601;
         config.bedrollRestfulMultiplier = 1.1;
 
@@ -173,6 +183,8 @@ class RespiteConfigTest {
         assertEquals(0.95, config.wearinessRegenPenalty);
         assertEquals(60, config.exhaustedThresholdDays);
         assertEquals(0.95, config.exhaustedRegenPenalty);
+        assertEquals(600, config.wellRestedSeconds);
+        assertEquals(2.0, config.wellRestedRegenBonus);
         assertEquals(600, config.brewHasteSeconds);
         assertEquals(1.0, config.bedrollRestfulMultiplier);
     }
@@ -189,6 +201,8 @@ class RespiteConfigTest {
         low.wearinessRegenPenalty = 0.0;
         low.exhaustedThresholdDays = 2;
         low.exhaustedRegenPenalty = 0.0;
+        low.wellRestedSeconds = 0;
+        low.wellRestedRegenBonus = 0.0;
         low.brewHasteSeconds = 0;
         low.bedrollRestfulMultiplier = 0.0;
 
@@ -203,6 +217,8 @@ class RespiteConfigTest {
         assertEquals(0.0, low.wearinessRegenPenalty);
         assertEquals(2, low.exhaustedThresholdDays);
         assertEquals(0.0, low.exhaustedRegenPenalty);
+        assertEquals(0, low.wellRestedSeconds);
+        assertEquals(0.0, low.wellRestedRegenBonus);
         assertEquals(0, low.brewHasteSeconds);
         assertEquals(0.0, low.bedrollRestfulMultiplier);
 
@@ -216,6 +232,8 @@ class RespiteConfigTest {
         high.wearinessRegenPenalty = 0.95;
         high.exhaustedThresholdDays = 60;
         high.exhaustedRegenPenalty = 0.95;
+        high.wellRestedSeconds = 600;
+        high.wellRestedRegenBonus = 2.0;
         high.brewHasteSeconds = 600;
         high.bedrollRestfulMultiplier = 1.0;
 
@@ -230,6 +248,8 @@ class RespiteConfigTest {
         assertEquals(0.95, high.wearinessRegenPenalty);
         assertEquals(60, high.exhaustedThresholdDays);
         assertEquals(0.95, high.exhaustedRegenPenalty);
+        assertEquals(600, high.wellRestedSeconds);
+        assertEquals(2.0, high.wellRestedRegenBonus);
         assertEquals(600, high.brewHasteSeconds);
         assertEquals(1.0, high.bedrollRestfulMultiplier);
     }
