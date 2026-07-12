@@ -26,10 +26,10 @@ import net.minecraft.world.phys.Vec3;
  * — with two Respite twists routed through here:
  *
  * <ul>
- *   <li>{@link #trySleep} replicates the vanilla bed-sleep rules (night-only,
- *       monsters-near, obstruction, natural dimension) but omits the one
- *       {@code setRespawnPosition} call, so a bedroll <em>never sets spawn</em>
- *       — no mixin needed. It is the road's shelter, not a home.</li>
+ *   <li>{@link #sleepProblem} replicates the vanilla bed-sleep rules (night-only,
+ *       obstruction, monsters-near, natural dimension) and {@link #sleep} omits
+ *       the one {@code setRespawnPosition} call, so a bedroll <em>never sets
+ *       spawn</em> — no mixin needed. It is the road's shelter, not a home.</li>
  *   <li>The bedroll rolls back into the sleeper's inventory on any wake from it
  *       (dawn, damage, leaving the bed) via {@link #onStopSleeping}; a
  *       disconnect or server stop mid-sleep leaves the block placed, reclaimed
@@ -58,8 +58,8 @@ public final class Bedroll {
     /**
      * Start of a bedroll sleep, if the bed rules allow it. Sends the waking
      * player the vanilla problem message on a soft refusal; on success the
-     * player is asleep with spawn untouched. Called both from the block's
-     * right-click and the item's auto-use.
+     * player is asleep with spawn untouched. The block's right-click entry —
+     * the item's auto-use checks the rules itself and calls {@link #enterSleep}.
      */
     public static void sleep(ServerPlayer player, BlockPos pos) {
         Optional<Player.BedSleepingProblem> problem = sleepProblem(player, pos);
@@ -67,10 +67,23 @@ public final class Bedroll {
             sendProblem(player, problem.get());
             return;
         }
-        // Spawn-suppressing sleep: vanilla ServerPlayer#startSleepInBed minus the
-        // setRespawnPosition call. startSleeping resets TIME_SINCE_REST (§4 clear)
-        // and sets the sleeping pose, so the time-lapse counts the sleeper (§1) and
-        // Fabric's START_SLEEPING fires to arm Restful Saturation (§2).
+        enterSleep(player, pos);
+    }
+
+    /**
+     * Begin a bedroll sleep once the bed rules are known to pass. Spawn-
+     * suppressing: this is vanilla {@code ServerPlayer#startSleepInBed} minus the
+     * {@code setRespawnPosition} call. {@code startSleeping} resets
+     * {@code TIME_SINCE_REST} (§4 clear) and sets the sleeping pose, so the
+     * time-lapse counts the sleeper (§1) and Fabric's {@code START_SLEEPING}
+     * fires to arm Restful Saturation (§2). Guarded on a bedroll actually sitting
+     * at {@code pos}, so a mis-computed position can never strand the player
+     * asleep on empty ground.
+     */
+    public static void enterSleep(ServerPlayer player, BlockPos pos) {
+        if (!(player.level().getBlockState(pos).getBlock() instanceof BedrollBlock)) {
+            return;
+        }
         player.startSleeping(pos);
         player.awardStat(Stats.SLEEP_IN_BED);
         CriteriaTriggers.SLEPT_IN_BED.trigger(player);
@@ -97,6 +110,12 @@ public final class Bedroll {
         Level level = player.level();
         if (!level.dimensionType().natural()) {
             return Optional.of(Player.BedSleepingProblem.NOT_POSSIBLE_HERE);
+        }
+        // Obstruction: the space directly above the bedroll must be clear, the
+        // single-tile analogue of vanilla's bedBlocked head/foot free-space check.
+        BlockPos above = pos.above();
+        if (level.getBlockState(above).isSuffocating(level, above)) {
+            return Optional.of(Player.BedSleepingProblem.OBSTRUCTED);
         }
         if (level.isDay()) {
             return Optional.of(Player.BedSleepingProblem.NOT_POSSIBLE_NOW);

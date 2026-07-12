@@ -13,8 +13,14 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * In-world coverage for the bedroll ({@code design/SPEC.md} §7). It leans on the
@@ -141,6 +147,91 @@ public class BedrollGameTest implements FabricGameTest {
                     helper.succeed();
                 }
             }
+        }));
+    }
+
+    /**
+     * The item's one-action unroll-and-sleep must sleep <em>at</em> the placed
+     * bedroll even on replaceable ground (grass, ferns, snow). Regression guard
+     * for the placement position being recomputed after placement — on a
+     * replaceable tile that shifts the sleep one block into the air, where
+     * vanilla's per-tick eject then wakes the player.
+     */
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "bedrollAutoUse", timeoutTicks = 200)
+    public void itemAutoUseSleepsAtTheBedrollOnReplaceableGround(GameTestHelper helper) {
+        MockPlayers.retireLeaked(helper);
+        helper.getLevel().setDayTime(NIGHT_START);
+        int savedBudget = RespiteConfig.get().timeLapseTickBudgetMs;
+        RespiteConfig.get().timeLapseTickBudgetMs = 0;
+        for (int x = 0; x <= 2; x++) {
+            for (int z = 0; z <= 2; z++) {
+                helper.setBlock(new BlockPos(x, 1, z), Blocks.SMOOTH_STONE.defaultBlockState());
+            }
+        }
+        // A replaceable tuft on the click tile: right-clicking it places the
+        // bedroll onto that same tile, not the space above.
+        BlockPos clickRel = new BlockPos(1, 2, 1);
+        helper.setBlock(clickRel, Blocks.SHORT_GRASS.defaultBlockState());
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
+        Runnable cleanup = () -> {
+            RespiteConfig.get().timeLapseTickBudgetMs = savedBudget;
+            MockPlayers.retire(player);
+        };
+        int[] realTick = {0};
+        long[] lastRealTick = {-1};
+        helper.onEachTick(() -> guarded(cleanup, () -> {
+            if (!newRealTick(lastRealTick)) {
+                return;
+            }
+            if (++realTick[0] != 2) {
+                return;
+            }
+            BlockPos abs = helper.absolutePos(clickRel);
+            // Stand off the placement tile so the bedroll can be placed there.
+            player.teleportTo(abs.getX() - 0.5, abs.getY(), abs.getZ() + 0.5);
+            BlockHitResult hit = new BlockHitResult(
+                    new Vec3(abs.getX() + 0.5, abs.getY() + 0.1, abs.getZ() + 0.5),
+                    Direction.UP, abs, false);
+            ItemStack stack = new ItemStack(RespiteRegistry.BEDROLL);
+            UseOnContext context =
+                    new UseOnContext(helper.getLevel(), player, InteractionHand.MAIN_HAND, stack, hit);
+
+            InteractionResult result = RespiteRegistry.BEDROLL.asItem().useOn(context);
+
+            helper.assertTrue(result.consumesAction(), "auto-use must place and act, got " + result);
+            helper.assertTrue(helper.getBlockState(clickRel).getBlock() instanceof BedrollBlock,
+                    "the bedroll must be placed on the replaceable tile");
+            helper.assertTrue(player.isSleeping(), "auto-use must start sleep in one action");
+            BlockPos sleepPos = player.getSleepingPos().orElse(null);
+            helper.assertTrue(abs.equals(sleepPos),
+                    "must sleep at the bedroll " + abs + ", not the air above it; got " + sleepPos);
+            cleanup.run();
+            helper.succeed();
+        }));
+    }
+
+    /** The promised "not obstructed" bed rule (§7.3): a blocked space above refuses sleep. */
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "bedrollObstructed", timeoutTicks = 100)
+    public void obstructedBedrollRefusesSleep(GameTestHelper helper) {
+        MockPlayers.retireLeaked(helper);
+        helper.getLevel().setDayTime(NIGHT_START);
+        placeBedroll(helper);
+        // A solid block directly above the bedroll — vanilla's OBSTRUCTED case.
+        helper.setBlock(BEDROLL_POS.above(), Blocks.STONE.defaultBlockState());
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
+        Runnable cleanup = () -> MockPlayers.retire(player);
+        int[] realTick = {0};
+        long[] lastRealTick = {-1};
+        helper.onEachTick(() -> guarded(cleanup, () -> {
+            if (!newRealTick(lastRealTick) || ++realTick[0] != 2) {
+                return;
+            }
+            BlockPos abs = helper.absolutePos(BEDROLL_POS);
+            player.teleportTo(abs.getX() + 0.5, abs.getY(), abs.getZ() + 0.5);
+            Bedroll.sleep(player, abs);
+            helper.assertTrue(!player.isSleeping(), "an obstructed bedroll must refuse sleep");
+            cleanup.run();
+            helper.succeed();
         }));
     }
 

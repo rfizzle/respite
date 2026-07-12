@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
  * vanilla's per-tick sleeper-eject ({@code LivingEntity#checkBedExists}) and
  * the client "Leave Bed" overlay both work with no mixin. Respite changes only
  * what a bedroll's sleep <em>does</em> — never sets spawn, heals at half
- * strength (§2) — routing every sleep through {@link Bedroll#trySleep}, which
+ * strength (§2) — routing every sleep through {@link Bedroll#sleep}, which
  * replicates the vanilla bed rules minus the respawn-point set.
  *
  * <p>Single-tile, unlike a vanilla two-block bed: {@link #setPlacedBy} never

@@ -357,7 +357,7 @@ Every other Respite system assumes a bed near home. A night on expedition has no
 ### Implementation Notes
 
 - `BedrollBlock extends BedBlock`: being a genuine bed keeps vanilla's per-tick sleeper-eject (`checkBedExists`, which requires an `instanceof BedBlock`) and the client sleep overlay working with no mixin. It is single-tile — `setPlacedBy` lays no head half, `updateShape` never self-destructs, `getStateForPlacement` needs no head space — renders as a plain static model with no `BedBlockEntity`, and never explodes.
-- Sleep routes through `Bedroll.trySleep`, a copy of `ServerPlayer#startSleepInBed` minus the `setRespawnPosition` call and the head-half checks, so spawn is never set and no mixin is needed.
+- Sleep routes through `Bedroll.sleep` (rules in `Bedroll.sleepProblem`, the actual sleep in `Bedroll.enterSleep`), a copy of `ServerPlayer#startSleepInBed` minus the `setRespawnPosition` call and the head-half checks, so spawn is never set and no mixin is needed.
 - The roll-up rides `EntitySleepEvents.STOP_SLEEPING`, reading the block at the synced sleeping position — the placed block is the whole state, so there is no transient tracker.
 - Half strength resolves in `RestfulMath.healPerStep(moonPhase, newMoonMultiplier, strength)`, with `strength` set at arm time from whether the sleeping-position block is a bedroll.
 

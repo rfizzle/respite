@@ -208,9 +208,15 @@ public final class RestfulSleepHandler {
         }
         int moonPhase = player.serverLevel().getMoonPhase();
         double strength = state.bedroll() ? config.bedrollRestfulMultiplier : 1.0;
+        float healAmount = RestfulMath.healPerStep(moonPhase, config.newMoonHealMultiplier, strength);
+        if (healAmount <= 0.0f) {
+            // A zeroed strength (e.g. bedrollRestfulMultiplier = 0) heals nothing —
+            // don't spend saturation for a conversion with no benefit.
+            return;
+        }
         // Vanilla setters, so other mods' hooks observe both mutations.
         food.setSaturation(saturation - RestfulMath.SATURATION_COST_PER_STEP);
-        player.heal(RestfulMath.healPerStep(moonPhase, config.newMoonHealMultiplier, strength));
+        player.heal(healAmount);
         // Tally the post-clamp delta, not the attempt — heal() clamps at max
         // health and other mods may scale or cancel it.
         float healed = player.getHealth() - healthBefore;

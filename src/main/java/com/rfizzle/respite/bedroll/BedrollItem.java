@@ -46,7 +46,10 @@ public class BedrollItem extends BlockItem {
             return InteractionResult.PASS;
         }
         // Dry-run the bed rules at the target before committing the placement, so a
-        // refusal (day, monsters near, wrong dimension) never litters a block.
+        // refusal (day, monsters near, wrong dimension, obstructed) never litters a
+        // block. The target is computed once, before placement: recomputing it after
+        // super.useOn() would shift by one on replaceable ground (the placed bedroll
+        // is no longer replaceable), stranding the sleep in the air above.
         BlockPos target = new BlockPlaceContext(context).getClickedPos();
         Optional<Player.BedSleepingProblem> problem = Bedroll.sleepProblem(serverPlayer, target);
         if (problem.isPresent()) {
@@ -57,7 +60,8 @@ public class BedrollItem extends BlockItem {
         if (!placed.consumesAction()) {
             return placed;
         }
-        Bedroll.sleep(serverPlayer, new BlockPlaceContext(context).getClickedPos());
+        // Rules already checked above; enterSleep verifies the bedroll landed here.
+        Bedroll.enterSleep(serverPlayer, target);
         return placed;
     }
 }
