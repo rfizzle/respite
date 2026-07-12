@@ -1,5 +1,6 @@
 {
   "block.respite.chronometer": "Chronometer",
+  "block.respite.bedroll": "Bedroll",
 
   "item.respite.unsteeped_brew": "Unsteeped Brew",
   "item.respite.caffeinated_brew": "Caffeinated Brew",
@@ -42,6 +43,7 @@
   "config.respite.category.weariness": "Weariness",
   "config.respite.category.chronometer": "Chronometer",
   "config.respite.category.brew": "Caffeinated Brew",
+  "config.respite.category.bedroll": "Bedroll",
   "config.respite.category.client": "Client",
 
   "config.respite.enableTimeLapse": "Enable Time-Lapse",
@@ -88,6 +90,11 @@
   "config.respite.enableCaffeinatedBrew.tooltip": "The campfire-steeped brew. Off removes its recipe; held items keep working.",
   "config.respite.brewHasteSeconds": "Brew Haste (Seconds)",
   "config.respite.brewHasteSeconds.tooltip": "Haste duration granted by the brew, in seconds (0–600).",
+
+  "config.respite.enableBedroll": "Enable the Bedroll",
+  "config.respite.enableBedroll.tooltip": "A craftable camp bed that sleeps anywhere without setting spawn. Off removes its recipe; placed bedrolls keep working.",
+  "config.respite.bedrollRestfulMultiplier": "Bedroll Rest Strength",
+  "config.respite.bedrollRestfulMultiplier.tooltip": "Fraction of overnight healing a bedroll gives versus a real bed (0.0–1.0); 0.5 is half strength.",
 
   "config.respite.showTimeLapseMessages": "Show Time-Lapse Messages",
   "config.respite.showTimeLapseMessages.tooltip": "Show the time-lapse action-bar lines on this client.",

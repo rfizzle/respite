@@ -10,5 +10,6 @@ public class RespiteClient implements ClientModInitializer {
         // Exhausted eyelid blink (§4.4), a cosmetic screen fade, not a HUD slot.
         TimeLapseClientHandler.register();
         WearinessBlinkHandler.register();
+        BedrollSleepClientHandler.register();
     }
 }

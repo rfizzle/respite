@@ -1,6 +1,8 @@
 package com.rfizzle.respite.registry;
 
 import com.rfizzle.respite.Respite;
+import com.rfizzle.respite.bedroll.BedrollBlock;
+import com.rfizzle.respite.bedroll.BedrollItem;
 import com.rfizzle.respite.block.ChronometerBlock;
 import com.rfizzle.respite.brew.CaffeinatedBrewItem;
 import com.rfizzle.respite.condition.FeatureEnabledCondition;
@@ -20,11 +22,13 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 
 /**
  * The one home for every {@code Registry.register} call. Registration runs
@@ -76,6 +80,20 @@ public final class RespiteRegistry {
                     .stacksTo(16)
                     .food(new FoodProperties.Builder().alwaysEdible().build()));
 
+    // The bedroll (design/SPEC.md §7) — a one-tile camp bed. Wool body → wool
+    // sound and a warm map colour; ignited by lava, crushed like a bed by pistons.
+    // A genuine BedBlock so vanilla's sleeper machinery treats it as one; Respite
+    // routes its sleep through Bedroll to skip the spawn set and halve the heal.
+    public static final BedrollBlock BEDROLL = new BedrollBlock(
+            DyeColor.BROWN,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_BROWN)
+                    .strength(0.2f)
+                    .sound(SoundType.WOOL)
+                    .ignitedByLava()
+                    .noOcclusion()
+                    .pushReaction(PushReaction.DESTROY));
+
     private static boolean registered;
 
     private RespiteRegistry() {
@@ -88,6 +106,14 @@ public final class RespiteRegistry {
         registered = true;
 
         registerBlock("chronometer", CHRONOMETER, new Item.Properties());
+
+        // The bedroll's item is a custom BlockItem (auto-use sleep), so it is
+        // registered directly rather than through the default-BlockItem helper.
+        ResourceLocation bedrollId = Respite.id("bedroll");
+        Registry.register(BuiltInRegistries.BLOCK, bedrollId, BEDROLL);
+        BLOCKS.put(bedrollId, BEDROLL);
+        Registry.register(BuiltInRegistries.ITEM, bedrollId,
+                new BedrollItem(BEDROLL, new Item.Properties().stacksTo(16)));
 
         registerItem("unsteeped_brew", UNSTEEPED_BREW);
         registerItem("caffeinated_brew", CAFFEINATED_BREW);
@@ -111,6 +137,11 @@ public final class RespiteRegistry {
                     entries.accept(UNSTEEPED_BREW);
                     entries.accept(CAFFEINATED_BREW);
                 });
+
+        // The bedroll is a camp utility — it sits with the other tools and
+        // utility items, not in the vanilla bed tab (functional blocks).
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES)
+                .register(entries -> entries.accept(BEDROLL));
 
         // Datapack-side feature gates (recipes and their unlock advancements).
         ResourceConditions.register(FeatureEnabledCondition.TYPE);

@@ -156,6 +156,20 @@ final class ClothConfigScreenBuilder {
                 .setSaveConsumer(v -> working.brewHasteSeconds = v)
                 .build());
 
+        // --- Bedroll (§7) ---
+        ConfigCategory bedroll = builder.getOrCreateCategory(Component.translatable("config.respite.category.bedroll"));
+        bedroll.addEntry(entry.startBooleanToggle(Component.translatable("config.respite.enableBedroll"), config.enableBedroll)
+                .setDefaultValue(defaults.enableBedroll)
+                .setTooltip(Component.translatable("config.respite.enableBedroll.tooltip"))
+                .setSaveConsumer(v -> working.enableBedroll = v)
+                .build());
+        bedroll.addEntry(entry.startDoubleField(Component.translatable("config.respite.bedrollRestfulMultiplier"), config.bedrollRestfulMultiplier)
+                .setDefaultValue(defaults.bedrollRestfulMultiplier)
+                .setMin(0.0).setMax(1.0)
+                .setTooltip(Component.translatable("config.respite.bedrollRestfulMultiplier.tooltip"))
+                .setSaveConsumer(v -> working.bedrollRestfulMultiplier = v)
+                .build());
+
         // --- Client ---
         ConfigCategory client = builder.getOrCreateCategory(Component.translatable("config.respite.category.client"));
         client.addEntry(entry.startBooleanToggle(Component.translatable("config.respite.showTimeLapseMessages"), config.showTimeLapseMessages)

@@ -17,7 +17,20 @@ public final class RestState {
     private float healthRestored;
     private boolean deepConversionRan;
 
+    /** Whether this night is slept in a bedroll (§7 — half-strength healing). Fixed at arming. */
+    private final boolean bedroll;
+
     RestState() {
+        this(false);
+    }
+
+    RestState(boolean bedroll) {
+        this.bedroll = bedroll;
+    }
+
+    /** True when this night is slept in a bedroll, not a full bed. */
+    public boolean bedroll() {
+        return bedroll;
     }
 
     /**

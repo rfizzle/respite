@@ -1,6 +1,7 @@
 package com.rfizzle.respite;
 
 import com.rfizzle.respite.advancement.RespiteCriteria;
+import com.rfizzle.respite.bedroll.Bedroll;
 import com.rfizzle.respite.command.RespiteCommand;
 import com.rfizzle.respite.config.RespiteConfig;
 import com.rfizzle.respite.registry.RespiteRegistry;
@@ -35,6 +36,8 @@ public class Respite implements ModInitializer {
         TimeLapseEngine.register();
 
         RestfulSleepHandler.register();
+
+        Bedroll.register();
 
         WearinessHandler.register();
 

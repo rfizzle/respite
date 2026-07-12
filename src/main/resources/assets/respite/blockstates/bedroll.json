@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "respite:block/bedroll" },
+    "facing=east": { "model": "respite:block/bedroll", "y": 90 },
+    "facing=south": { "model": "respite:block/bedroll", "y": 180 },
+    "facing=west": { "model": "respite:block/bedroll", "y": 270 }
+  }
+}
