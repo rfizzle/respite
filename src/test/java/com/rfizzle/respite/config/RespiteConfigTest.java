@@ -27,6 +27,7 @@ class RespiteConfigTest {
             "phantomAltitudeMin", "phantomNewMoon", "enableWeariness", "wearinessThresholdDays",
             "wearinessRegenPenalty", "exhaustedThresholdDays", "exhaustedRegenPenalty",
             "enableChronometer", "enableCaffeinatedBrew", "brewHasteSeconds",
+            "enableBedroll", "bedrollRestfulMultiplier",
             "showTimeLapseMessages", "showExhaustionBlink");
 
     @Test
@@ -54,6 +55,8 @@ class RespiteConfigTest {
         assertTrue(config.enableChronometer);
         assertTrue(config.enableCaffeinatedBrew);
         assertEquals(90, config.brewHasteSeconds);
+        assertTrue(config.enableBedroll);
+        assertEquals(0.5, config.bedrollRestfulMultiplier);
         assertTrue(config.showTimeLapseMessages);
         assertTrue(config.showExhaustionBlink);
     }
@@ -126,6 +129,7 @@ class RespiteConfigTest {
         config.exhaustedThresholdDays = 1;
         config.exhaustedRegenPenalty = -1.0;
         config.brewHasteSeconds = -5;
+        config.bedrollRestfulMultiplier = -0.1;
 
         config.clamp();
 
@@ -140,6 +144,7 @@ class RespiteConfigTest {
         assertEquals(2, config.exhaustedThresholdDays);
         assertEquals(0.0, config.exhaustedRegenPenalty);
         assertEquals(0, config.brewHasteSeconds);
+        assertEquals(0.0, config.bedrollRestfulMultiplier);
     }
 
     @Test
@@ -155,6 +160,7 @@ class RespiteConfigTest {
         config.exhaustedThresholdDays = 61;
         config.exhaustedRegenPenalty = 2.0;
         config.brewHasteSeconds = 601;
+        config.bedrollRestfulMultiplier = 1.1;
 
         config.clamp();
 
@@ -168,6 +174,7 @@ class RespiteConfigTest {
         assertEquals(60, config.exhaustedThresholdDays);
         assertEquals(0.95, config.exhaustedRegenPenalty);
         assertEquals(600, config.brewHasteSeconds);
+        assertEquals(1.0, config.bedrollRestfulMultiplier);
     }
 
     @Test
@@ -183,6 +190,7 @@ class RespiteConfigTest {
         low.exhaustedThresholdDays = 2;
         low.exhaustedRegenPenalty = 0.0;
         low.brewHasteSeconds = 0;
+        low.bedrollRestfulMultiplier = 0.0;
 
         low.clamp();
 
@@ -196,6 +204,7 @@ class RespiteConfigTest {
         assertEquals(2, low.exhaustedThresholdDays);
         assertEquals(0.0, low.exhaustedRegenPenalty);
         assertEquals(0, low.brewHasteSeconds);
+        assertEquals(0.0, low.bedrollRestfulMultiplier);
 
         RespiteConfig high = new RespiteConfig();
         high.maxTimeLapseRate = 100;
@@ -208,6 +217,7 @@ class RespiteConfigTest {
         high.exhaustedThresholdDays = 60;
         high.exhaustedRegenPenalty = 0.95;
         high.brewHasteSeconds = 600;
+        high.bedrollRestfulMultiplier = 1.0;
 
         high.clamp();
 
@@ -221,6 +231,7 @@ class RespiteConfigTest {
         assertEquals(60, high.exhaustedThresholdDays);
         assertEquals(0.95, high.exhaustedRegenPenalty);
         assertEquals(600, high.brewHasteSeconds);
+        assertEquals(1.0, high.bedrollRestfulMultiplier);
     }
 
     @Test

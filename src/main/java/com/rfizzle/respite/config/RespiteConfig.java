@@ -62,6 +62,10 @@ public class RespiteConfig {
     public boolean enableCaffeinatedBrew = true;
     public int brewHasteSeconds = 90;
 
+    // Bedroll (§7)
+    public boolean enableBedroll = true;
+    public double bedrollRestfulMultiplier = 0.5;
+
     // --- Client Config ---
 
     public boolean showTimeLapseMessages = true;
@@ -78,6 +82,7 @@ public class RespiteConfig {
         exhaustedThresholdDays = clampInt("exhaustedThresholdDays", exhaustedThresholdDays, 2, 60);
         exhaustedRegenPenalty = clampDouble("exhaustedRegenPenalty", exhaustedRegenPenalty, 0.0, 0.95);
         brewHasteSeconds = clampInt("brewHasteSeconds", brewHasteSeconds, 0, 600);
+        bedrollRestfulMultiplier = clampDouble("bedrollRestfulMultiplier", bedrollRestfulMultiplier, 0.0, 1.0);
         // Exhausted must sit at least one full day past Weary (SPEC §4); runs after the
         // range clamps so the raised value stays inside both fields' stated ranges.
         if (exhaustedThresholdDays < wearinessThresholdDays + 1) {

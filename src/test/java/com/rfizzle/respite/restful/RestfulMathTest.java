@@ -74,6 +74,39 @@ class RestfulMathTest {
         assertEquals(4.0f, RestfulMath.healPerStep(RestfulMath.NEW_MOON_PHASE, 4.0), EPS);
     }
 
+    // --- Bedroll half-strength (§7) ---
+
+    @Test
+    void bedrollHalvesAnOrdinaryNightsHeal() {
+        // half strength on an ordinary night: 0.5 HP per step vs a full bed's 1.0
+        assertEquals(0.5f, RestfulMath.healPerStep(0, 2.0, 0.5), EPS);
+        assertEquals(1.0f, RestfulMath.healPerStep(0, 2.0, 1.0), EPS);
+    }
+
+    @Test
+    void bedrollHalfStrengthStacksWithDeepSleep() {
+        // a bedroll on a new moon heals ×2 × 0.5 = ×1.0 — exactly a full bed on
+        // an ordinary night, and a real bed on a new moon still beats it (2.0).
+        assertEquals(1.0f, RestfulMath.healPerStep(RestfulMath.NEW_MOON_PHASE, 2.0, 0.5), EPS);
+        assertEquals(2.0f, RestfulMath.healPerStep(RestfulMath.NEW_MOON_PHASE, 2.0, 1.0), EPS);
+    }
+
+    @Test
+    void bedrollStrengthExtremes() {
+        assertEquals(0.0f, RestfulMath.healPerStep(0, 2.0, 0.0), EPS);
+        assertEquals(0.0f, RestfulMath.healPerStep(RestfulMath.NEW_MOON_PHASE, 4.0, 0.0), EPS);
+    }
+
+    @Test
+    void defaultStrengthEqualsAFullBed() {
+        // the 2-arg overload is a full bed (strength 1.0) at every phase
+        for (int phase = 0; phase < 8; phase++) {
+            assertEquals(RestfulMath.healPerStep(phase, 2.0),
+                    RestfulMath.healPerStep(phase, 2.0, 1.0), EPS,
+                    "phase " + phase + " default must equal a full-strength bed");
+        }
+    }
+
     // --- Wake feedback (§2.7) ---
 
     @Test

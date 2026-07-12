@@ -39,12 +39,24 @@ class FeatureEnabledConditionTest {
     }
 
     @Test
+    void bedrollFeatureTracksItsToggle() {
+        RespiteConfig config = new RespiteConfig();
+        config.enableBedroll = true;
+        assertTrue(Feature.BEDROLL.enabledIn(config));
+        config.enableBedroll = false;
+        assertFalse(Feature.BEDROLL.enabledIn(config));
+    }
+
+    @Test
     void codecParsesTheShippedSpelling() {
         var result = Feature.CODEC.parse(JsonOps.INSTANCE, new JsonPrimitive("chronometer"));
         assertEquals(Feature.CHRONOMETER, result.result().orElseThrow());
 
         var brew = Feature.CODEC.parse(JsonOps.INSTANCE, new JsonPrimitive("caffeinated_brew"));
         assertEquals(Feature.CAFFEINATED_BREW, brew.result().orElseThrow());
+
+        var bedroll = Feature.CODEC.parse(JsonOps.INSTANCE, new JsonPrimitive("bedroll"));
+        assertEquals(Feature.BEDROLL, bedroll.result().orElseThrow());
     }
 
     @Test

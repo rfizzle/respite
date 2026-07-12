@@ -74,6 +74,14 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
   crafting and campfire recipes that show natively in recipe viewers;
   `enableCaffeinatedBrew = false` removes them while already-brewed bottles keep
   working.
+- **The Bedroll** — a camp bed for the road, crafted from a row of string over a
+  row of any wool. Right-click the ground to unroll it and sleep in one action;
+  it rolls back into your inventory when you wake. It sleeps like a bed — the
+  time-lapse runs and your days-awake count resets — but never sets your spawn,
+  and overnight Restful Saturation heals at half a real bed's rate (a new moon
+  under a bedroll heals like an ordinary night in a real bed). Every vanilla bed
+  rule applies and it never explodes in the Nether; `enableBedroll = false`
+  removes the recipe while placed bedrolls keep working.
 
 Alongside the features, Respite ships a small `respite` advancement tab (sleep
 through a time-lapse night, heal eight hearts overnight, pull a night shift on

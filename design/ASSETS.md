@@ -22,6 +22,8 @@
 | Chronometer dial faces (8 phases, 32×32) | `art/glyphs/chronometer-dial-0..7.glyph` | `assets/respite/textures/block/chronometer_dial_0..7.png` |
 | Chronometer still face (fixed-time dimensions) | `art/glyphs/chronometer-dial-still.glyph` | `assets/respite/textures/block/chronometer_dial_still.png` |
 | Chronometer top/bottom cap | `art/glyphs/chronometer-top.glyph` | `assets/respite/textures/block/chronometer_top.png` |
+| Bedroll top face (32×32) | `art/glyphs/bedroll-top.glyph` | `assets/respite/textures/block/bedroll_top.png` |
+| Bedroll side (16×16) | `art/glyphs/bedroll-side.glyph` | `assets/respite/textures/block/bedroll_side.png` |
 
 ## Item textures
 
@@ -29,6 +31,7 @@
 |---|---|---|
 | Unsteeped Brew item (16×16) | `art/unsteeped-brew.glyph` | `assets/respite/textures/item/unsteeped_brew.png` |
 | Caffeinated Brew item (16×16) | `art/caffeinated-brew.glyph` | `assets/respite/textures/item/caffeinated_brew.png` |
+| Bedroll item (32×32) | `art/glyphs/bedroll-item.glyph` | `assets/respite/textures/item/bedroll.png` |
 
 ## Not yet created
 

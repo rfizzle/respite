@@ -55,9 +55,21 @@ public final class RestfulMath {
      * the base amount, or {@code × newMoonHealMultiplier} under Deep Sleep.
      */
     public static float healPerStep(int moonPhase, double newMoonHealMultiplier) {
-        return moonPhase == NEW_MOON_PHASE
-                ? (float) (BASE_HEAL_PER_STEP * newMoonHealMultiplier)
+        return healPerStep(moonPhase, newMoonHealMultiplier, 1.0);
+    }
+
+    /**
+     * As {@link #healPerStep(int, double)}, scaled by a bed-strength multiplier
+     * (§7): a real bed is 1.0, a bedroll is {@code bedrollRestfulMultiplier}
+     * (default 0.5). The bedroll's half strength stacks with Deep Sleep — a
+     * bedroll on a new moon heals the same as a full bed on an ordinary night,
+     * and a real bed is always the best night's sleep.
+     */
+    public static float healPerStep(int moonPhase, double newMoonHealMultiplier, double strengthMultiplier) {
+        double base = moonPhase == NEW_MOON_PHASE
+                ? BASE_HEAL_PER_STEP * newMoonHealMultiplier
                 : BASE_HEAL_PER_STEP;
+        return (float) (base * strengthMultiplier);
     }
 
     /**

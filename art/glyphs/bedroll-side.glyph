@@ -1,0 +1,31 @@
+# bedroll — respite (design/SPEC.md §7)
+size: 16
+legend:
+  . transparent
+  K ink                 # #0a0a0a outline / occlusion
+  H #efe6d6             # fabric highlight (near-bone)
+  L #d8b98a             # light tan
+  M #c19a6b             # mid tan
+  C #8a6d47             # core brown
+  S #5c4a33             # deep brown shadow
+  p respite.candleglow-pale  # cord highlight
+  t respite.candleglow       # cord body
+  b #b8892f                  # cord shadow
+
+frame:
+  LLLLLLLLLLLLLLLL
+  LLLLLLLLLLLLLLLL
+  CLCLCLCLCLCLCLCL
+  LLLLLLLLLLLLLLLL
+  MMMMMMMMMMMMMMMM
+  MMMMMMMMMMMMMMMM
+  CMCMCMCMCMCMCMCM
+  MMMMMMMMMMMMMMMM
+  MMMMMMMMMMMMMMMM
+  MMMMMMMMMMMMMMMM
+  CCCCCCCCCCCCCCCC
+  CCCCCCCCCCCCCCCC
+  CCCCCCCCCCCCCCCC
+  CCCCCCCCCCCCCCCC
+  CCCCCCCCCCCCCCCC
+  CCCCCCCCCCCCCCCC

@@ -1,6 +1,7 @@
 package com.rfizzle.respite.restful;
 
 import com.rfizzle.respite.Respite;
+import com.rfizzle.respite.bedroll.BedrollBlock;
 import com.rfizzle.respite.config.RespiteConfig;
 import com.rfizzle.respite.rest.RestWakeEvents;
 import com.rfizzle.respite.timelapse.TimeLapseEngine;
@@ -114,7 +115,10 @@ public final class RestfulSleepHandler {
         }
         try {
             if (RestfulMath.arms(player.getFoodData().getFoodLevel(), config.restfulRequiresFullHunger)) {
-                TRACKER.arm(player.getUUID());
+                // A bedroll (§7) heals at half strength; the block at the sleeping
+                // position is the whole signal — no tracker of our own needed.
+                boolean bedroll = level.getBlockState(sleepingPos).getBlock() instanceof BedrollBlock;
+                TRACKER.arm(player.getUUID(), bedroll);
             }
         } catch (Exception e) {
             Respite.LOGGER.error("Restful arming failed for {}", player.getName().getString(), e);
@@ -203,9 +207,16 @@ public final class RestfulSleepHandler {
             return;
         }
         int moonPhase = player.serverLevel().getMoonPhase();
+        double strength = state.bedroll() ? config.bedrollRestfulMultiplier : 1.0;
+        float healAmount = RestfulMath.healPerStep(moonPhase, config.newMoonHealMultiplier, strength);
+        if (healAmount <= 0.0f) {
+            // A zeroed strength (e.g. bedrollRestfulMultiplier = 0) heals nothing —
+            // don't spend saturation for a conversion with no benefit.
+            return;
+        }
         // Vanilla setters, so other mods' hooks observe both mutations.
         food.setSaturation(saturation - RestfulMath.SATURATION_COST_PER_STEP);
-        player.heal(RestfulMath.healPerStep(moonPhase, config.newMoonHealMultiplier));
+        player.heal(healAmount);
         // Tally the post-clamp delta, not the attempt — heal() clamps at max
         // health and other mods may scale or cancel it.
         float healed = player.getHealth() - healthBefore;

@@ -22,7 +22,12 @@ public final class RestfulTracker {
 
     /** The player started sleeping armed — begin their night's accounting. */
     public void arm(UUID playerId) {
-        sleepers.put(playerId, new RestState());
+        arm(playerId, false);
+    }
+
+    /** As {@link #arm(UUID)}, recording whether the night is slept in a bedroll (§7). */
+    public void arm(UUID playerId, boolean bedroll) {
+        sleepers.put(playerId, new RestState(bedroll));
     }
 
     /** The player's live night, or null when they aren't an armed sleeper. */

@@ -315,6 +315,54 @@ Weariness (§4) needs counterplay that isn't "ignore it": a deliberate, craftabl
 
 ---
 
+## 7. The Bedroll
+
+A craftable camp bed for the road: it sleeps anywhere without setting spawn, at half a bed's overnight healing.
+
+### Problem
+
+Every other Respite system assumes a bed near home. A night on expedition has no answer but the Caffeinated Brew, which postpones rest rather than giving it. The bedroll is the away-from-home story — shelter for the road that still lets the night pass and clears the day's weariness, without ever becoming a second home.
+
+### Behavior
+
+1. **Item** — `respite:bedroll`, a block-item that stacks to 16.
+2. **Recipe** — shaped, yields 1: a row of string over a row of any wool (`#minecraft:wool`):
+
+   ```
+   string | string | string
+   wool   | wool   | wool
+   ```
+3. **Unroll and sleep** — right-clicking the ground with a bedroll unrolls it: the block is placed and the player begins to sleep in one action. Crouch-right-click places it without sleeping; right-clicking a placed bedroll then sleeps. Sleep obeys every vanilla bed rule — night or thunderstorm only, no monster within 8 blocks, not obstructed, and only in a natural dimension. A refused sleep places nothing.
+4. **Never sets spawn** — sleeping in a bedroll leaves the player's spawn point exactly as it was. It runs the vanilla bed-sleep minus the one step that sets spawn: shelter for the road, not a home.
+5. **An ordinary sleeper** — a bedroll sleeper counts toward the time-lapse share (§1) exactly like a bed sleeper, and clears Weariness (§4) by resetting `TIME_SINCE_REST` like any night's rest. Both are unchanged vanilla sleep semantics.
+6. **Half-strength Restful Saturation** — while an armed bedroll sleeper (§2) converts, each step heals `bedrollRestfulMultiplier ×` the bed amount (default 0.5) for the same 1.0 saturation. The multiplier stacks with Deep Sleep, so a bedroll on a new moon heals ×1.0 — a full bed on an ordinary night — and a real bed always beats it. A real bed remains the best night's sleep.
+7. **Roll back up** — waking from a bedroll (dawn, damage, or leaving the bed) removes the block and returns the item to the sleeper, dropped at their feet if the inventory is full. Disconnecting or a server stop mid-sleep leaves the bedroll placed as an ordinary block, reclaimed by breaking it — it drops itself. Placing consumes the item and the wake roll-up (or a break) returns it, so the bedroll is conserved and never wears out.
+8. **No explosion** — a bedroll never explodes in the Nether or End; it simply refuses to let the player rest there.
+
+### Edge cases
+
+- **Nether/End** — no sleep (natural-dimension rule), no explosion; the same refusal any bed gives.
+- **Config-disabled** — `enableBedroll = false` removes the recipe (resource condition) and makes a held bedroll inert — it neither places nor sleeps. A bedroll already placed in the world keeps working, mirroring the Chronometer (§5).
+- **Phantoms on open-sky summits** — a bedroll sleeper is a sleeping player, so per §3 they are never a phantom anchor; a phantom already aloft can still swoop and wake them (damage), and the peril brake (§1) then holds the night while they defend themselves. The bedroll changes nothing about phantom spawning.
+- **Multiplayer** — per-player: each bedroll and its half-strength healing are the sleeper's own.
+- **Client** — a server-initiated bedroll sleep opens the vanilla "Leave Bed" overlay through a one-shot notification, the same overlay a bed shows.
+
+### Config
+
+| Key | Type | Default | Range |
+|---|---|---|---|
+| `enableBedroll` | bool | `true` | — |
+| `bedrollRestfulMultiplier` | double | `0.5` | 0.0–1.0 |
+
+### Implementation Notes
+
+- `BedrollBlock extends BedBlock`: being a genuine bed keeps vanilla's per-tick sleeper-eject (`checkBedExists`, which requires an `instanceof BedBlock`) and the client sleep overlay working with no mixin. It is single-tile — `setPlacedBy` lays no head half, `updateShape` never self-destructs, `getStateForPlacement` needs no head space — renders as a plain static model with no `BedBlockEntity`, and never explodes.
+- Sleep routes through `Bedroll.sleep` (rules in `Bedroll.sleepProblem`, the actual sleep in `Bedroll.enterSleep`), a copy of `ServerPlayer#startSleepInBed` minus the `setRespawnPosition` call and the head-half checks, so spawn is never set and no mixin is needed.
+- The roll-up rides `EntitySleepEvents.STOP_SLEEPING`, reading the block at the synced sleeping position — the placed block is the whole state, so there is no transient tracker.
+- Half strength resolves in `RestfulMath.healPerStep(moonPhase, newMoonMultiplier, strength)`, with `strength` set at arm time from whether the sleeping-position block is a bedroll.
+
+---
+
 ## Configuration
 
 Single JSON config `config/respite.json`, created with defaults on first launch, plus a ModMenu/Cloth Config screen when those mods are present. `configVersion` is **1**. Unknown or missing fields are filled with defaults; every numeric field is clamped to its stated range after load; a corrupted file falls back to full defaults and is left on disk untouched. Every `config.respite.*` label ships with a `.tooltip` key.
@@ -343,6 +391,8 @@ Single JSON config `config/respite.json`, created with defaults on first launch,
 | `enableChronometer` | bool | `true` | — | §5 |
 | `enableCaffeinatedBrew` | bool | `true` | — | §6 |
 | `brewHasteSeconds` | int | `90` | 0–600 | §6 |
+| `enableBedroll` | bool | `true` | — | §7 |
+| `bedrollRestfulMultiplier` | double | `0.5` | 0.0–1.0 | §7 |
 
 ### Client config
 
@@ -468,7 +518,7 @@ All user-facing strings are translation keys in `assets/respite/lang/en_us.json`
 
 | Key | Surface |
 |---|---|
-| `block.respite.chronometer` | Block name |
+| `block.respite.chronometer`, `block.respite.bedroll` | Block names |
 | `item.respite.unsteeped_brew`, `item.respite.caffeinated_brew` | Item names |
 | `effect.respite.weary`, `effect.respite.exhausted` | Effect names |
 | `notification.respite.time_lapse` | `✦ Time ×%s — %s of %s asleep` |
