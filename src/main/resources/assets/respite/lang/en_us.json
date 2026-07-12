@@ -1,6 +1,9 @@
 {
   "block.respite.chronometer": "Chronometer",
 
+  "item.respite.unsteeped_brew": "Unsteeped Brew",
+  "item.respite.caffeinated_brew": "Caffeinated Brew",
+
   "effect.respite.weary": "Weary",
   "effect.respite.exhausted": "Exhausted",
 

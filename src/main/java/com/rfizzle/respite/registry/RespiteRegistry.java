@@ -2,10 +2,13 @@ package com.rfizzle.respite.registry;
 
 import com.rfizzle.respite.Respite;
 import com.rfizzle.respite.block.ChronometerBlock;
+import com.rfizzle.respite.brew.CaffeinatedBrewItem;
 import com.rfizzle.respite.condition.FeatureEnabledCondition;
 import com.rfizzle.respite.effect.WearinessEffect;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Holder;
@@ -14,6 +17,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
@@ -32,6 +36,10 @@ public final class RespiteRegistry {
 
     /** Every registered block, in registration order. */
     public static final Map<ResourceLocation, Block> BLOCKS = new LinkedHashMap<>();
+
+    /** Standalone (non-BlockItem) items, in registration order — the roster
+     * datagen, compat, and the resource-contract tests can walk. */
+    public static final List<Item> STANDALONE_ITEMS = new ArrayList<>();
 
     // Quick to break with any tool (or none), always drops itself, pistons move
     // it like stone; copper case on smooth stone → copper sounds, copper map color.
@@ -55,6 +63,19 @@ public final class RespiteRegistry {
     public static Holder<MobEffect> WEARY;
     public static Holder<MobEffect> EXHAUSTED;
 
+    // The Caffeinated Brew pair (design/SPEC.md §6). Both stack to 16. The
+    // Unsteeped Brew is inert — a plain crafting intermediate. The Caffeinated
+    // Brew carries a zero-nutrition, always-edible food component so it drinks
+    // like a potion while restoring no hunger or saturation ("not food"); its
+    // effects are applied in CaffeinatedBrewItem#finishUsingItem, never through
+    // this component's own eat path.
+    public static final Item UNSTEEPED_BREW =
+            new Item(new Item.Properties().stacksTo(16));
+    public static final CaffeinatedBrewItem CAFFEINATED_BREW = new CaffeinatedBrewItem(
+            new Item.Properties()
+                    .stacksTo(16)
+                    .food(new FoodProperties.Builder().alwaysEdible().build()));
+
     private static boolean registered;
 
     private RespiteRegistry() {
@@ -68,6 +89,9 @@ public final class RespiteRegistry {
 
         registerBlock("chronometer", CHRONOMETER, new Item.Properties());
 
+        registerItem("unsteeped_brew", UNSTEEPED_BREW);
+        registerItem("caffeinated_brew", CAFFEINATED_BREW);
+
         registerSound(TIME_LAPSE_START);
         registerSound(TIME_LAPSE_END);
 
@@ -79,12 +103,27 @@ public final class RespiteRegistry {
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS)
                 .register(entries -> entries.accept(CHRONOMETER));
 
+        // Both brews are drinks in all but name, so they sit with the other
+        // bottles in the vanilla Food & Drinks tab. Accepted explicitly so the
+        // tab stays intentional even as the standalone-item roster grows.
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FOOD_AND_DRINKS)
+                .register(entries -> {
+                    entries.accept(UNSTEEPED_BREW);
+                    entries.accept(CAFFEINATED_BREW);
+                });
+
         // Datapack-side feature gates (recipes and their unlock advancements).
         ResourceConditions.register(FeatureEnabledCondition.TYPE);
     }
 
     private static void registerSound(SoundEvent event) {
         Registry.register(BuiltInRegistries.SOUND_EVENT, event.getLocation(), event);
+    }
+
+    private static <T extends Item> T registerItem(String name, T item) {
+        Registry.register(BuiltInRegistries.ITEM, Respite.id(name), item);
+        STANDALONE_ITEMS.add(item);
+        return item;
     }
 
     private static Holder<MobEffect> registerEffect(String name, MobEffect effect) {

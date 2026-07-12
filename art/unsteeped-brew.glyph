@@ -1,0 +1,39 @@
+# respite — Unsteeped Brew item (design/SPEC.md §6, design/DESIGN.md §3)
+# A potion-bottle silhouette: cork stopper, cool glass, a murky greenish-brown
+# liquid with a few floating leaf flecks — unfinished, waiting for the campfire.
+# Glass and cork read vanilla; the murk carries no sibling accent. Native 16x16
+# to match vanilla item-sprite weight, 1px ink outline.
+size: 16
+
+legend:
+  . transparent
+  k ink                # silhouette outline
+  C #b58f5e            # cork highlight
+  c #8a6a43            # cork body
+  G #d2dbf0            # glass rim highlight (light from upper-left)
+  g #8b95b4            # glass midtone
+  h #5b6486            # glass shadow rim
+  H #7c8a52            # murk highlight
+  L #5c6a3c            # murk midtone
+  S #45502e            # murk shadow
+  O #333c22            # murk occlusion (base)
+  f #93c063            # leaf fleck, lit
+  e #5f8a3a            # leaf fleck, shadowed
+
+frame:
+  ................
+  ......kCck......
+  ......kcck......
+  ......kGgk......
+  ......kGgk......
+  .....kGHHhk.....
+  ....kGHHHHhk....
+  ...kGHHHHHHhk...
+  ..kGHLLLLLLShk..
+  ..kGHLLefLLShk..
+  ..kGHLLLLLSShk..
+  ..kGHLfeLLSShk..
+  ...kGHLLLSShk...
+  ....kGHLLShk....
+  .....kOSSOk.....
+  ................

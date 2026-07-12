@@ -28,7 +28,8 @@ public record FeatureEnabledCondition(Feature feature) implements ResourceCondit
 
     /** The gateable feature toggles, each bound to its config field. */
     public enum Feature implements StringRepresentable {
-        CHRONOMETER("chronometer");
+        CHRONOMETER("chronometer"),
+        CAFFEINATED_BREW("caffeinated_brew");
 
         public static final com.mojang.serialization.Codec<Feature> CODEC =
                 StringRepresentable.fromEnum(Feature::values);
@@ -48,6 +49,7 @@ public record FeatureEnabledCondition(Feature feature) implements ResourceCondit
         public boolean enabledIn(RespiteConfig config) {
             return switch (this) {
                 case CHRONOMETER -> config.enableChronometer;
+                case CAFFEINATED_BREW -> config.enableCaffeinatedBrew;
             };
         }
     }

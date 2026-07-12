@@ -1,0 +1,40 @@
+# respite — Caffeinated Brew item (design/SPEC.md §6, design/DESIGN.md §3)
+# The steeped drink: same bottle silhouette as the Unsteeped Brew, now a warm
+# cocoa-brown liquid with a candleglow surface sheen and a faint steam wisp
+# rising off the cork — finished and inviting. Glass and cork read vanilla; the
+# warmth is Respite's own candleglow, no sibling accent. Native 16x16, 1px ink.
+size: 16
+
+legend:
+  . transparent
+  t #e8d9bf                  # steam wisp
+  p respite.candleglow-pale  # steam tip / warm glint
+  k ink                      # silhouette outline
+  C #b58f5e                  # cork highlight
+  c #8a6a43                  # cork body
+  G #d2dbf0                  # glass rim highlight (light from upper-left)
+  g #8b95b4                  # glass midtone
+  h #5b6486                  # glass shadow rim
+  w respite.candleglow       # warm liquid sheen
+  H #b07a44                  # cocoa highlight
+  L #8a5a30                  # cocoa midtone
+  S #66421f                  # cocoa shadow
+  O #452a13                  # cocoa occlusion (base)
+
+frame:
+  ........tp......
+  ......kCck......
+  ......kcck......
+  ......kGgk......
+  ......kGgk......
+  .....kGHHhk.....
+  ....kGHwHHhk....
+  ...kGHwpHHHhk...
+  ..kGHLLwLLLShk..
+  ..kGHLLLLLLShk..
+  ..kGHLLLLLSShk..
+  ..kGHLLLLSSShk..
+  ...kGHLLLSShk...
+  ....kGHLLShk....
+  .....kOSSOk.....
+  ................
