@@ -6,8 +6,12 @@
     "mixins": [
         "FoodDataMixin",
         "FoodDataRegenMixin",
+        "MinecraftServerMixin",
         "MobMixin",
+        "PhantomSpawnerAccessor",
+        "PhantomSpawnerMixin",
         "PlayerMixin",
+        "ServerLevelCustomSpawnersAccessor",
         "ServerLevelMixin",
         "ServerPlayerMixin"
     ],

@@ -38,6 +38,15 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
   the bed, and waking three hearts richer earns a quiet action-bar line. The
   time-lapse compresses the wait, never the totals.
   `enableRestfulSaturation = false` leaves sleep behaviorally vanilla.
+- **Phantoms of the Heights** — insomnia no longer summons phantoms; they become a
+  territorial hazard instead. They hunt survival and adventure players who are up
+  high at night — feet above Y=100 with open sky — or those same players caught
+  under the open night sky on a new moon, one night in eight. Sleeping players are never anchors,
+  and everything about the phantom itself stays vanilla: cadence, group size, spawn
+  position, daylight burning, cat avoidance, drops, and XP are untouched, so only
+  when and where they appear changes. The `doInsomnia` gamerule remains the master
+  phantom switch — off keeps them dead. `enablePhantomRework = false` restores
+  vanilla insomnia spawning untouched.
 - **Weariness** — sleeplessness wears you down in two stages. Three days without
   rest makes you Weary (natural healing 25% slower); six makes you Exhausted (50%
   slower), and your eyelids droop — a cosmetic half-second screen dim every
