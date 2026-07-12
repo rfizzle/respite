@@ -21,11 +21,13 @@ Vanilla sleep is a discontinuity: the world state at dawn is the world state at 
 Evaluated once per real server tick, server-side:
 
 1. **Eligibility** — the time-lapse can run in the Overworld when `doDaylightCycle` is true and vanilla would allow sleep to matter: it is night, or a thunderstorm is active during the day.
-2. **Rate** — let `n` = non-spectator players currently in the Overworld and `k` = those with `isSleeping() == true` (in bed, at any stage of falling asleep). The target rate is:
+2. **Rate** — let `n` = non-spectator, non-idle players currently in the Overworld and `k` = those with `isSleeping() == true` (in bed, at any stage of falling asleep). The target rate is:
 
    `rate = max(1, round(maxTimeLapseRate × k / n))`
 
    With the default `maxTimeLapseRate = 60` and `n = 4`: 1 sleeper → 15×, 2 → 30×, 3 → 45×, 4 → 60×. A solo player gets the full 60×. `k = 0` (or `n = 0`) → rate 1, time-lapse inactive.
+
+   **Idle exclusion** — a player idle for `idleThresholdMinutes` of real time (default 5) counts for nothing on either side of the share: dropped from `n`, from `k`, and from the peril check alike, so an absent player neither speeds the night nor drags it down, and an AFK-in-bed body contributes nothing — only a present, sleeping player accelerates time. Idle is vanilla's own signal (`ServerPlayer.getLastActionTime()`, the clock `player-idle-timeout` reads, refreshed on every input packet), so a returning player rejoins the share the instant they move or interact, and going to bed — itself an interaction — refreshes the clock at sleep onset, so a player who deliberately sleeps is never immediately idle. Because any rate above 1 passes the night in seconds of real time, a genuinely sleeping player never trips the threshold except on a night already stalled to ×1 (a budget-starved server, or one sleeper among dozens), where dropping them costs nothing they were getting. The **degenerate cases land sanely**: all players idle → `n = 0` → time-lapse inactive; one active sleeper among idle others → `n = 1, k = 1` → runs; spectators are excluded before the idle check as ever; and solo play is behaviorally identical to today. `excludeIdleFromShare = false` restores strict counting of everyone online.
 
    **Peril brake** — while `combatHoldsTime` is true and any awake player counted in `n` is *in peril*, the rate clamps to 1: extra ticks pause, sleepers stay in bed, and the lapse resumes when the peril ends. A player is in peril when a hostile mob's current attack target is that player, or the player dealt or took damage within the last 100 **real** server ticks (5 s — real ticks, not world ticks, so the window is never compressed by the lapse itself). While the brake holds an otherwise-active lapse, Overworld players see `✦ Time holds — battle nearby` (`notification.respite.time_hold`) in place of the rate line, under the same `announceTimeLapse` / `showTimeLapseMessages` toggles.
 3. **Vanilla skip suppressed** — while `enableTimeLapse` is true, vanilla's "enough players sleeping → set time to morning, wake everyone, clear weather" path never fires. The `playersSleepingPercentage` gamerule consequently has no effect (see Gamerules below). Players simply stay asleep in bed.
@@ -50,6 +52,7 @@ Extra ticks are metered, never assumed free:
 - **The peril brake is the combat-fairness contract** — accelerated mob AI against real-time human reaction is unwinnable, so the night never rushes past a live fight. The brake is deliberately veto-like but paid-for: holding mob aggro to stall the night means actually being hunted. Servers that disagree set `combatHoldsTime = false`.
 - Players in the Nether or End neither count toward `n` nor receive extra ticks (see Dimensions below), so an Overworld crew can't accelerate a dimension a teammate is fighting in.
 - Spectators are excluded from `n` (matching vanilla sleep accounting).
+- **Idle players are excluded from `n`** too — the night runs at the speed of the people actually present, not the roster. It is not a punishment: no kick, no announcement, nothing tells the server who is idle, and any input rejoins the share instantly (see Idle exclusion above).
 - When the effective rate changes, players in the Overworld get an action bar line — `✦ Time ×30 — 2 of 4 asleep` (`notification.respite.time_lapse`), and `✦ Time settles` when it ends (`notification.respite.time_lapse_end`). Server toggle `announceTimeLapse`; client toggle `showTimeLapseMessages`.
 
 ### Sleep whisper
@@ -58,7 +61,7 @@ With the vanilla night skip retired, the running "who's sleeping?" tally that ma
 
 - **Enter** — `Alex is in bed (2/4)` (`message.respite.sleep_vote_enter`): the actor's display name, then the share of players in bed after they climbed in. **Leave** — `Alex left the bed (1/4)` (`message.respite.sleep_vote_leave`): the same, after they rise.
 - **The tally is honest on a leave.** The leaving player is not counted among the sleepers — vanilla has not yet cleared their sleeping state when the event fires, so the count explicitly excludes the actor.
-- **Counted like the rate share** — `sleeping` of `total` over the same non-spectator players `k`/`n` the rate uses, recomputed fresh at each event, sent to every non-spectator player in the sleeper's level.
+- **Counted like the rate share** — `sleeping` of `total` over the same active `k`/`n` the rate uses (non-spectator, non-idle), recomputed fresh at each event, sent to every non-spectator player in the sleeper's level. So the whisper's tally and the rate's denominator never disagree in the same tick.
 - **A `message.respite.*` chat surface** — muted to gray, no ✦ marker (that glyph is the action-bar `notification.*` surface's, per concord DESIGN-SYSTEM §10). It lands in chat history, distinct from the transient rate line.
 - **The night's end is not a negotiation.** A leave once sleep is no longer eligible (dawn, or a thunderstorm blowing out) is the crew waking together — silent, so morning is never a stack of "left the bed" lines.
 - **A solo world sees nothing** — the whisper is a multiplayer signal; with fewer than two non-spectator players present it stays quiet.
@@ -92,6 +95,8 @@ Extra ticks run for the **Overworld only**. The Nether and End tick at the norma
 | `combatHoldsTime` | bool | `true` | — |
 | `announceTimeLapse` | bool | `true` | — |
 | `announceSleepVote` | bool | `true` | — |
+| `excludeIdleFromShare` | bool | `true` | — |
+| `idleThresholdMinutes` | int | `5` | 1–60 |
 
 ### Implementation Notes
 
@@ -101,6 +106,7 @@ Extra ticks run for the **Overworld only**. The Nether and End tick at the norma
 - Effective-rate state lives on the engine; `RespiteTimeLapseCallback` (Fabric `Event`, array-backed) fires on change, server-side.
 - Peril tracking stays allocation-free on the hot path: a `Mob#setTarget` mixin maintains a per-player count of hostile mobs currently targeting them, and dealt/took damage timestamps (real-tick clock) live on the same per-player transient state — the rate evaluation reads both, no entity scan.
 - The awake-player exemption keys off an "extra tick in progress" flag on the engine: during extra ticks the player tick runs, but `FoodData` ticking, effect-duration decrement, and air/fire/regen bookkeeping are skipped for non-sleeping players.
+- Idle detection is a pure predicate, `TimeLapseMath.isIdle(enabled, nowMillis, lastActionMillis, thresholdMinutes)`, shared by the rate evaluation, the peril check, and the sleep whisper. It reads `ServerPlayer.getLastActionTime()` (a plain field read, one `Util.getMillis()` per evaluation) — no new tracker, no persistence, nothing to reset on stop, since the timestamp is vanilla-owned transient state.
 
 ---
 
@@ -408,6 +414,8 @@ Single JSON config `config/respite.json`, created with defaults on first launch,
 | `combatHoldsTime` | bool | `true` | — | §1 |
 | `announceTimeLapse` | bool | `true` | — | §1 |
 | `announceSleepVote` | bool | `true` | — | §1 |
+| `excludeIdleFromShare` | bool | `true` | — | §1 |
+| `idleThresholdMinutes` | int | `5` | 1–60 | §1 |
 | `enableRestfulSaturation` | bool | `true` | — | §2 |
 | `restfulRequiresFullHunger` | bool | `true` | — | §2 |
 | `restfulHealIntervalTicks` | int | `600` | 100–2400 | §2 |
@@ -484,7 +492,7 @@ public final class RespiteAPI {
 
 Events (server-side, array-backed Fabric `Event`s):
 
-- **`RespiteTimeLapseCallback`** — `onRateChanged(ServerLevel level, int oldRate, int newRate, int sleeping, int total)`; fires on every effective-rate change, including start (old 1) and end (new 1).
+- **`RespiteTimeLapseCallback`** — `onRateChanged(ServerLevel level, int oldRate, int newRate, int sleeping, int total)`; fires on every effective-rate change, including start (old 1) and end (new 1). `sleeping`/`total` are the active `k`/`n` the rate is computed over — non-spectator, non-idle (§1 Idle exclusion) — not the full online roster.
 - **`RespiteRestCallback`** — `onPlayerRested(ServerPlayer player, long ticksSlept, float healthRestored)`; fires when a player wakes at dawn having slept (not on interrupted sleep).
 
 Consumption is the suite pattern: `modCompileOnly` against the published jar, every call site guarded by `FabricLoader.getInstance().isModLoaded("respite")`.
@@ -607,6 +615,7 @@ Tiering per the `mc-mod-testing` skill.
 ### Unit tests (JUnit, pure)
 
 - Rate formula: `k/n` sweep (including k=0, n=0, n=1, rounding at every k for n=4), clamp to `maxTimeLapseRate`; peril-brake clamp and the 100-real-tick peril window decay.
+- Idle predicate (`isIdle`): the threshold boundary (at / just under / just over), a fresh gap and a clock-skewed negative gap reading not-idle, the disabled switch and a non-positive threshold reading not-idle, at realistic wall-clock magnitudes.
 - Chronometer signal function: boundary ticks 0, 1,599, 1,600, 11,200, 12,000, 17,999, 18,000, 22,400, 23,999; fixed-time → 0; the clock-time formatting math; the `(4 − phase) mod 8` new-moon countdown for all eight phases and the night-window gate for the moon line.
 - Chronometer moon/alarm math: `moonFullness` 0–15 ramp for all eight phases; `alarmBoundary` clock inversion; `alarmFires` window predicate (at the boundary, last window tick, one tick past, off never fires); `cycleAlarm` off-wrap; `hourLabel` 12-hour formatting.
 - Restful-saturation accounting: 20-interval night totals, stop conditions (saturation floor, full health), penalty-exemption arithmetic, Deep Sleep multiplier arithmetic (default and range extremes).

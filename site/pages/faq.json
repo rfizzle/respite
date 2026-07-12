@@ -21,7 +21,7 @@
             },
             {
               "q": "How does multiplayer sleep work?",
-              "a": "Proportionally: each sleeper adds an equal share of the acceleration. Two of four players in bed run time at half the maximum. Nobody's sleep is wasted and nobody can veto the night — the <code>playersSleepingPercentage</code> all-or-nothing model is replaced."
+              "a": "Proportionally: each sleeper adds an equal share of the acceleration. Two of four players in bed run time at half the maximum. Nobody's sleep is wasted and nobody can veto the night — the <code>playersSleepingPercentage</code> all-or-nothing model is replaced. The share is over the players actually present: an AFK player idle for a few minutes drops out of it (both as a possible sleeper and from the count), so the night runs at the speed of the people at their keyboards."
             },
             {
               "q": "What happened to insomnia?",
