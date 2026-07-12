@@ -1,5 +1,6 @@
 package com.rfizzle.respite.brew;
 
+import com.rfizzle.respite.advancement.RespiteCriteria;
 import com.rfizzle.respite.config.RespiteConfig;
 import com.rfizzle.respite.registry.RespiteRegistry;
 import net.minecraft.server.level.ServerPlayer;
@@ -100,6 +101,13 @@ public class CaffeinatedBrewItem extends Item {
      * escalates to Haste II.
      */
     private static void applyBrewEffects(ServerPlayer player) {
+        // Night Shift (§Advancements) grants for drinking while sleepless. Fire
+        // it before the removal below, which strips the stage out from under any
+        // effect check. Either Weariness stage counts — an Exhausted all-nighter
+        // is as much "drinking while weary" as a Weary one.
+        if (player.hasEffect(RespiteRegistry.WEARY) || player.hasEffect(RespiteRegistry.EXHAUSTED)) {
+            RespiteCriteria.NIGHT_SHIFT.trigger(player);
+        }
         player.removeEffect(RespiteRegistry.WEARY);
         player.removeEffect(RespiteRegistry.EXHAUSTED);
         player.getStats().setValue(player, Stats.CUSTOM.get(Stats.TIME_SINCE_REST), 0);

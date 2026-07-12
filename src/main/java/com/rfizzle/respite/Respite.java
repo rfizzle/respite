@@ -1,5 +1,7 @@
 package com.rfizzle.respite;
 
+import com.rfizzle.respite.advancement.RespiteCriteria;
+import com.rfizzle.respite.command.RespiteCommand;
 import com.rfizzle.respite.config.RespiteConfig;
 import com.rfizzle.respite.registry.RespiteRegistry;
 import com.rfizzle.respite.restful.RestfulSleepHandler;
@@ -26,11 +28,17 @@ public class Respite implements ModInitializer {
 
         RespiteRegistry.register();
 
+        // Advancement criteria must register before any advancement JSON loads
+        // on datapack load — an unknown trigger id fails the whole advancement.
+        RespiteCriteria.register();
+
         TimeLapseEngine.register();
 
         RestfulSleepHandler.register();
 
         WearinessHandler.register();
+
+        RespiteCommand.register();
 
         LOGGER.info("Respite initialized — make the night count.");
     }

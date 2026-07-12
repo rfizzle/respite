@@ -1,0 +1,29 @@
+{
+  "parent": "respite:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:enchanted_golden_apple"
+    },
+    "title": {
+      "translate": "advancements.respite.dark_and_dreamless.title"
+    },
+    "description": {
+      "translate": "advancements.respite.dark_and_dreamless.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "dark_and_dreamless": {
+      "trigger": "respite:dark_and_dreamless"
+    }
+  },
+  "requirements": [
+    [
+      "dark_and_dreamless"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

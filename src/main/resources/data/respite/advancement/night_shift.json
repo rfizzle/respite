@@ -1,0 +1,29 @@
+{
+  "parent": "respite:root",
+  "display": {
+    "icon": {
+      "id": "respite:caffeinated_brew"
+    },
+    "title": {
+      "translate": "advancements.respite.night_shift.title"
+    },
+    "description": {
+      "translate": "advancements.respite.night_shift.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "night_shift": {
+      "trigger": "respite:night_shift"
+    }
+  },
+  "requirements": [
+    [
+      "night_shift"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

@@ -75,6 +75,55 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
   `enableCaffeinatedBrew = false` removes them while already-brewed bottles keep
   working.
 
+Alongside the features, Respite ships a small `respite` advancement tab (sleep
+through a time-lapse night, heal eight hearts overnight, pull a night shift on
+the brew, down a phantom at altitude, place a Chronometer, sleep through a new moon) and the
+`/respite` command tree: `status` for any player, and op-only `reload` and
+`rest` testing levers. See the [command reference](https://respite.rfizzle.com/commands).
+
+---
+
+## For developers
+
+Respite publishes a stable, read-only integration surface under
+`com.rfizzle.respite.api`, per the [Concord API Standard](https://github.com/rfizzle/concord/blob/master/API-STANDARD.md).
+Reads are server-authoritative. Respite has no HUD slot by design, so the
+surface ships no HUD accessors.
+
+`RespiteAPI` accessors:
+
+- `getTimeLapseRate(ServerLevel)` / `isTimeLapseActive(ServerLevel)` — the effective time-lapse acceleration, Overworld-only.
+- `getTicksSinceRest(ServerPlayer)`, `isWeary(ServerPlayer)`, `isExhausted(ServerPlayer)` — the Weariness state.
+- `getChronometerSignal(Level)` — the Chronometer signal 1–15 for the level's day time; 0 in fixed-time dimensions.
+
+Array-backed Fabric events (server-side):
+
+- `RespiteTimeLapseCallback` — fires on every effective-rate change, start and end included.
+- `RespiteRestCallback` — fires when a player wakes at dawn having slept.
+
+Consume as a soft dependency — compile against the release jar and guard every
+call site with an `isModLoaded` check:
+
+```gradle
+repositories {
+    ivy {
+        url = 'https://github.com'
+        patternLayout { artifact '/[organisation]/[module]/releases/download/v[revision]/[module]-[revision].jar' }
+        metadataSources { artifact() }
+        content { includeGroup 'rfizzle' }
+    }
+}
+dependencies {
+    modCompileOnly "rfizzle:respite:${project.respite_version}"
+}
+```
+
+```java
+if (FabricLoader.getInstance().isModLoaded("respite")) {
+    int rate = RespiteAPI.getTimeLapseRate(serverLevel);
+}
+```
+
 ---
 
 ## Development

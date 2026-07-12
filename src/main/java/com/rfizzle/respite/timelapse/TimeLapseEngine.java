@@ -1,6 +1,7 @@
 package com.rfizzle.respite.timelapse;
 
 import com.rfizzle.respite.Respite;
+import com.rfizzle.respite.api.RespiteTimeLapseCallback;
 import com.rfizzle.respite.config.RespiteConfig;
 import java.util.List;
 import java.util.UUID;
@@ -59,6 +60,12 @@ public final class TimeLapseEngine {
     private static int sleeping;
     private static int total;
 
+    /** The effective rate at the previous callback fire — the edge {@link com.rfizzle.respite.api.RespiteTimeLapseCallback} keys off. */
+    private static int previousEffectiveRate = 1;
+
+    /** The most recent real tick the lapse was {@link LapseState#ACTIVE}; -1 if never. The root advancement's "lapse touched my sleep" marker. */
+    private static long lastActiveRealTick = -1;
+
     private TimeLapseEngine() {
     }
 
@@ -104,6 +111,20 @@ public final class TimeLapseEngine {
                 state = LapseState.SETTLED;
             }
         }
+        // Fire the public API callback on every effective-rate edge, independent
+        // of the announce toggle (that gates only the player-facing action bar).
+        // Cheap on the hot path: primitive compare, and the array-backed invoker
+        // is a no-op when no mod has registered a listener.
+        if (effectiveRate != previousEffectiveRate) {
+            try {
+                RespiteTimeLapseCallback.EVENT.invoker()
+                        .onRateChanged(overworld, previousEffectiveRate, effectiveRate, sleeping, total);
+            } catch (Exception e) {
+                Respite.LOGGER.error("Time-lapse rate callback failed", e);
+            }
+            previousEffectiveRate = effectiveRate;
+        }
+
         try {
             TimeLapseNotifier.announce(overworld, config, state, effectiveRate, sleeping, total);
         } catch (Exception e) {
@@ -176,6 +197,9 @@ public final class TimeLapseEngine {
         sleeping = k;
         total = n;
         state = effectiveRate > 1 ? LapseState.ACTIVE : held ? LapseState.HELD : LapseState.SETTLED;
+        if (state == LapseState.ACTIVE) {
+            lastActiveRealTick = realTickCount;
+        }
 
         if (extras > 0) {
             // Vanilla syncs time every 20 real ticks — at 60× the sky would
@@ -238,6 +262,8 @@ public final class TimeLapseEngine {
         state = LapseState.SETTLED;
         sleeping = 0;
         total = 0;
+        previousEffectiveRate = 1;
+        lastActiveRealTick = -1;
         PERIL.clear();
         TimeLapseNotifier.reset();
     }
@@ -275,5 +301,15 @@ public final class TimeLapseEngine {
     /** Rate evaluations run — equals the real tick count while enabled (recursion-guard contract). */
     public static long getRateEvaluations() {
         return rateEvaluations;
+    }
+
+    /**
+     * The most recent real tick the lapse was active, or -1 if it has not been
+     * active since server start. A sleeper's night counts as "lapse-touched"
+     * when this is at or past the real tick they started sleeping — the seam the
+     * root advancement reads to grant "slept through an active night".
+     */
+    public static long getLastActiveRealTick() {
+        return lastActiveRealTick;
     }
 }
