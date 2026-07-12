@@ -56,7 +56,13 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
   Restful Saturation are untouched), and no monsters are ever sent after the
   sleepless. Sleeping, dying, or a Caffeinated Brew clears both stages. The
   eyelid blink hides with F1 and toggles off with `showExhaustionBlink`;
-  `enableWeariness = false` removes the effects and the penalty entirely.
+  `enableWeariness = false` removes the effects and the penalty entirely. The
+  ladder's positive pole: waking from a full night's sleep — bed or bedroll —
+  grants **Well-Rested**, a beneficial status effect that heals you 50% faster
+  for two minutes (it reads as one morning with Restful Saturation, not a double
+  reward — the night heals you in bed, the grace only speeds recovery if you
+  still wake hurt). Tuned with `enableWellRested`, `wellRestedSeconds` (120), and
+  `wellRestedRegenBonus` (0.5); off restores untouched vanilla waking.
 - **The Chronometer** — a copper-and-redstone timepiece block. It emits redstone
   power 1–15 that climbs with the hour (each level lasts 80 seconds; comparators
   read the same value), its dial face sweeps the sun and moon across the day,
@@ -101,7 +107,7 @@ surface ships no HUD accessors.
 `RespiteAPI` accessors:
 
 - `getTimeLapseRate(ServerLevel)` / `isTimeLapseActive(ServerLevel)` — the effective time-lapse acceleration, Overworld-only.
-- `getTicksSinceRest(ServerPlayer)`, `isWeary(ServerPlayer)`, `isExhausted(ServerPlayer)` — the Weariness state.
+- `getTicksSinceRest(ServerPlayer)`, `isWeary(ServerPlayer)`, `isExhausted(ServerPlayer)`, `isWellRested(ServerPlayer)` — the Weariness state.
 - `getChronometerSignal(Level)` — the Chronometer signal 1–15 for the level's day time; 0 in fixed-time dimensions.
 
 Array-backed Fabric events (server-side):

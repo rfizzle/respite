@@ -181,7 +181,7 @@ Vanilla ties phantoms to a hygiene stat: skip sleep three days and the sky punis
 
 ## 4. Weariness
 
-Sleeplessness wears you down in two stages: three days without rest slows natural healing by 25%; six days slows it by 50% and your eyelids start to droop.
+Sleeplessness wears you down in two stages: three days without rest slows natural healing by 25%; six days slows it by 50% and your eyelids start to droop. Waking from a full night's sleep grants the opposite pole — a short Well-Rested grace of faster healing.
 
 ### Problem
 
@@ -196,6 +196,16 @@ With insomnia gone (§3), staying awake would have no cost at all, and sleep nee
 3. **Penalty** — food-based natural regeneration heals less: each vanilla regen heal event is scaled to `amount × (1 − penalty)`, with `wearinessRegenPenalty` (default 0.25) while Weary and `exhaustedRegenPenalty` (default 0.50) while Exhausted. Unaffected: instant health, Regeneration the potion effect, beacon regen, peaceful-difficulty ambient regen, and Restful Saturation's conversion (§2).
 4. **The blink (client-side, cosmetic)** — while Exhausted, the player's eyelids droop at intervals: every 90 real seconds with ±30 s uniform jitter, an eyelid-shaped fade eases in from screen top and bottom over ~0.3 s and releases over ~0.3 s, peaking at 55% occlusion — never full black, vision is never lost. **Combat-suppressed:** no blink begins within 200 client ticks (10 s) of the player taking or dealing damage; a due blink is deferred until the window clears, not skipped. No gameplay effect, no sound; hidden with F1; client toggle `showExhaustionBlink`.
 5. **Clearing** — both stages lift when `TIME_SINCE_REST` drops below their thresholds, which happens when the stat resets: starting to sleep in a bed (vanilla stat semantics — a catnap counts, exactly as it did for vanilla insomnia), dying, or drinking a Caffeinated Brew (§6).
+
+### Well-Rested — the positive pole
+
+The ladder's positive counterpart: a night's sleep leaves a short grace of faster healing, so the morning after rest is not mechanically identical to any other moment. A pleasant echo of the night, never a reason sleep becomes mandatory (the vision's "never force the night" holds).
+
+1. **Grant** — waking at dawn from a night's sleep — a genuine dawn wake, the same fact that fires the rest callback (§Public API), not an interrupted wake — applies the **Well-Rested** status effect (`respite:well_rested`, beneficial category, its own icon). A bed and a bedroll (§7) grant it alike: a night's rest is a night's rest, the same rest that clears Weariness. The Caffeinated Brew resets the rest count but is not a sleep, so it never grants the grace — a brew postpones rest, it is not a night in bed.
+2. **The boost** — while Well-Rested, food-based natural regeneration heals `amount × (1 + wellRestedRegenBonus)` (default 0.5 → healing 50% faster). It scales the same two `Player#heal(F)` natural-regen call sites the Weariness penalty scales, and nothing else — instant health, the Regeneration effect, beacon and peaceful regen, and Restful Saturation's conversion all heal through other call sites. The two poles compose **multiplicatively** on the rare occasion both are present (an op forcing `TIME_SINCE_REST` back over threshold while the grace still ticks); under normal play a freshly-woken player is never Weary, so exactly one pole is ever active.
+3. **Duration** — `wellRestedSeconds` (default 120 s). A self-expiring beneficial marker — no sweep re-asserts it, unlike the two Weariness stages; a fresh night's sleep refreshes it.
+4. **No double-dip with Restful Saturation (§2)** — the two read as one coherent morning, not a stacked reward. Restful Saturation heals you *in bed* overnight; Well-Rested only speeds regeneration *after* you rise. A player the night filled to full wakes with nothing for the grace to heal; a player who woke hurt — unarmed, or out of saturation — recovers a little faster for two minutes. Temporally disjoint by construction.
+5. **Toggle-off parity** — disabling `enableWellRested` neutralizes the boost immediately (the regen hook gates on it); a grace already granted shows its harmless icon until it self-expires (≤ `wellRestedSeconds`). Behavioral parity holds.
 
 ### Edge cases
 
@@ -215,13 +225,17 @@ With insomnia gone (§3), staying awake would have no cost at all, and sleep nee
 | `wearinessRegenPenalty` | double | `0.25` | 0.0–0.95 |
 | `exhaustedThresholdDays` | int | `6` | 2–60 |
 | `exhaustedRegenPenalty` | double | `0.50` | 0.0–0.95 |
+| `enableWellRested` | bool | `true` | — |
+| `wellRestedSeconds` | int | `120` | 0–600 |
+| `wellRestedRegenBonus` | double | `0.5` | 0.0–2.0 |
 
 Client: `showExhaustionBlink` (see Configuration).
 
 ### Implementation Notes
 
 - `WearyEffect` and `ExhaustedEffect` extend `MobEffect` (neutral), registered `respite:weary` / `respite:exhausted`; a 100-tick server task sweeps online players' `Stats.TIME_SINCE_REST` and applies the matching stage, removing the other.
-- The regen scale wraps both natural-regeneration heal calls in `FoodData#tick` — the food≥20 saturated fast regen and the food≥18 slow regen, both `Player#heal(F)` — not `LivingEntity#heal` generally, so the penalty follows every food-driven heal (a well-fed player included) but never touches potion, beacon, instant, or Restful Saturation healing, which all heal through other call sites. The factor resolves from the active stage.
+- The regen scale wraps both natural-regeneration heal calls in `FoodData#tick` — the food≥20 saturated fast regen and the food≥18 slow regen, both `Player#heal(F)` — not `LivingEntity#heal` generally, so the penalty follows every food-driven heal (a well-fed player included) but never touches potion, beacon, instant, or Restful Saturation healing, which all heal through other call sites. The single wrap composes both poles: `respite$regenFactor = wearinessFactor × wellRestedFactor`, each independently config-gated, so neither silently drops the other when both are present.
+- `WellRestedEffect` extends `MobEffect` (beneficial), registered `respite:well_rested`. The grant is one call in `RestfulSleepHandler`'s dawn-wake path — `WellRested.grantOnDawnWake(player, config)` — gated there on the per-tick config snapshot so `RestWakeEvents` stays toggle-free (it fans a dawn wake out to the public callback and criteria; it does not read config). No sweep: the effect is a self-expiring marker applied for `wellRestedSeconds × 20` ticks.
 - The blink is client-only: a screen-space gradient fill (no texture) drawn from a `HudRenderCallback`, keyed off the synced `respite:exhausted` effect instance; the jitter timer and combat-suppression window (local hurt/attack observations) live on the client, and nothing is networked beyond the vanilla effect sync.
 
 ---
@@ -388,6 +402,9 @@ Single JSON config `config/respite.json`, created with defaults on first launch,
 | `wearinessRegenPenalty` | double | `0.25` | 0.0–0.95 | §4 |
 | `exhaustedThresholdDays` | int | `6` | 2–60 | §4 |
 | `exhaustedRegenPenalty` | double | `0.50` | 0.0–0.95 | §4 |
+| `enableWellRested` | bool | `true` | — | §4 |
+| `wellRestedSeconds` | int | `120` | 0–600 | §4 |
+| `wellRestedRegenBonus` | double | `0.5` | 0.0–2.0 | §4 |
 | `enableChronometer` | bool | `true` | — | §5 |
 | `enableCaffeinatedBrew` | bool | `true` | — | §6 |
 | `brewHasteSeconds` | int | `90` | 0–600 | §6 |
@@ -438,6 +455,9 @@ public final class RespiteAPI {
 
     /** True if the player currently has the Exhausted effect. */
     public static boolean isExhausted(ServerPlayer player);
+
+    /** True if the player currently has the Well-Rested effect (§4 positive pole). */
+    public static boolean isWellRested(ServerPlayer player);
 
     /** The Chronometer signal (1–15) for the level's day time; 0 in fixed-time dimensions. */
     public static int getChronometerSignal(Level level);
@@ -508,7 +528,7 @@ Rate *changes* while the lapse stays active (3 of 4 sleepers → 2 of 4) do not 
 
 ## HUD
 
-No HUD element, no HUD accessors — the "no slot, by design" decision and its reasoning live in `design/DESIGN.md` §2. Respite's ambient surfaces are: the vanilla status-effect icons for Weary and Exhausted, transient action-bar lines (time-lapse rate, peril hold, wake-refreshed, Chronometer inspect — all listed above), `/respite status`, and the Jade/WTHIT Chronometer line. Nothing persistent is ever drawn on the screen. The Exhausted blink (§4) is the one transient client-drawn surface — a sub-second cosmetic fade, not a HUD element: it carries no information beyond what its effect icon already shows, takes no slot, and ships no accessors.
+No HUD element, no HUD accessors — the "no slot, by design" decision and its reasoning live in `design/DESIGN.md` §2. Respite's ambient surfaces are: the vanilla status-effect icons for Weary, Exhausted, and Well-Rested, transient action-bar lines (time-lapse rate, peril hold, wake-refreshed, Chronometer inspect — all listed above), `/respite status`, and the Jade/WTHIT Chronometer line. Nothing persistent is ever drawn on the screen. The Exhausted blink (§4) is the one transient client-drawn surface — a sub-second cosmetic fade, not a HUD element: it carries no information beyond what its effect icon already shows, takes no slot, and ships no accessors.
 
 ---
 
@@ -520,7 +540,7 @@ All user-facing strings are translation keys in `assets/respite/lang/en_us.json`
 |---|---|
 | `block.respite.chronometer`, `block.respite.bedroll` | Block names |
 | `item.respite.unsteeped_brew`, `item.respite.caffeinated_brew` | Item names |
-| `effect.respite.weary`, `effect.respite.exhausted` | Effect names |
+| `effect.respite.weary`, `effect.respite.exhausted`, `effect.respite.well_rested` | Effect names |
 | `notification.respite.time_lapse` | `✦ Time ×%s — %s of %s asleep` |
 | `notification.respite.time_lapse_end` | `✦ Time settles` |
 | `notification.respite.time_hold` | `✦ Time holds — battle nearby` |
