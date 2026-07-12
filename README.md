@@ -55,6 +55,16 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
   countdown at night. In dimensions without a day-night cycle it honestly emits
   nothing. `enableChronometer = false` removes the recipe; placed blocks keep
   working.
+- **The Caffeinated Brew** — deliberate counterplay to Weariness, never the
+  brewing stand. Craft an Unsteeped Brew from a water bottle, two cocoa beans,
+  and any leaves, then steep it over a campfire for 30 seconds into the
+  Caffeinated Brew. Drinking it clears Weary or Exhausted, resets your
+  days-awake count, and grants 90 seconds of Haste I (configurable), returning
+  the empty bottle — no hunger or saturation restored, since it is a drink and
+  not food. It postpones rest without replacing it. Both recipes are ordinary
+  crafting and campfire recipes that show natively in recipe viewers;
+  `enableCaffeinatedBrew = false` removes them while already-brewed bottles keep
+  working.
 
 ---
 

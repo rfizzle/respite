@@ -23,12 +23,17 @@
 | Chronometer still face (fixed-time dimensions) | `art/glyphs/chronometer-dial-still.glyph` | `assets/respite/textures/block/chronometer_dial_still.png` |
 | Chronometer top/bottom cap | `art/glyphs/chronometer-top.glyph` | `assets/respite/textures/block/chronometer_top.png` |
 
+## Item textures
+
+| Asset | Source | Final / derived copies |
+|---|---|---|
+| Unsteeped Brew item (16×16) | `art/unsteeped-brew.glyph` | `assets/respite/textures/item/unsteeped_brew.png` |
+| Caffeinated Brew item (16×16) | `art/caffeinated-brew.glyph` | `assets/respite/textures/item/caffeinated_brew.png` |
+
 ## Not yet created
 
 | Asset | Intended source | Destination |
 |---|---|---|
-| Unsteeped Brew item texture | `/glyph` | `art/unsteeped-brew.glyph` → `assets/respite/textures/item/unsteeped_brew.png` — (planned, with implementation) |
-| Caffeinated Brew item texture | `/glyph` | `art/caffeinated-brew.glyph` → `assets/respite/textures/item/caffeinated_brew.png` — (planned, with implementation) |
 | Weary effect icon | `/glyph` | `art/weary-effect.glyph` → `assets/respite/textures/mob_effect/weary.png` |
 | Exhausted effect icon | `/glyph` | `art/exhausted-effect.glyph` → `assets/respite/textures/mob_effect/exhausted.png` |
 | Time-lapse onset cue | `/sfx` | `art/audio/time-lapse-start.sfx` → `assets/respite/sounds/time_lapse_start.ogg` — (planned, with implementation) |
