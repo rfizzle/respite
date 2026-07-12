@@ -30,9 +30,10 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * In-world coverage for {@code design/SPEC.md} §5: the {@code /time set} sweep
- * across all 15 levels (wire and comparator), placement snap, the fixed-time
- * Nether, the inspect action-bar line in all three variants, and the
- * config-disabled contract (placed blocks keep functioning).
+ * across all 15 wire levels, the comparator's moon-fullness reading, the
+ * sneak-cycled alarm hour, placement snap, the fixed-time Nether, the inspect
+ * action-bar line in all three variants, and the config-disabled contract
+ * (placed blocks keep functioning).
  *
  * <p>Every test that touches the shared overworld day time runs in its own
  * batch so the batches serialize instead of racing each other's clock.
@@ -70,8 +71,6 @@ public class ChronometerGameTest implements FabricGameTest {
         helper.assertTrue(power == level, "chronometer power was " + power + ", expected " + level);
         int wire = helper.getBlockState(WIRE).getValue(BlockStateProperties.POWER);
         helper.assertTrue(wire == level, "adjacent wire read " + wire + ", expected " + level);
-        int comparator = helper.getBlockState(OUTPUT_WIRE).getValue(BlockStateProperties.POWER);
-        helper.assertTrue(comparator == level, "comparator output read " + comparator + ", expected " + level);
     }
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerSweep", timeoutTicks = 700)
@@ -106,6 +105,69 @@ public class ChronometerGameTest implements FabricGameTest {
                     assertReadings(helper, 6);
                 })
                 .thenSucceed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerComparator", timeoutTicks = 300)
+    public void comparatorReadsMoonFullness(GameTestHelper helper) {
+        helper.getLevel().setDayTime(0);
+        buildRig(helper);
+        // dayTime → expected fullness. Each step also lands in a different signal
+        // band (level 2 → 8 → 14) so the chronometer's power change notifies the
+        // comparator to re-read the moon. Full → new → third quarter proves the
+        // comparator actively drops to 0 and climbs again, not that it never powered.
+        long[][] cases = {
+                {midBand(2), 15},                 // day 0, full moon
+                {4 * 24000L + midBand(8), 0},     // day 4, new moon
+                {2 * 24000L + midBand(14), 8},    // day 2, third quarter
+        };
+        GameTestSequence sequence = helper.startSequence();
+        for (long[] testCase : cases) {
+            final long dayTime = testCase[0];
+            final int expected = (int) testCase[1];
+            sequence = sequence
+                    .thenExecute(() -> helper.getLevel().setDayTime(dayTime))
+                    .thenExecuteAfter(25, () -> {
+                        int comparator = helper.getBlockState(OUTPUT_WIRE).getValue(BlockStateProperties.POWER);
+                        helper.assertTrue(comparator == expected,
+                                "comparator read " + comparator + ", expected moon fullness " + expected);
+                    });
+        }
+        sequence.thenSucceed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerAlarm", timeoutTicks = 100)
+    public void alarmCyclesWithSneakAndPersistsAcrossTick(GameTestHelper helper) {
+        helper.setBlock(FLOOR, Blocks.SMOOTH_STONE.defaultBlockState());
+        helper.setBlock(CHRONO, RespiteRegistry.CHRONOMETER.defaultBlockState());
+        helper.assertTrue(
+                helper.getBlockState(CHRONO).getValue(ChronometerBlock.ALARM_HOUR) == ChronometerTime.ALARM_OFF,
+                "a fresh chronometer must place with its alarm off");
+
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer player = connected.player();
+        try {
+            player.setShiftKeyDown(true);
+            BlockPos abs = helper.absolutePos(CHRONO);
+            BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(abs), Direction.NORTH, abs, false);
+
+            // off → hour 0 → hour 1
+            helper.getBlockState(CHRONO).useWithoutItem(helper.getLevel(), player, hit);
+            int first = helper.getBlockState(CHRONO).getValue(ChronometerBlock.ALARM_HOUR);
+            helper.assertTrue(first == 0, "first sneak-cycle must arm the alarm at hour 0, got " + first);
+
+            helper.getBlockState(CHRONO).useWithoutItem(helper.getLevel(), player, hit);
+            int second = helper.getBlockState(CHRONO).getValue(ChronometerBlock.ALARM_HOUR);
+            helper.assertTrue(second == 1, "second sneak-cycle must advance to hour 1, got " + second);
+
+            // the 20-tick re-check swaps only POWER — it must leave the alarm alone
+            BlockPos abs2 = helper.absolutePos(CHRONO);
+            helper.getLevel().getBlockState(abs2).tick(helper.getLevel(), abs2, helper.getLevel().getRandom());
+            int afterTick = helper.getBlockState(CHRONO).getValue(ChronometerBlock.ALARM_HOUR);
+            helper.assertTrue(afterTick == 1, "the re-check tick must preserve the alarm hour, got " + afterTick);
+        } finally {
+            MockPlayers.retire(player);
+        }
+        helper.succeed();
     }
 
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerPlace", timeoutTicks = 100)
@@ -239,7 +301,19 @@ public class ChronometerGameTest implements FabricGameTest {
                 // toggle poisoned for the rest of the gametest run
                 .thenExecuteAfter(25, () -> {
                     try {
+                        // The disable is a recipe gate only — a placed block keeps its
+                        // wire signal, its moon comparator, and its alarm (SPEC §5).
                         assertReadings(helper, 9);
+                        int comparator = helper.getBlockState(OUTPUT_WIRE).getValue(BlockStateProperties.POWER);
+                        helper.assertTrue(comparator == 15,
+                                "disabled config: comparator read " + comparator + ", expected moon fullness 15");
+
+                        helper.setBlock(CHRONO, helper.getBlockState(CHRONO).setValue(ChronometerBlock.ALARM_HOUR, 6));
+                        BlockPos abs = helper.absolutePos(CHRONO);
+                        helper.getLevel().getBlockState(abs).tick(helper.getLevel(), abs, helper.getLevel().getRandom());
+                        int alarm = helper.getBlockState(CHRONO).getValue(ChronometerBlock.ALARM_HOUR);
+                        helper.assertTrue(alarm == 6,
+                                "disabled config: a placed block must keep its alarm, got " + alarm);
                     } finally {
                         RespiteConfig.get().enableChronometer = saved;
                     }

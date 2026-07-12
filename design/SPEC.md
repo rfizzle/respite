@@ -262,18 +262,21 @@ Vanilla's only time-automation primitive is the daylight detector, which reads *
 
    `power = floor((dayTime mod 24000) / 1600) + 1` → 1–15
 
-   Each level spans 1,600 ticks (80 real seconds). Anchors: level 1 begins at tick 0 (dawn), level 8 covers 11,200–12,799 (sunset at 12,000 falls inside it), level 12 covers midnight (18,000), level 15 covers 22,400–23,999 (the last stretch before dawn). A comparator reading the block sees the same 1–15 value.
+   Each level spans 1,600 ticks (80 real seconds). Anchors: level 1 begins at tick 0 (dawn), level 8 covers 11,200–12,799 (sunset at 12,000 falls inside it), level 12 covers midnight (18,000), level 15 covers 22,400–23,999 (the last stretch before dawn). This is the **direct wire signal** — it powers adjacent wires and components; a comparator reads the moon instead (item 5).
 4. **Updates** — the block re-checks its level on a self-rescheduled 20-tick block tick and emits neighbor updates only when the level changes (at most once per 1,600 world ticks in real time; during a 60× time-lapse a change can land every ~1.3 real seconds — still trivially cheap). Placement sets the correct level immediately.
-5. **Inspect** — right-click (survival, no item consumed, no GUI): action bar `✦ 7:12 pm — signal 9` (`notification.respite.chronometer`) with the 12-hour clock derived as `hours = ((dayTime / 1000) + 6) mod 24`, minutes = `(dayTime mod 1000) × 60 / 1000`. At night (day-time position 12,000–23,999) the line gains the moon: `✦ 7:12 pm — signal 9 — waning crescent, new moon in 2 nights` (`notification.respite.chronometer_night`), with the phase name from `moon.respite.<phase>` and the count computed as `(4 − moonPhase) mod 8`; when the count is 0 the line is `✦ 7:12 pm — signal 9 — new moon tonight` (`notification.respite.chronometer_new_moon`). The Jade/WTHIT line carries the same night addition.
-6. **Dial face** — the block's face texture sweeps through 8 visual phases, two signal levels per face (the blockstate JSON maps the `power` property onto the eight dial models; `power=0` is the still face). Cosmetic only; the signal keeps full 15-level precision.
+5. **Comparator — moon fullness** — a comparator reading the block reports **moon fullness** on a 0–15 ramp, distinct from the wire's hour meaning: new moon reads 0 (dark), full moon 15 (bright), the quarters ~8, computed `round(|moonPhase − 4| × 15 / 4)` → 15, 11, 8, 4, 0, 4, 8, 11 for vanilla phases 0–7. It reads the coming night's moon at any time of day. Because the new moon reads 0 — indistinguishable from no signal — a build that must trigger *on* the new moon inverts the comparator (a redstone torch). Fixed-time dimensions have no cycling moon and read 0. A wire build reads the hour; a comparator build reads the moon.
+6. **Alarm** — each placed block carries an **alarm hour** in its `alarm_hour` blockstate (0–23, default off). Sneak-right-click (empty hand) cycles it forward one hour — `off → 12 am → … → 11 pm → off` — confirmed on the action bar (`✦ Alarm set to 6:00 am`, `notification.respite.chronometer_alarm_set`; `✦ Alarm off`, `notification.respite.chronometer_alarm_off`). When the set hour arrives the block rings a vanilla bell (`block.bell.use`) once, audible to nearby players. The check rides the same 20-tick re-check and fires only while `doDaylightCycle` is on. The alarm needs no redstone and no config — it is per-block, opt-in, and off by default.
+7. **Inspect** — right-click (survival, no item consumed, no GUI): action bar `✦ 7:12 pm — signal 9` (`notification.respite.chronometer`) with the 12-hour clock derived as `hours = ((dayTime / 1000) + 6) mod 24`, minutes = `(dayTime mod 1000) × 60 / 1000`. At night (day-time position 12,000–23,999) the line gains the moon: `✦ 7:12 pm — signal 9 — waning crescent, new moon in 2 nights` (`notification.respite.chronometer_night`), with the phase name from `moon.respite.<phase>` and the count computed as `(4 − moonPhase) mod 8`; when the count is 0 the line is `✦ 7:12 pm — signal 9 — new moon tonight` (`notification.respite.chronometer_new_moon`). A set alarm appends ` — alarm 6:00 am` (`notification.respite.chronometer_alarm`) to any variant. The Jade/WTHIT line carries the same night and alarm additions.
+8. **Dial face** — the block's face texture sweeps through 8 visual phases, two signal levels per face (the blockstate JSON maps the `power` property onto the eight dial models; `power=0` is the still face; `alarm_hour` is unmentioned there, so it never affects the model). Cosmetic only; the signal keeps full 15-level precision.
 
 ### Edge cases
 
-- **Fixed-time dimensions** (Nether, End — any dimension with `fixed_time`): power 0, dial shows a distinct "still" face. Vanilla-deferential: the clock spins uselessly there, the Chronometer honestly says nothing.
-- **`doDaylightCycle = false`** — the signal freezes at the current (correct) level; time isn't advancing, so neither is the dial.
-- **`/time set`** — the next block tick (≤ 20 game ticks) snaps the level to the new time.
+- **Fixed-time dimensions** (Nether, End — any dimension with `fixed_time`): power 0, comparator 0, dial shows a distinct "still" face. Vanilla-deferential: the clock spins uselessly there, the Chronometer honestly says nothing.
+- **`doDaylightCycle = false`** — the signal freezes at the current (correct) level; time isn't advancing, so neither is the dial, and the alarm never chimes (no hour boundary is ever crossed).
+- **`/time set`** — the next block tick (≤ 20 game ticks) snaps the level to the new time; a jump that steps clear over a set alarm hour skips that chime.
 - **Redstone semantics** — no strong powering means a lever-style "power through a wall" build needs a repeater, same as a redstone block; stated so builders aren't surprised.
-- **Config-disabled** — `enableChronometer = false` disables the crafting recipe (resource condition); already-placed blocks keep functioning, because un-registering a placed block corrupts worlds. Documented in the config tooltip.
+- **Alarm save-compat** — a Chronometer placed before the alarm existed loads with `alarm_hour` filled from the block's default (off) by vanilla's blockstate deserializer; no migration, no crash.
+- **Config-disabled** — `enableChronometer = false` disables the crafting recipe (resource condition); already-placed blocks keep functioning — including their comparator and alarm — because un-registering a placed block corrupts worlds. Documented in the config tooltip.
 
 ### Config
 
@@ -283,8 +286,9 @@ Vanilla's only time-automation primitive is the daylight detector, which reads *
 
 ### Implementation Notes
 
-- `ChronometerBlock extends Block`: the current level lives in a `power` blockstate property (0–15, the daylight-detector pattern); a scheduled tick re-arms itself every 20 ticks and swaps the state only when the level changed, which is what makes neighbor updates fire exactly on change. `isSignalSource → true` with `getSignal` reading the property covers wires; `hasAnalogOutputSignal`/`getAnalogOutputSignal` are the separate pair a comparator reads — both return the same value. The dial's 8 faces are the blockstate JSON's mapping of the property.
-- The level function lives in one static, pure method (`ChronometerTime.signalFor(long dayTime, boolean fixedTime)`) shared by the block, the inspect line, `/respite status`, and the API — one formula, one home.
+- `ChronometerBlock extends Block`: the current level lives in a `power` blockstate property (0–15, the daylight-detector pattern); a scheduled tick re-arms itself every 20 ticks and swaps the state only when the level changed, which is what makes neighbor updates fire exactly on change. `isSignalSource → true` with `getSignal` reading the property covers wires; `hasAnalogOutputSignal`/`getAnalogOutputSignal` are the separate pair a comparator reads — `getAnalogOutputSignal` returns `ChronometerTime.moonFullness(level.getMoonPhase())` (0 in fixed-time dimensions), decoupled from the wire's hour. The dial's 8 faces are the blockstate JSON's mapping of the `power` property.
+- The alarm hour lives in a second blockstate property, `alarm_hour` (`IntegerProperty` 0–24, where 24 = off, default off). It is vanilla-persisted with the chunk and client-synced for free, so no block entity and no server-data plumbing are needed — the Jade/WTHIT providers read it straight off the state. The blockstate JSON's `variants` key only on `power`, so `alarm_hour` maps like a slab's `waterlogged` and forces no model cross-product. Sneak-cycling writes the new value with a client-only update (no neighbor updates — the alarm has no redstone effect). Firing rides the 20-tick re-check: `ChronometerTime.alarmFires(dayTime, alarmHour, 20)` is true exactly once per day because a period-20 tick grid lands in each 20-tick window `[boundary, boundary + 20)` once; the `doDaylightCycle` gate stops a parked, frozen clock from re-chiming, so no per-block "already fired" state is needed.
+- The level function lives in one static, pure method (`ChronometerTime.signalFor(long dayTime, boolean fixedTime)`) shared by the block, the inspect line, `/respite status`, and the API — one formula, one home. `moonFullness`, `alarmBoundary`, `alarmFires`, `cycleAlarm`, and `hourLabel` join it there.
 - Recipe JSON gated by a Fabric resource condition bound to the config (evaluated at datapack load; `/respite reload` + `/reload` re-evaluates).
 
 ---
@@ -484,7 +488,7 @@ Consumption is the suite pattern: `modCompileOnly` against the published jar, ev
 ### Optional integrations
 
 - **ModMenu + Cloth Config** — config screen.
-- **Jade / WTHIT** — one Chronometer line: current clock time and signal level (`tooltip.respite.chronometer`). Guarded plugin, absent mods cost nothing.
+- **Jade / WTHIT** — one Chronometer line: current clock time and signal level, plus the night moon and any set alarm (`tooltip.respite.chronometer`). Guarded plugin, absent mods cost nothing.
 - **EMI / REI / JEI** — no plugin code: both recipes are vanilla recipe types and display natively.
 
 ### Concord siblings
@@ -549,10 +553,13 @@ All user-facing strings are translation keys in `assets/respite/lang/en_us.json`
 | `notification.respite.chronometer` | `✦ %s — signal %s` |
 | `notification.respite.chronometer_night` | `✦ %s — signal %s — %s, new moon in %s nights` |
 | `notification.respite.chronometer_new_moon` | `✦ %s — signal %s — new moon tonight` |
+| `notification.respite.chronometer_alarm` | ` — alarm %s` (appended to any inspect variant when set) |
+| `notification.respite.chronometer_alarm_set` | `✦ Alarm set to %s` |
+| `notification.respite.chronometer_alarm_off` | `✦ Alarm off` |
 | `moon.respite.<phase>` | The eight moon-phase names (indices 0–7: full, waning gibbous, third quarter, waning crescent, new, waxing crescent, first quarter, waxing gibbous) |
 | `command.respite.*` | All command feedback (status lines, reload result, rest set/clear confirmations) |
 | `config.respite.<key>` + `.tooltip` | Every config option, label + tooltip pairs |
-| `tooltip.respite.chronometer` (+ `_night`, `_new_moon`) | Jade/WTHIT line — same variants as the inspect notification, without the ✦ |
+| `tooltip.respite.chronometer` (+ `_night`, `_new_moon`, `_alarm`) | Jade/WTHIT line — same variants as the inspect notification, without the ✦ |
 | `subtitles.respite.time_lapse_start`, `subtitles.respite.time_lapse_end` | Sound subtitles |
 | `advancements.respite.<id>.title` / `.description` | Advancement pairs (below) |
 | `key.categories.respite` | Reserved; no keybinds ship at v0.1 |
@@ -586,6 +593,7 @@ Tiering per the `mc-mod-testing` skill.
 
 - Rate formula: `k/n` sweep (including k=0, n=0, n=1, rounding at every k for n=4), clamp to `maxTimeLapseRate`; peril-brake clamp and the 100-real-tick peril window decay.
 - Chronometer signal function: boundary ticks 0, 1,599, 1,600, 11,200, 12,000, 17,999, 18,000, 22,400, 23,999; fixed-time → 0; the clock-time formatting math; the `(4 − phase) mod 8` new-moon countdown for all eight phases and the night-window gate for the moon line.
+- Chronometer moon/alarm math: `moonFullness` 0–15 ramp for all eight phases; `alarmBoundary` clock inversion; `alarmFires` window predicate (at the boundary, last window tick, one tick past, off never fires); `cycleAlarm` off-wrap; `hourLabel` 12-hour formatting.
 - Restful-saturation accounting: 20-interval night totals, stop conditions (saturation floor, full health), penalty-exemption arithmetic, Deep Sleep multiplier arithmetic (default and range extremes).
 - Weariness ladder math: both thresholds, the Exhausted `wearinessThresholdDays + 1` clamp, per-stage penalty resolution, and config clamping (all ranges in the Configuration table).
 - Blink scheduling math: jitter bounds (60–120 s), combat-suppression deferral (due blink fires after the window clears, never inside it).
@@ -597,7 +605,7 @@ Tiering per the `mc-mod-testing` skill.
 
 ### Gametests (Fabric Gametest API)
 
-- Chronometer: `/time set` sweep across all 15 levels asserts emitted power and comparator reading; fixed-time dimension asserts 0; neighbor update fires exactly on level change.
+- Chronometer: `/time set` sweep across all 15 levels asserts emitted power and adjacent-wire reading; the comparator reads moon fullness across full/new/quarter-moon days; fixed-time dimension asserts 0; neighbor update fires exactly on level change; a sneak-cycle arms and advances the `alarm_hour`, and the 20-tick re-check preserves it.
 - Brew: shapeless recipe assembles; campfire converts Unsteeped → Caffeinated in 600 ticks; drinking clears a synthetically applied Weary or Exhausted, resets the stat, applies Haste 1,800 ticks, returns a bottle.
 - Weariness: set `TIME_SINCE_REST` past each threshold → the matching stage applied within 100 ticks and the other absent; natural-regen heal scaled ×0.75 Weary and ×0.50 Exhausted (measured via health delta under controlled food state); stat reset → effects removed.
 - Restful Saturation: simulated sleeping player with full hunger heals 1.0 HP per 600 world ticks and spends saturation 1:1; vanilla regen suspended while asleep; on a phase-4 night (`/time set` to a new-moon night) each conversion heals 2.0 HP for the same 1.0 saturation.

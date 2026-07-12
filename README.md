@@ -63,13 +63,14 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
   reward — the night heals you in bed, the grace only speeds recovery if you
   still wake hurt). Tuned with `enableWellRested`, `wellRestedSeconds` (120), and
   `wellRestedRegenBonus` (0.5); off restores untouched vanilla waking.
-- **The Chronometer** — a copper-and-redstone timepiece block. It emits redstone
-  power 1–15 that climbs with the hour (each level lasts 80 seconds; comparators
-  read the same value), its dial face sweeps the sun and moon across the day,
-  and a right-click reads out the exact time — plus the moon phase and new-moon
-  countdown at night. In dimensions without a day-night cycle it honestly emits
-  nothing. `enableChronometer = false` removes the recipe; placed blocks keep
-  working.
+- **The Chronometer** — a copper-and-redstone timepiece block. Its wire signal
+  climbs 1–15 with the hour (each level lasts 80 seconds), a comparator instead
+  reads moon fullness (0 on the new moon, 15 on the full), and its dial face
+  sweeps the sun and moon across the day. Right-click reads out the exact time —
+  plus the moon phase and new-moon countdown at night — and sneak-right-click
+  sets an alarm hour, at which the block rings a bell once. In dimensions without
+  a day-night cycle it honestly emits nothing. `enableChronometer = false`
+  removes the recipe; placed blocks keep working.
 - **The Caffeinated Brew** — deliberate counterplay to Weariness, never the
   brewing stand. Craft an Unsteeped Brew from a water bottle, two cocoa beans,
   and any leaves, then steep it over a campfire for 30 seconds into the
@@ -108,7 +109,7 @@ surface ships no HUD accessors.
 
 - `getTimeLapseRate(ServerLevel)` / `isTimeLapseActive(ServerLevel)` — the effective time-lapse acceleration, Overworld-only.
 - `getTicksSinceRest(ServerPlayer)`, `isWeary(ServerPlayer)`, `isExhausted(ServerPlayer)`, `isWellRested(ServerPlayer)` — the Weariness state.
-- `getChronometerSignal(Level)` — the Chronometer signal 1–15 for the level's day time; 0 in fixed-time dimensions.
+- `getChronometerSignal(Level)` — the Chronometer's hour signal 1–15 (what a wire reads) for the level's day time; 0 in fixed-time dimensions. A comparator reads moon fullness instead, not this value.
 
 Array-backed Fabric events (server-side):
 
