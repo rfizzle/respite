@@ -33,9 +33,11 @@
             ["<code>exhaustedRegenPenalty</code>", "double", "<code>0.50</code>", "0.0–0.95", "Weariness"],
             ["<code>enableChronometer</code>", "bool", "<code>true</code>", "—", "Chronometer"],
             ["<code>enableCaffeinatedBrew</code>", "bool", "<code>true</code>", "—", "Brew"],
-            ["<code>brewHasteSeconds</code>", "int", "<code>90</code>", "0–600", "Brew"]
+            ["<code>brewHasteSeconds</code>", "int", "<code>90</code>", "0–600", "Brew"],
+            ["<code>enableBedroll</code>", "bool", "<code>true</code>", "—", "Bedroll"],
+            ["<code>bedrollRestfulMultiplier</code>", "double", "<code>0.5</code>", "0.0–1.0", "Bedroll"]
           ],
-          "note": "Setting <code>enablePhantomRework</code> to <code>false</code> restores full vanilla insomnia. Disabling the Chronometer or brew removes their recipes; placed blocks and held items keep working."
+          "note": "Setting <code>enablePhantomRework</code> to <code>false</code> restores full vanilla insomnia. Disabling the Chronometer, brew, or bedroll removes their recipes; placed blocks, held items, and placed bedrolls keep working."
         }
       ]
     },

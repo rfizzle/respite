@@ -1,9 +1,9 @@
 {
   "nav": "Features",
   "metaTitle": "Features — Respite",
-  "metaDescription": "Respite's feature set as specced: continuous time-lapse sleep, restful saturation, phantoms of the heights, weariness, the Chronometer, and the Caffeinated Brew.",
+  "metaDescription": "Respite's feature set as specced: continuous time-lapse sleep, restful saturation, phantoms of the heights, weariness, the Chronometer, the Caffeinated Brew, and the bedroll.",
   "title": "Features",
-  "lede": "The six headline systems, as specced in <a href='https://github.com/rfizzle/respite/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a>. Respite is in development — these are commitments, not yet a shipped jar.",
+  "lede": "The seven headline systems, as specced in <a href='https://github.com/rfizzle/respite/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a>. Respite is in development — these are commitments, not yet a shipped jar.",
   "width": "5xl",
   "scale": "lg",
   "sections": [
@@ -89,6 +89,20 @@
           "type": "prose",
           "html": [
             "Steep two cocoa beans and leaves in a water bottle at a crafting table, then cook the bottle over a campfire for 30 seconds. Drinking it clears Weariness, resets your days-awake count, and grants 90 seconds of Haste I. It postpones rest but never replaces it — only a real night's sleep converts a supper into hearts. The brewing stand is never involved; this is one drink, not a potion system."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bedroll",
+      "title": "The Bedroll",
+      "intro": "A camp bed for the road — sleep anywhere without setting spawn.",
+      "blocks": [
+        {
+          "type": "prose",
+          "html": [
+            "Craft a bedroll from a row of string over a row of any wool. Right-click the ground to unroll it and turn in — the block is placed and you begin to sleep in one action — then it rolls back into your inventory when you wake. It obeys every vanilla bed rule (night or thunderstorm, no monster at your back, not obstructed, natural dimensions only) and never explodes in the Nether; it just refuses to let you rest where a bed can't.",
+            "A bedroll sleeps like a bed for that night — the time-lapse runs, and your days-awake count resets — but it never sets your spawn: morning comes to you where you lie, not a new home. Overnight Restful Saturation heals at half a real bed's rate, so a bed at home stays the better night's sleep and a new moon under a bedroll heals like an ordinary night in your own bed. <code>enableBedroll = false</code> removes the recipe; a bedroll already placed keeps working."
           ]
         }
       ]
