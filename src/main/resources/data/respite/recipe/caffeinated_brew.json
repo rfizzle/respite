@@ -1,0 +1,18 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "respite:feature_enabled",
+      "feature": "caffeinated_brew"
+    }
+  ],
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "ingredient": {
+    "item": "respite:unsteeped_brew"
+  },
+  "result": {
+    "id": "respite:caffeinated_brew"
+  },
+  "experience": 0.0,
+  "cookingtime": 600
+}

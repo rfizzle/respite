@@ -30,9 +30,21 @@ class FeatureEnabledConditionTest {
     }
 
     @Test
+    void caffeinatedBrewFeatureTracksItsToggle() {
+        RespiteConfig config = new RespiteConfig();
+        config.enableCaffeinatedBrew = true;
+        assertTrue(Feature.CAFFEINATED_BREW.enabledIn(config));
+        config.enableCaffeinatedBrew = false;
+        assertFalse(Feature.CAFFEINATED_BREW.enabledIn(config));
+    }
+
+    @Test
     void codecParsesTheShippedSpelling() {
         var result = Feature.CODEC.parse(JsonOps.INSTANCE, new JsonPrimitive("chronometer"));
         assertEquals(Feature.CHRONOMETER, result.result().orElseThrow());
+
+        var brew = Feature.CODEC.parse(JsonOps.INSTANCE, new JsonPrimitive("caffeinated_brew"));
+        assertEquals(Feature.CAFFEINATED_BREW, brew.result().orElseThrow());
     }
 
     @Test
