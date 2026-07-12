@@ -37,8 +37,8 @@ public final class RespiteRegistry {
     /** Every registered block, in registration order. */
     public static final Map<ResourceLocation, Block> BLOCKS = new LinkedHashMap<>();
 
-    /** Standalone (non-BlockItem) items, in registration order — the roster the
-     * creative-tab wiring and the resource-contract tests walk. */
+    /** Standalone (non-BlockItem) items, in registration order — the roster
+     * datagen, compat, and the resource-contract tests can walk. */
     public static final List<Item> STANDALONE_ITEMS = new ArrayList<>();
 
     // Quick to break with any tool (or none), always drops itself, pistons move
@@ -104,9 +104,13 @@ public final class RespiteRegistry {
                 .register(entries -> entries.accept(CHRONOMETER));
 
         // Both brews are drinks in all but name, so they sit with the other
-        // bottles in the vanilla Food & Drinks tab.
+        // bottles in the vanilla Food & Drinks tab. Accepted explicitly so the
+        // tab stays intentional even as the standalone-item roster grows.
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FOOD_AND_DRINKS)
-                .register(entries -> STANDALONE_ITEMS.forEach(entries::accept));
+                .register(entries -> {
+                    entries.accept(UNSTEEPED_BREW);
+                    entries.accept(CAFFEINATED_BREW);
+                });
 
         // Datapack-side feature gates (recipes and their unlock advancements).
         ResourceConditions.register(FeatureEnabledCondition.TYPE);
