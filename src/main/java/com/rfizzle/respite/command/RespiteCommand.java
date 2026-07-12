@@ -183,7 +183,7 @@ public final class RespiteCommand {
     }
 
     private static int restSet(CommandSourceStack source, ServerPlayer target, int days) {
-        setRest(target, days * (int) StatusFormat.TICKS_PER_DAY);
+        setRest(target, days * (int) WearinessMath.TICKS_PER_DAY);
         source.sendSuccess(() -> Component.translatable("command.respite.rest.set",
                 target.getDisplayName(), days), true);
         return 1;

@@ -1,5 +1,6 @@
 package com.rfizzle.respite.command;
 
+import com.rfizzle.respite.weariness.WearinessMath;
 import com.rfizzle.respite.weariness.WearinessStage;
 import java.util.Locale;
 
@@ -11,15 +12,12 @@ import java.util.Locale;
  */
 public final class StatusFormat {
 
-    /** World ticks in a full day — the unit "time awake" is reported in. */
-    public static final long TICKS_PER_DAY = 24_000L;
-
     private StatusFormat() {
     }
 
     /** Time awake as days to one decimal, e.g. {@code "3.5"} ({@code Locale.ROOT} so the point never localizes to a comma). */
     public static String awakeDays(long ticksSinceRest) {
-        return String.format(Locale.ROOT, "%.1f", ticksSinceRest / (double) TICKS_PER_DAY);
+        return String.format(Locale.ROOT, "%.1f", ticksSinceRest / (double) WearinessMath.TICKS_PER_DAY);
     }
 
     /** The translation key naming a rest stage — routes through a key, never {@code Enum#name()}. */
