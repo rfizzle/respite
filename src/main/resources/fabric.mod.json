@@ -24,6 +24,7 @@
             "com.rfizzle.respite.gametest.TimeLapseGameTest",
             "com.rfizzle.respite.gametest.RestfulSaturationGameTest",
             "com.rfizzle.respite.gametest.WearinessGameTest",
+            "com.rfizzle.respite.gametest.PhantomGameTest",
             "com.rfizzle.respite.gametest.CaffeinatedBrewGameTest",
             "com.rfizzle.respite.gametest.util.MockPlayersGameTest"
         ]
