@@ -1,0 +1,37 @@
+{
+  "parent": "respite:root",
+  "display": {
+    "icon": {
+      "id": "respite:chronometer"
+    },
+    "title": {
+      "translate": "advancements.respite.clockwork.title"
+    },
+    "description": {
+      "translate": "advancements.respite.clockwork.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "place_chronometer": {
+      "conditions": {
+        "location": [
+          {
+            "block": "respite:chronometer",
+            "condition": "minecraft:block_state_property"
+          }
+        ]
+      },
+      "trigger": "minecraft:placed_block"
+    }
+  },
+  "requirements": [
+    [
+      "place_chronometer"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

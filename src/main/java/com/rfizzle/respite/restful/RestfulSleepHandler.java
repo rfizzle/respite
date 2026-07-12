@@ -2,12 +2,18 @@ package com.rfizzle.respite.restful;
 
 import com.rfizzle.respite.Respite;
 import com.rfizzle.respite.config.RespiteConfig;
+import com.rfizzle.respite.rest.RestWakeEvents;
+import com.rfizzle.respite.timelapse.TimeLapseEngine;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -41,6 +47,20 @@ public final class RestfulSleepHandler {
     private static final RestfulTracker TRACKER = new RestfulTracker();
 
     /**
+     * Per-sleeper facts captured at sleep start, feeding the dawn-wake events
+     * (§Public API + §Advancements) — tracked for <em>every</em> sleeper, not
+     * just armed ones, because the rest callback and the root/dark_and_dreamless
+     * advancements key off the night itself, not off overnight healing. One map
+     * put at sleep start and one remove at wake per player: no per-tick cost,
+     * bounded by the online sleeper count, transient like {@link RestfulTracker}.
+     */
+    private static final Map<UUID, SleepSession> SESSIONS = new HashMap<>();
+
+    /** The real tick, world time, and moon phase a sleep began at. */
+    private record SleepSession(long startRealTick, long startGameTime, int nightMoonPhase) {
+    }
+
+    /**
      * The config snapshot for this real tick, per {@code RespiteConfig.get()}'s
      * rule for repeated-tick code: the hot paths below run once per world tick
      * per sleeper (up to 60× per real tick under the lapse) and must not
@@ -57,10 +77,14 @@ public final class RestfulSleepHandler {
         ServerTickEvents.START_SERVER_TICK.register(server -> tickConfig = RespiteConfig.get());
         EntitySleepEvents.START_SLEEPING.register(RestfulSleepHandler::onStartSleeping);
         EntitySleepEvents.STOP_SLEEPING.register(RestfulSleepHandler::onStopSleeping);
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) ->
-                TRACKER.forget(handler.player.getUUID()));
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            UUID id = handler.player.getUUID();
+            TRACKER.forget(id);
+            SESSIONS.remove(id);
+        });
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             TRACKER.clear();
+            SESSIONS.clear();
             tickConfig = null;
         });
     }
@@ -77,6 +101,13 @@ public final class RestfulSleepHandler {
         if (!(entity instanceof ServerPlayer player)) {
             return;
         }
+        // Capture the night's facts for the wake events, before (and independent
+        // of) the Restful Saturation gate: an unarmed sleeper can still earn the
+        // rest callback, root, and dark_and_dreamless.
+        ServerLevel level = player.serverLevel();
+        SESSIONS.put(player.getUUID(), new SleepSession(
+                TimeLapseEngine.getRealTickCount(), level.getGameTime(), level.getMoonPhase()));
+
         RespiteConfig config = config();
         if (!config.enableRestfulSaturation) {
             return;
@@ -95,7 +126,21 @@ public final class RestfulSleepHandler {
         if (!(entity instanceof ServerPlayer player)) {
             return;
         }
+        SleepSession session = SESSIONS.remove(player.getUUID());
         RestState state = TRACKER.forget(player.getUUID());
+
+        // Wake-derived events (§Public API + §Advancements) — a genuine dawn wake
+        // only, gated inside fireDawnWakeEvents. Independent of the Restful
+        // Saturation toggle; an unarmed sleeper reports 0 health restored.
+        if (session != null) {
+            try {
+                fireDawnWakeEvents(player, session, state);
+            } catch (Exception e) {
+                Respite.LOGGER.error("Rest wake events failed for {}", player.getName().getString(), e);
+            }
+        }
+
+        // Restful Saturation wake feedback (§2.7) — armed sleepers only.
         if (state == null || !config().enableRestfulSaturation) {
             return;
         }
@@ -107,6 +152,23 @@ public final class RestfulSleepHandler {
         } catch (Exception e) {
             Respite.LOGGER.error("Restful wake feedback failed for {}", player.getName().getString(), e);
         }
+    }
+
+    /**
+     * Fan a genuine dawn wake out to the public rest callback and the
+     * rest-derived advancement criteria. Interrupted sleep (waking to damage, or
+     * leaving the bed while it is still night) is filtered by the dawn gate, so
+     * nothing fires; {@code state} is null for an unarmed sleeper (0 health).
+     */
+    private static void fireDawnWakeEvents(ServerPlayer player, SleepSession session, RestState state) {
+        long ticksSlept = player.serverLevel().getGameTime() - session.startGameTime();
+        if (!RestWakeEvents.isDawnWake(player.serverLevel().isDay(), ticksSlept)) {
+            return;
+        }
+        float healthRestored = state != null ? state.healthRestored() : 0.0f;
+        boolean lapseActive = RestWakeEvents.lapseTouchedSleep(
+                TimeLapseEngine.getLastActiveRealTick(), session.startRealTick());
+        RestWakeEvents.onDawnWake(player, ticksSlept, healthRestored, lapseActive, session.nightMoonPhase());
     }
 
     /**

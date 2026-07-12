@@ -1,0 +1,29 @@
+{
+  "display": {
+    "icon": {
+      "id": "minecraft:red_bed"
+    },
+    "title": {
+      "translate": "advancements.respite.root.title"
+    },
+    "description": {
+      "translate": "advancements.respite.root.description"
+    },
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "slept_through_lapse": {
+      "trigger": "respite:slept_through_lapse"
+    }
+  },
+  "requirements": [
+    [
+      "slept_through_lapse"
+    ]
+  ],
+  "sends_telemetry_event": false
+}
