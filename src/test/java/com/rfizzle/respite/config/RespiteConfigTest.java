@@ -22,7 +22,8 @@ class RespiteConfigTest {
     // Every key the spec's Configuration table names, server then client.
     private static final List<String> SPEC_KEYS = List.of(
             "enableTimeLapse", "maxTimeLapseRate", "timeLapseTickBudgetMs", "combatHoldsTime",
-            "announceTimeLapse", "announceSleepVote", "enableRestfulSaturation", "restfulRequiresFullHunger",
+            "announceTimeLapse", "announceSleepVote", "excludeIdleFromShare", "idleThresholdMinutes",
+            "enableRestfulSaturation", "restfulRequiresFullHunger",
             "restfulHealIntervalTicks", "newMoonHealMultiplier", "enablePhantomRework",
             "phantomAltitudeMin", "phantomNewMoon", "enableWeariness", "wearinessThresholdDays",
             "wearinessRegenPenalty", "exhaustedThresholdDays", "exhaustedRegenPenalty",
@@ -42,6 +43,8 @@ class RespiteConfigTest {
         assertTrue(config.combatHoldsTime);
         assertTrue(config.announceTimeLapse);
         assertTrue(config.announceSleepVote);
+        assertTrue(config.excludeIdleFromShare);
+        assertEquals(5, config.idleThresholdMinutes);
         assertTrue(config.enableRestfulSaturation);
         assertTrue(config.restfulRequiresFullHunger);
         assertEquals(600, config.restfulHealIntervalTicks);
@@ -126,6 +129,7 @@ class RespiteConfigTest {
         RespiteConfig config = new RespiteConfig();
         config.maxTimeLapseRate = 1;
         config.timeLapseTickBudgetMs = 4;
+        config.idleThresholdMinutes = 0;
         config.restfulHealIntervalTicks = 99;
         config.newMoonHealMultiplier = 0.5;
         config.phantomAltitudeMin = -65;
@@ -142,6 +146,7 @@ class RespiteConfigTest {
 
         assertEquals(2, config.maxTimeLapseRate);
         assertEquals(5, config.timeLapseTickBudgetMs);
+        assertEquals(1, config.idleThresholdMinutes);
         assertEquals(100, config.restfulHealIntervalTicks);
         assertEquals(1.0, config.newMoonHealMultiplier);
         assertEquals(-64, config.phantomAltitudeMin);
@@ -161,6 +166,7 @@ class RespiteConfigTest {
         RespiteConfig config = new RespiteConfig();
         config.maxTimeLapseRate = 101;
         config.timeLapseTickBudgetMs = 46;
+        config.idleThresholdMinutes = 61;
         config.restfulHealIntervalTicks = 2401;
         config.newMoonHealMultiplier = 4.1;
         config.phantomAltitudeMin = 321;
@@ -177,6 +183,7 @@ class RespiteConfigTest {
 
         assertEquals(100, config.maxTimeLapseRate);
         assertEquals(45, config.timeLapseTickBudgetMs);
+        assertEquals(60, config.idleThresholdMinutes);
         assertEquals(2400, config.restfulHealIntervalTicks);
         assertEquals(4.0, config.newMoonHealMultiplier);
         assertEquals(320, config.phantomAltitudeMin);
@@ -195,6 +202,7 @@ class RespiteConfigTest {
         RespiteConfig low = new RespiteConfig();
         low.maxTimeLapseRate = 2;
         low.timeLapseTickBudgetMs = 5;
+        low.idleThresholdMinutes = 1;
         low.restfulHealIntervalTicks = 100;
         low.newMoonHealMultiplier = 1.0;
         low.phantomAltitudeMin = -64;
@@ -211,6 +219,7 @@ class RespiteConfigTest {
 
         assertEquals(2, low.maxTimeLapseRate);
         assertEquals(5, low.timeLapseTickBudgetMs);
+        assertEquals(1, low.idleThresholdMinutes);
         assertEquals(100, low.restfulHealIntervalTicks);
         assertEquals(1.0, low.newMoonHealMultiplier);
         assertEquals(-64, low.phantomAltitudeMin);
@@ -226,6 +235,7 @@ class RespiteConfigTest {
         RespiteConfig high = new RespiteConfig();
         high.maxTimeLapseRate = 100;
         high.timeLapseTickBudgetMs = 45;
+        high.idleThresholdMinutes = 60;
         high.restfulHealIntervalTicks = 2400;
         high.newMoonHealMultiplier = 4.0;
         high.phantomAltitudeMin = 320;
@@ -242,6 +252,7 @@ class RespiteConfigTest {
 
         assertEquals(100, high.maxTimeLapseRate);
         assertEquals(45, high.timeLapseTickBudgetMs);
+        assertEquals(60, high.idleThresholdMinutes);
         assertEquals(2400, high.restfulHealIntervalTicks);
         assertEquals(4.0, high.newMoonHealMultiplier);
         assertEquals(320, high.phantomAltitudeMin);
