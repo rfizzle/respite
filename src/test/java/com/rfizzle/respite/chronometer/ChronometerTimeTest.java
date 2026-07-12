@@ -123,4 +123,78 @@ class ChronometerTimeTest {
             LineVariant expected) {
         assertEquals(expected, ChronometerTime.lineVariant(dayTime, fixedTime, moonPhase));
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "0, 15",   // full moon reads brightest
+            "1, 11",
+            "2, 8",    // the quarters read half
+            "3, 4",
+            "4, 0",    // new moon reads dark
+            "5, 4",    // symmetric either side of the new moon
+            "6, 8",
+            "7, 11",
+    })
+    void moonFullnessRampForEveryPhase(int moonPhase, int expected) {
+        assertEquals(expected, ChronometerTime.moonFullness(moonPhase));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "6, 0",        // 6 am is the day's origin
+            "7, 1000",
+            "12, 6000",    // noon
+            "18, 12000",   // 6 pm, the night window's edge
+            "0, 18000",    // midnight
+            "5, 23000",
+    })
+    void alarmBoundaryInvertsTheClock(int hour, long expected) {
+        assertEquals(expected, ChronometerTime.alarmBoundary(hour));
+        // round-trips: the boundary day time reads back as the top of that hour
+        assertEquals(ChronometerTime.hourLabel(hour), ChronometerTime.clockTime(expected));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "12000, 18, 20, true",    // exactly at the 6 pm boundary
+            "12019, 18, 20, true",    // last tick of the 20-tick window
+            "12020, 18, 20, false",   // the window has closed
+            "11999, 18, 20, false",   // one tick before it opens
+            "17999, 0, 20, false",    // just shy of midnight
+            "18000, 0, 20, true",     // midnight arrives
+            "6000, 12, 20, true",     // noon boundary, wrapped day position
+    })
+    void alarmFiresOnceInsideItsWindow(long dayTime, int alarmHour, long interval, boolean expected) {
+        assertEquals(expected, ChronometerTime.alarmFires(dayTime, alarmHour, interval));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"0", "6000", "12000", "18000", "23999", "12010"})
+    void alarmOffNeverFires(long dayTime) {
+        assertFalse(ChronometerTime.alarmFires(dayTime, ChronometerTime.ALARM_OFF, 20));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "24, 0",     // off wraps to midnight
+            "0, 1",
+            "22, 23",
+            "23, 24",    // 11 pm wraps to off
+    })
+    void cycleAlarmWalksHoursThenOff(int alarmHour, int expected) {
+        assertEquals(expected, ChronometerTime.cycleAlarm(alarmHour));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "0, 12:00 am",    // midnight
+            "6, 6:00 am",
+            "11, 11:00 am",
+            "12, 12:00 pm",   // noon
+            "18, 6:00 pm",
+            "23, 11:00 pm",
+    })
+    void hourLabelFormatsWholeHours(int hour, String expected) {
+        assertEquals(expected, ChronometerTime.hourLabel(hour));
+    }
 }

@@ -21,6 +21,9 @@ public final class ChronometerTime {
     /** First tick of the night window (day-time position), inclusive. */
     public static final long NIGHT_START = 12000L;
 
+    /** The {@code alarm_hour} blockstate value meaning "no alarm set". */
+    public static final int ALARM_OFF = 24;
+
     /** Moon-phase lang-key suffixes, indexed by the vanilla phase number (0 = full moon). */
     private static final String[] MOON_PHASE_KEYS = {
             "full", "waning_gibbous", "third_quarter", "waning_crescent",
@@ -93,6 +96,62 @@ public final class ChronometerTime {
             return LineVariant.DAY;
         }
         return nightsUntilNewMoon(moonPhase) == 0 ? LineVariant.NEW_MOON : LineVariant.NIGHT;
+    }
+
+    /**
+     * The comparator's moon reading, 0–15: a fullness ramp keyed off the moon's
+     * distance from the new moon (vanilla phase 4). New moon reads 0 (dark),
+     * full moon 15, the quarters ~8; the half-illuminated phases sit symmetric
+     * either side. {@code round(|phase − 4| × 15 / 4)} → 15, 11, 8, 4, 0, 4, 8, 11
+     * for phases 0–7.
+     */
+    public static int moonFullness(int moonPhase) {
+        int distance = Math.abs(Math.floorMod(moonPhase, 8) - 4);
+        return (distance * 15 + 2) / 4;
+    }
+
+    /**
+     * The day-time position at which a wall-clock alarm hour (0–23) arrives:
+     * {@code ((hour − 6) mod 24) × 1000}, the inverse of {@link #clockTime}'s
+     * {@code hours = ((dayTime / 1000) + 6) mod 24}. Hour 6 (6 am) maps to 0,
+     * hour 0 (midnight) to 18,000.
+     */
+    public static long alarmBoundary(int hour) {
+        return Math.floorMod(hour - 6, 24) * 1000L;
+    }
+
+    /**
+     * Whether an alarm set to {@code alarmHour} arrives within the current
+     * {@code interval}-tick window — true exactly once per day for a tick grid
+     * of period {@code interval}, because such a grid lands in each half-open
+     * window {@code [boundary, boundary + interval)} exactly once. {@link #ALARM_OFF}
+     * never fires. Callers still gate on {@code doDaylightCycle}: with time
+     * frozen no window is ever crossed, so a stopped clock never chimes.
+     */
+    public static boolean alarmFires(long dayTime, int alarmHour, long interval) {
+        if (alarmHour == ALARM_OFF) {
+            return false;
+        }
+        return Math.floorMod(dayPosition(dayTime) - alarmBoundary(alarmHour), DAY_LENGTH) < interval;
+    }
+
+    /**
+     * The next {@code alarm_hour} value when the block is sneak-cycled:
+     * {@code off → 0 → 1 → … → 23 → off}. A single {@code (value + 1) mod 25}
+     * over the 0–24 range, with {@link #ALARM_OFF} (24) the wrap point.
+     */
+    public static int cycleAlarm(int alarmHour) {
+        return Math.floorMod(alarmHour + 1, ALARM_OFF + 1);
+    }
+
+    /**
+     * A whole wall-clock hour (0–23) as a 12-hour label, e.g. {@code "6:00 am"},
+     * {@code "12:00 am"} for midnight, {@code "12:00 pm"} for noon.
+     */
+    public static String hourLabel(int hour) {
+        int h = Math.floorMod(hour, 24);
+        int h12 = h % 12 == 0 ? 12 : h % 12;
+        return h12 + ":00" + (h < 12 ? " am" : " pm");
     }
 
     /** Position within the current day, 0–23,999, safe for negative day times. */

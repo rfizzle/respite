@@ -1,5 +1,6 @@
 package com.rfizzle.respite.compat.wthit;
 
+import com.rfizzle.respite.block.ChronometerBlock;
 import com.rfizzle.respite.chronometer.ChronometerLines;
 import mcp.mobius.waila.api.IBlockAccessor;
 import mcp.mobius.waila.api.IBlockComponentProvider;
@@ -16,6 +17,7 @@ public enum ChronometerWthitProvider implements IBlockComponentProvider {
 
     @Override
     public void appendBody(ITooltip tooltip, IBlockAccessor accessor, IPluginConfig config) {
-        tooltip.addLine(ChronometerLines.build("tooltip.respite.chronometer", accessor.getWorld()));
+        tooltip.addLine(ChronometerLines.build("tooltip.respite.chronometer", accessor.getWorld(),
+                accessor.getBlockState().getValue(ChronometerBlock.ALARM_HOUR)));
     }
 }

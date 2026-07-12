@@ -42,9 +42,13 @@ class ChronometerResourceContractTest {
                 {"notification.respite.chronometer", "2"},
                 {"notification.respite.chronometer_night", "4"},
                 {"notification.respite.chronometer_new_moon", "2"},
+                {"notification.respite.chronometer_alarm", "1"},
+                {"notification.respite.chronometer_alarm_set", "1"},
+                {"notification.respite.chronometer_alarm_off", "0"},
                 {"tooltip.respite.chronometer", "2"},
                 {"tooltip.respite.chronometer_night", "4"},
                 {"tooltip.respite.chronometer_new_moon", "2"},
+                {"tooltip.respite.chronometer_alarm", "1"},
         };
         for (String[] expectation : expectations) {
             String key = expectation[0];

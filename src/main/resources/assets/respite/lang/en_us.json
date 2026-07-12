@@ -22,10 +22,14 @@
   "notification.respite.chronometer": "✦ %s — signal %s",
   "notification.respite.chronometer_night": "✦ %s — signal %s — %s, new moon in %s nights",
   "notification.respite.chronometer_new_moon": "✦ %s — signal %s — new moon tonight",
+  "notification.respite.chronometer_alarm": " — alarm %s",
+  "notification.respite.chronometer_alarm_set": "✦ Alarm set to %s",
+  "notification.respite.chronometer_alarm_off": "✦ Alarm off",
 
   "tooltip.respite.chronometer": "%s — signal %s",
   "tooltip.respite.chronometer_night": "%s — signal %s — %s, new moon in %s nights",
   "tooltip.respite.chronometer_new_moon": "%s — signal %s — new moon tonight",
+  "tooltip.respite.chronometer_alarm": " — alarm %s",
 
   "moon.respite.full": "full moon",
   "moon.respite.waning_gibbous": "waning gibbous",

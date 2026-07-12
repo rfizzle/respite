@@ -67,17 +67,18 @@
     {
       "id": "chronometer",
       "title": "The Chronometer",
-      "intro": "A copper-and-redstone timepiece block whose signal tracks the sun.",
+      "intro": "A copper-and-redstone timepiece block whose signal tracks the sun, with a comparator that reads the moon and an alarm that rings the hour.",
       "blocks": [
         {
           "type": "prose",
           "html": [
-            "Crafted from copper ingots, redstone, and a clock, the Chronometer emits a redstone signal that climbs with the hour: strength 1 at dawn, 8 at dusk, 15 in the last stretch before sunrise — each level lasting 80 seconds. Doors that bolt at dusk, lanterns that light at nightfall, farms on a schedule: time-of-day automation without daylight-sensor guesswork. Right-click it for the exact time and current signal."
+            "Crafted from copper ingots, redstone, and a clock, the Chronometer emits a redstone signal that climbs with the hour: strength 1 at dawn, 8 at dusk, 15 in the last stretch before sunrise — each level lasting 80 seconds. Doors that bolt at dusk, lanterns that light at nightfall, farms on a schedule: time-of-day automation without daylight-sensor guesswork. Right-click it for the exact time and current signal.",
+            "A comparator off the same block reads a different clock — moon fullness, 0 on the new moon to 15 on the full — so a build can arm for the dark nights when phantoms own the sky. Because the new moon reads 0, invert the comparator (a redstone torch) to trigger on the dark itself. And each block carries an alarm: sneak-right-click to cycle an alarm hour, and when it arrives the Chronometer rings a bell once. The direct wire keeps its hour meaning; only the comparator reads the moon."
           ]
         },
         {
           "type": "note",
-          "html": "In dimensions without a day-night cycle the Chronometer honestly emits nothing, and with <code>doDaylightCycle</code> off it freezes at the correct level."
+          "html": "In dimensions without a day-night cycle the Chronometer honestly emits nothing, and with <code>doDaylightCycle</code> off it freezes at the correct level and never chimes."
         }
       ]
     },
