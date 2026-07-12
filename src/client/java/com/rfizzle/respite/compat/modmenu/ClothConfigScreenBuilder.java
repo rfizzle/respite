@@ -133,6 +133,23 @@ final class ClothConfigScreenBuilder {
                 .setTooltip(Component.translatable("config.respite.exhaustedRegenPenalty.tooltip"))
                 .setSaveConsumer(v -> working.exhaustedRegenPenalty = v)
                 .build());
+        weariness.addEntry(entry.startBooleanToggle(Component.translatable("config.respite.enableWellRested"), config.enableWellRested)
+                .setDefaultValue(defaults.enableWellRested)
+                .setTooltip(Component.translatable("config.respite.enableWellRested.tooltip"))
+                .setSaveConsumer(v -> working.enableWellRested = v)
+                .build());
+        weariness.addEntry(entry.startIntField(Component.translatable("config.respite.wellRestedSeconds"), config.wellRestedSeconds)
+                .setDefaultValue(defaults.wellRestedSeconds)
+                .setMin(0).setMax(600)
+                .setTooltip(Component.translatable("config.respite.wellRestedSeconds.tooltip"))
+                .setSaveConsumer(v -> working.wellRestedSeconds = v)
+                .build());
+        weariness.addEntry(entry.startDoubleField(Component.translatable("config.respite.wellRestedRegenBonus"), config.wellRestedRegenBonus)
+                .setDefaultValue(defaults.wellRestedRegenBonus)
+                .setMin(0.0).setMax(2.0)
+                .setTooltip(Component.translatable("config.respite.wellRestedRegenBonus.tooltip"))
+                .setSaveConsumer(v -> working.wellRestedRegenBonus = v)
+                .build());
 
         // --- Chronometer (§5) ---
         ConfigCategory chronometer = builder.getOrCreateCategory(Component.translatable("config.respite.category.chronometer"));

@@ -96,6 +96,19 @@ public final class RespiteAPI {
     }
 
     /**
+     * Whether a player currently carries the Well-Rested status effect — the
+     * positive pole of the weariness ladder, granted on a genuine dawn wake and
+     * lasting a short grace while it speeds natural regeneration. Authoritative,
+     * server-side only.
+     *
+     * @param player the player
+     * @return true if the player currently has the Well-Rested effect
+     */
+    public static boolean isWellRested(ServerPlayer player) {
+        return player.hasEffect(RespiteRegistry.WELL_RESTED);
+    }
+
+    /**
      * The Chronometer redstone signal (1–15) for a level's current day time,
      * the same pure function of time the Chronometer block emits. Fixed-time
      * dimensions (the Nether, the End) read {@code 0}. Authoritative,

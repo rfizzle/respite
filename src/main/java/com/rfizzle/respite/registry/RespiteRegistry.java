@@ -7,6 +7,7 @@ import com.rfizzle.respite.block.ChronometerBlock;
 import com.rfizzle.respite.brew.CaffeinatedBrewItem;
 import com.rfizzle.respite.condition.FeatureEnabledCondition;
 import com.rfizzle.respite.effect.WearinessEffect;
+import com.rfizzle.respite.effect.WellRestedEffect;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -67,6 +68,12 @@ public final class RespiteRegistry {
     public static Holder<MobEffect> WEARY;
     public static Holder<MobEffect> EXHAUSTED;
 
+    // The positive pole of the weariness ladder (design/SPEC.md §4): a beneficial,
+    // behaviour-free marker granted on a dawn wake. Warm Candleglow tint — the
+    // "wake refreshed" morning. The regen mixin reads it off the player to resolve
+    // the bonus; the grant applies it, no sweep re-asserts it.
+    public static Holder<MobEffect> WELL_RESTED;
+
     // The Caffeinated Brew pair (design/SPEC.md §6). Both stack to 16. The
     // Unsteeped Brew is inert — a plain crafting intermediate. The Caffeinated
     // Brew carries a zero-nutrition, always-edible food component so it drinks
@@ -123,6 +130,7 @@ public final class RespiteRegistry {
 
         WEARY = registerEffect("weary", new WearinessEffect(0x5A5A82));
         EXHAUSTED = registerEffect("exhausted", new WearinessEffect(0x3A3A5A));
+        WELL_RESTED = registerEffect("well_rested", new WellRestedEffect(0xF2C14E));
 
         // A redstone component belongs where builders look for redstone
         // components — the vanilla tab, not a one-block mod tab.

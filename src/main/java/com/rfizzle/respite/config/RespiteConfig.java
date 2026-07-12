@@ -54,6 +54,10 @@ public class RespiteConfig {
     public double wearinessRegenPenalty = 0.25;
     public int exhaustedThresholdDays = 6;
     public double exhaustedRegenPenalty = 0.50;
+    // Well-Rested — the positive pole of the weariness ladder (§4)
+    public boolean enableWellRested = true;
+    public int wellRestedSeconds = 120;
+    public double wellRestedRegenBonus = 0.5;
 
     // Chronometer (§5)
     public boolean enableChronometer = true;
@@ -81,6 +85,8 @@ public class RespiteConfig {
         wearinessRegenPenalty = clampDouble("wearinessRegenPenalty", wearinessRegenPenalty, 0.0, 0.95);
         exhaustedThresholdDays = clampInt("exhaustedThresholdDays", exhaustedThresholdDays, 2, 60);
         exhaustedRegenPenalty = clampDouble("exhaustedRegenPenalty", exhaustedRegenPenalty, 0.0, 0.95);
+        wellRestedSeconds = clampInt("wellRestedSeconds", wellRestedSeconds, 0, 600);
+        wellRestedRegenBonus = clampDouble("wellRestedRegenBonus", wellRestedRegenBonus, 0.0, 2.0);
         brewHasteSeconds = clampInt("brewHasteSeconds", brewHasteSeconds, 0, 600);
         bedrollRestfulMultiplier = clampDouble("bedrollRestfulMultiplier", bedrollRestfulMultiplier, 0.0, 1.0);
         // Exhausted must sit at least one full day past Weary (SPEC §4); runs after the
