@@ -52,6 +52,18 @@ Extra ticks are metered, never assumed free:
 - Spectators are excluded from `n` (matching vanilla sleep accounting).
 - When the effective rate changes, players in the Overworld get an action bar line — `✦ Time ×30 — 2 of 4 asleep` (`notification.respite.time_lapse`), and `✦ Time settles` when it ends (`notification.respite.time_lapse_end`). Server toggle `announceTimeLapse`; client toggle `showTimeLapseMessages`.
 
+### Sleep whisper
+
+With the vanilla night skip retired, the running "who's sleeping?" tally that made a shared night answerable disappears. Respite restores it as a quiet chat line — not the action bar — on every bed enter and leave:
+
+- **Enter** — `Alex is in bed (2/4)` (`message.respite.sleep_vote_enter`): the actor's display name, then the share of players in bed after they climbed in. **Leave** — `Alex left the bed (1/4)` (`message.respite.sleep_vote_leave`): the same, after they rise.
+- **The tally is honest on a leave.** The leaving player is not counted among the sleepers — vanilla has not yet cleared their sleeping state when the event fires, so the count explicitly excludes the actor.
+- **Counted like the rate share** — `sleeping` of `total` over the same non-spectator players `k`/`n` the rate uses, recomputed fresh at each event, sent to every non-spectator player in the sleeper's level.
+- **A `message.respite.*` chat surface** — muted to gray, no ✦ marker (that glyph is the action-bar `notification.*` surface's, per concord DESIGN-SYSTEM §10). It lands in chat history, distinct from the transient rate line.
+- **The night's end is not a negotiation.** A leave once sleep is no longer eligible (dawn, or a thunderstorm blowing out) is the crew waking together — silent, so morning is never a stack of "left the bed" lines.
+- **A solo world sees nothing** — the whisper is a multiplayer signal; with fewer than two non-spectator players present it stays quiet.
+- Independent of the rate machinery: server toggle `announceSleepVote` (default on) gates only this line, and it fires whether or not `enableTimeLapse` is on.
+
 ### Dimensions
 
 Extra ticks run for the **Overworld only**. The Nether and End tick at the normal rate throughout, so mobs there never rush an absent-minded teammate at 60×. Accepted trade-off, stated plainly: cross-dimension contraptions (a Nether-side farm) do not accelerate during the time-lapse, and machinery keyed to game-time deltas observed from another dimension will see the Overworld's clock run ahead. Global day time is Overworld-owned in vanilla, so the day/night position stays coherent everywhere.
@@ -79,6 +91,7 @@ Extra ticks run for the **Overworld only**. The Nether and End tick at the norma
 | `timeLapseTickBudgetMs` | int | `40` | 5–45 |
 | `combatHoldsTime` | bool | `true` | — |
 | `announceTimeLapse` | bool | `true` | — |
+| `announceSleepVote` | bool | `true` | — |
 
 ### Implementation Notes
 
@@ -394,6 +407,7 @@ Single JSON config `config/respite.json`, created with defaults on first launch,
 | `timeLapseTickBudgetMs` | int | `40` | 5–45 | §1 |
 | `combatHoldsTime` | bool | `true` | — | §1 |
 | `announceTimeLapse` | bool | `true` | — | §1 |
+| `announceSleepVote` | bool | `true` | — | §1 |
 | `enableRestfulSaturation` | bool | `true` | — | §2 |
 | `restfulRequiresFullHunger` | bool | `true` | — | §2 |
 | `restfulHealIntervalTicks` | int | `600` | 100–2400 | §2 |
@@ -548,6 +562,7 @@ All user-facing strings are translation keys in `assets/respite/lang/en_us.json`
 | `notification.respite.time_lapse` | `✦ Time ×%s — %s of %s asleep` |
 | `notification.respite.time_lapse_end` | `✦ Time settles` |
 | `notification.respite.time_hold` | `✦ Time holds — battle nearby` |
+| `message.respite.sleep_vote_enter`, `message.respite.sleep_vote_leave` | `%s is in bed (%s/%s)` / `%s left the bed (%s/%s)` — sleep-whisper chat lines |
 | `notification.respite.rested` | `✦ You wake refreshed` |
 | `notification.respite.deep_rested` | `✦ You wake deeply rested` |
 | `notification.respite.chronometer` | `✦ %s — signal %s` |

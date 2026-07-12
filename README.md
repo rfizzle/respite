@@ -26,9 +26,11 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
   than skipped. Awake players keep real time in their own body, a nearby fight
   holds time at normal pace until it's settled, and a struggling server
   degrades gracefully under a per-tick millisecond budget. Action-bar lines
-  and a start/settle sound pair mark the lapse — both toggleable.
-  `enableTimeLapse = false` restores the entire vanilla sleep system,
-  `playersSleepingPercentage` included.
+  and a start/settle sound pair mark the lapse — both toggleable. On a shared
+  server a quiet chat whisper names who climbs into or out of bed with the
+  running tally (`Alex is in bed (2/4)`), so the night stays a negotiation;
+  `announceSleepVote = false` silences it. `enableTimeLapse = false` restores
+  the entire vanilla sleep system, `playersSleepingPercentage` included.
 - **Restful Saturation** — going to bed on a full hunger bar arms the night:
   while you sleep, every 600 world ticks converts 1 point of saturation into
   half a heart — up to 10 hearts across a full night, and double per point

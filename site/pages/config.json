@@ -19,6 +19,7 @@
             ["<code>timeLapseTickBudgetMs</code>", "int", "<code>40</code>", "5–45", "Time-lapse"],
             ["<code>combatHoldsTime</code>", "bool", "<code>true</code>", "—", "Time-lapse"],
             ["<code>announceTimeLapse</code>", "bool", "<code>true</code>", "—", "Time-lapse"],
+            ["<code>announceSleepVote</code>", "bool", "<code>true</code>", "—", "Time-lapse"],
             ["<code>enableRestfulSaturation</code>", "bool", "<code>true</code>", "—", "Restful saturation"],
             ["<code>restfulRequiresFullHunger</code>", "bool", "<code>true</code>", "—", "Restful saturation"],
             ["<code>restfulHealIntervalTicks</code>", "int", "<code>600</code>", "100–2400", "Restful saturation"],
