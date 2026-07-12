@@ -14,6 +14,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.ItemStack;
@@ -160,6 +161,31 @@ public class CaffeinatedBrewGameTest implements FabricGameTest {
             helper.assertTrue(result.is(Items.GLASS_BOTTLE),
                     "a survival drinker gets the empty bottle back, got " + result);
 
+            cleanup.run();
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "brewFullInventory", timeoutTicks = 100)
+    public void aFullInventoryDropsTheReturnedBottleRatherThanLosingIt(GameTestHelper helper) {
+        MockPlayers.retireLeaked(helper);
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
+        Runnable cleanup = () -> MockPlayers.retire(player);
+        guarded(cleanup, () -> {
+            player.getAbilities().instabuild = false;
+            // Fill every main slot so the emptied bottle cannot be re-inserted.
+            for (int i = 0; i < player.getInventory().items.size(); i++) {
+                player.getInventory().items.set(i, new ItemStack(Items.STONE, 64));
+            }
+            // A stack of two: drinking one leaves a brew in hand, so the bottle
+            // must find another home — the drop fallback, not a silent discard.
+            ItemStack twoBrews = new ItemStack(RespiteRegistry.CAFFEINATED_BREW, 2);
+            RespiteRegistry.CAFFEINATED_BREW.finishUsingItem(twoBrews, helper.getLevel(), player);
+
+            boolean dropped = player.level()
+                    .getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(2.0)).stream()
+                    .anyMatch(e -> e.getItem().is(Items.GLASS_BOTTLE));
+            helper.assertTrue(dropped, "a full inventory must drop the empty bottle, never lose it");
             cleanup.run();
             helper.succeed();
         });

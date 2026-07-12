@@ -73,13 +73,19 @@ public class CaffeinatedBrewItem extends Item {
             stack.consume(1, player);
         }
         // Return the emptied glass, mirroring the vanilla bottle-drink convention:
-        // nothing back in creative, the bottle back (or in place) in survival.
+        // nothing back in creative, the bottle back (or in place) in survival. If
+        // the inventory is full, drop it rather than lose it — the brew's promise
+        // is never to brick a player's items (§6), so it follows HoneyBottleItem's
+        // drop fallback rather than PotionItem's silent discard.
         if (player == null || !player.hasInfiniteMaterials()) {
             if (stack.isEmpty()) {
                 return new ItemStack(Items.GLASS_BOTTLE);
             }
             if (player != null) {
-                player.getInventory().add(new ItemStack(Items.GLASS_BOTTLE));
+                ItemStack bottle = new ItemStack(Items.GLASS_BOTTLE);
+                if (!player.getInventory().add(bottle)) {
+                    player.drop(bottle, false);
+                }
             }
         }
         entity.gameEvent(GameEvent.DRINK);
