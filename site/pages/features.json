@@ -18,6 +18,10 @@
             "Get into a bed at night and time rushes visibly past: furnaces smelt, crops grow, brewing stands bubble, and the sky wheels overhead. Each sleeper adds an equal share of the speed — alone you get the full 60×; with two of four players in bed, time runs at 30×. A full night passes in about ten seconds with everyone asleep, and a furnace smelts close to a full stack while you dream.",
             "The acceleration is real ticks under a hard millisecond budget, so a struggling server degrades to a slower night — never a stall. Players still awake share the fast night, and an action-bar line (<code>✦ Time ×30 — 2 of 4 asleep</code>) says why the stars are streaking."
           ]
+        },
+        {
+          "type": "note",
+          "html": "On a shared server a quiet chat whisper — <code>Alex is in bed (2/4)</code> — names who climbs into or out of bed with the running tally, so \"who's sleeping?\" stays answerable. It lands in chat rather than the action bar, goes silent once the night is over, and stays quiet in a solo world. <code>announceSleepVote = false</code> turns it off."
         }
       ]
     },

@@ -22,7 +22,7 @@ class RespiteConfigTest {
     // Every key the spec's Configuration table names, server then client.
     private static final List<String> SPEC_KEYS = List.of(
             "enableTimeLapse", "maxTimeLapseRate", "timeLapseTickBudgetMs", "combatHoldsTime",
-            "announceTimeLapse", "enableRestfulSaturation", "restfulRequiresFullHunger",
+            "announceTimeLapse", "announceSleepVote", "enableRestfulSaturation", "restfulRequiresFullHunger",
             "restfulHealIntervalTicks", "newMoonHealMultiplier", "enablePhantomRework",
             "phantomAltitudeMin", "phantomNewMoon", "enableWeariness", "wearinessThresholdDays",
             "wearinessRegenPenalty", "exhaustedThresholdDays", "exhaustedRegenPenalty",
@@ -41,6 +41,7 @@ class RespiteConfigTest {
         assertEquals(40, config.timeLapseTickBudgetMs);
         assertTrue(config.combatHoldsTime);
         assertTrue(config.announceTimeLapse);
+        assertTrue(config.announceSleepVote);
         assertTrue(config.enableRestfulSaturation);
         assertTrue(config.restfulRequiresFullHunger);
         assertEquals(600, config.restfulHealIntervalTicks);
