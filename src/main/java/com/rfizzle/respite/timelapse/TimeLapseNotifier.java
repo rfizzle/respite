@@ -16,8 +16,7 @@ import net.minecraft.sounds.SoundSource;
  * toggle for line and cue alike), a plain action-bar line plus notify-sound to
  * clients without the mod. Gated server-side by {@code announceTimeLapse};
  * the transition machine still runs when the gate is off so a later toggle
- * never replays a stale cue. The rate-change seam is also where the public
- * {@code RespiteTimeLapseCallback} will hang once the API surface ships.
+ * never replays a stale cue.
  */
 public final class TimeLapseNotifier {
 
