@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 
 import java.util.Random;
 
@@ -27,8 +28,9 @@ import java.util.Random;
  * {@code respite:exhausted} effect on {@link LocalPlayer}, so nothing is
  * networked for this. {@link BlinkMath} owns the timing; this class owns the
  * live state and the draw. Combat suppression watches two local signals: the
- * player's health dropping (took damage) and an attack landing on an entity
- * (dealt damage); a blink due inside the 10s window is deferred, not skipped.
+ * player's health dropping (took damage) and an attack that plausibly lands
+ * damage on a living target (dealt damage); a blink due inside the 10s window
+ * is deferred, not skipped.
  */
 public final class WearinessBlinkHandler {
 
@@ -51,7 +53,14 @@ public final class WearinessBlinkHandler {
         ClientTickEvents.END_CLIENT_TICK.register(WearinessBlinkHandler::onClientTick);
         HudRenderCallback.EVENT.register(WearinessBlinkHandler::onHudRender);
         AttackEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
-            lastCombatTick = clientTick;
+            // The callback fires on the attack input against any entity, before
+            // damage resolves — so arm the window only for a hit that plausibly
+            // lands damage on a living target (§4.4).
+            if (entity instanceof LivingEntity target
+                    && BlinkMath.attackDealsDamage(
+                            target.isAlive(), target.isAttackable(), target.isInvulnerable())) {
+                lastCombatTick = clientTick;
+            }
             return InteractionResult.PASS;
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> reset());

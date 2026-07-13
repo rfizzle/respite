@@ -42,6 +42,19 @@ public final class BlinkMath {
     }
 
     /**
+     * Whether an attack on a target with these traits counts as dealing damage
+     * for combat suppression (§4.4). The blink window should arm only on real
+     * combat, so a swing that lands no damage — an invulnerable target, an
+     * unattackable one (a marker armor stand, a spectator), or a corpse in a
+     * post-kill client frame — does not count. Callers gate this behind an
+     * {@code instanceof LivingEntity} check; non-living hits (item frames,
+     * boats) are never combat either.
+     */
+    public static boolean attackDealsDamage(boolean alive, boolean attackable, boolean invulnerable) {
+        return alive && attackable && !invulnerable;
+    }
+
+    /**
      * Whether a blink may begin now — true once the combat window has cleared.
      * {@code lastCombatTick < 0} means no combat has been observed this session.
      * A due blink held here is deferred, not skipped: it fires the first tick
