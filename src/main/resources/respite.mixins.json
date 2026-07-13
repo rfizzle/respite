@@ -11,6 +11,7 @@
         "PhantomSpawnerAccessor",
         "PhantomSpawnerMixin",
         "PlayerMixin",
+        "RespitePhantomSpawnerAccessor",
         "ServerLevelCustomSpawnersAccessor",
         "ServerLevelMixin",
         "ServerPlayerMixin"

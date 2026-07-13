@@ -3,6 +3,7 @@ package com.rfizzle.respite.gametest;
 import com.rfizzle.respite.config.RespiteConfig;
 import com.rfizzle.respite.gametest.util.MockPlayers;
 import com.rfizzle.respite.mixin.PhantomSpawnerAccessor;
+import com.rfizzle.respite.mixin.RespitePhantomSpawnerAccessor;
 import com.rfizzle.respite.mixin.ServerLevelCustomSpawnersAccessor;
 import com.rfizzle.respite.phantom.RespitePhantomSpawner;
 import java.util.List;
@@ -34,9 +35,13 @@ public class PhantomGameTest implements FabricGameTest {
         boolean saved = config.enablePhantomRework;
         try {
             config.enablePhantomRework = false;
-            int spawned = new RespitePhantomSpawner().tick(helper.getLevel(), true, false);
+            RespitePhantomSpawner spawner = new RespitePhantomSpawner();
+            int spawned = spawner.tick(helper.getLevel(), true, false);
             helper.assertTrue(spawned == 0,
                     "with the rework off, Respite's spawner must do nothing, got " + spawned);
+            int nextTick = ((RespitePhantomSpawnerAccessor) (Object) spawner).respite$getNextTick();
+            helper.assertTrue(nextTick == 0,
+                    "the rework-off bail-out must fire before --nextTick, was " + nextTick);
             helper.succeed();
         } finally {
             config.enablePhantomRework = saved;
@@ -49,8 +54,12 @@ public class PhantomGameTest implements FabricGameTest {
         boolean saved = config.enablePhantomRework;
         try {
             config.enablePhantomRework = true;
-            int spawned = new RespitePhantomSpawner().tick(helper.getLevel(), false, false);
+            RespitePhantomSpawner spawner = new RespitePhantomSpawner();
+            int spawned = spawner.tick(helper.getLevel(), false, false);
             helper.assertTrue(spawned == 0, "spawnEnemies=false must yield no phantoms, got " + spawned);
+            int nextTick = ((RespitePhantomSpawnerAccessor) (Object) spawner).respite$getNextTick();
+            helper.assertTrue(nextTick == 0,
+                    "the spawnEnemies=false bail-out must fire before --nextTick, was " + nextTick);
             helper.succeed();
         } finally {
             config.enablePhantomRework = saved;
@@ -67,8 +76,12 @@ public class PhantomGameTest implements FabricGameTest {
             MockPlayers.retireLeaked(helper);
             config.enablePhantomRework = true;
             setInsomnia(level, false);
-            int spawned = new RespitePhantomSpawner().tick(level, true, false);
+            RespitePhantomSpawner spawner = new RespitePhantomSpawner();
+            int spawned = spawner.tick(level, true, false);
             helper.assertTrue(spawned == 0, "doInsomnia off must suppress Respite's spawner too, got " + spawned);
+            int nextTick = ((RespitePhantomSpawnerAccessor) (Object) spawner).respite$getNextTick();
+            helper.assertTrue(nextTick == 0,
+                    "the doInsomnia-off bail-out must fire before --nextTick, was " + nextTick);
             helper.succeed();
         } finally {
             config.enablePhantomRework = savedRework;
