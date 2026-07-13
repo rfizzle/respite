@@ -2,6 +2,7 @@
   "block.respite.chronometer": "Chronometer",
   "block.respite.bedroll": "Bedroll",
 
+  "item.respite.pocket_chronometer": "Pocket Chronometer",
   "item.respite.unsteeped_brew": "Unsteeped Brew",
   "item.respite.caffeinated_brew": "Caffeinated Brew",
 
@@ -33,6 +34,12 @@
   "tooltip.respite.chronometer_night": "%s — signal %s — %s, new moon in %s nights",
   "tooltip.respite.chronometer_new_moon": "%s — signal %s — new moon tonight",
   "tooltip.respite.chronometer_alarm": " — alarm %s",
+
+  "tooltip.respite.pocket_chronometer": "%s",
+  "tooltip.respite.pocket_chronometer_night": "%s — %s, new moon in %s nights",
+  "tooltip.respite.pocket_chronometer_new_moon": "%s — new moon tonight",
+  "tooltip.respite.pocket_chronometer_still": "— still —",
+  "tooltip.respite.pocket_chronometer_awake": "Awake %s days",
 
   "moon.respite.full": "full moon",
   "moon.respite.waning_gibbous": "waning gibbous",
@@ -105,7 +112,7 @@
   "config.respite.wellRestedRegenBonus.tooltip": "Fraction of extra natural regeneration while Well-Rested (0.0–2.0).",
 
   "config.respite.enableChronometer": "Enable the Chronometer",
-  "config.respite.enableChronometer.tooltip": "The time-of-day redstone block. Off removes its recipe; placed blocks keep working.",
+  "config.respite.enableChronometer.tooltip": "The Chronometer — the time-of-day redstone block and the pocket chronometer item. Off removes both recipes; placed blocks and held items keep working.",
   "config.respite.enableCaffeinatedBrew": "Enable the Caffeinated Brew",
   "config.respite.enableCaffeinatedBrew.tooltip": "The campfire-steeped brew. Off removes its recipe; held items keep working.",
   "config.respite.brewHasteSeconds": "Brew Haste (Seconds)",
