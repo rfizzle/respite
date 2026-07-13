@@ -135,8 +135,26 @@ public class WellRestedGameTest implements FabricGameTest {
             ServerPlayer player = current[0];
             player.getFoodData().setFoodLevel(20);
             player.getFoodData().setSaturation(6.0f);
+            // The regen mixin reads both feature flags off the global RespiteConfig
+            // singleton. Gametest batches all tick on the one server thread, and a
+            // concurrent batch (the weariness-disabled test) holds enableWeariness=false
+            // across its own tick loop — which would silently drop the Exhausted pole
+            // here and heal ×1.5 instead of ×0.75. Re-assert the flags this test needs
+            // inside the same synchronous block that drives the heal, then restore them
+            // immediately, so the set→heal→restore is atomic and never leaks a value a
+            // concurrent test depends on.
+            RespiteConfig config = RespiteConfig.get();
+            boolean savedWeariness = config.enableWeariness;
+            boolean savedWellRested = config.enableWellRested;
+            config.enableWeariness = true;
+            config.enableWellRested = true;
             float before = player.getHealth();
-            player.doTick();
+            try {
+                player.doTick();
+            } finally {
+                config.enableWeariness = savedWeariness;
+                config.enableWellRested = savedWellRested;
+            }
             float healed = player.getHealth() - before;
             if (healed > 0.0f) {
                 helper.assertTrue(Math.abs(healed - expected) < 1.0e-4f,
