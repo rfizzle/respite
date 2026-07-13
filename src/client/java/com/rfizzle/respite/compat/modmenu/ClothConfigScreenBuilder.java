@@ -37,13 +37,13 @@ final class ClothConfigScreenBuilder {
                 .build());
         timeLapse.addEntry(entry.startIntField(Component.translatable("config.respite.maxTimeLapseRate"), config.maxTimeLapseRate)
                 .setDefaultValue(defaults.maxTimeLapseRate)
-                .setMin(2).setMax(100)
+                .setMin(RespiteConfig.Bounds.MAX_TIME_LAPSE_RATE.min()).setMax(RespiteConfig.Bounds.MAX_TIME_LAPSE_RATE.max())
                 .setTooltip(Component.translatable("config.respite.maxTimeLapseRate.tooltip"))
                 .setSaveConsumer(v -> working.maxTimeLapseRate = v)
                 .build());
         timeLapse.addEntry(entry.startIntField(Component.translatable("config.respite.timeLapseTickBudgetMs"), config.timeLapseTickBudgetMs)
                 .setDefaultValue(defaults.timeLapseTickBudgetMs)
-                .setMin(5).setMax(45)
+                .setMin(RespiteConfig.Bounds.TIME_LAPSE_TICK_BUDGET_MS.min()).setMax(RespiteConfig.Bounds.TIME_LAPSE_TICK_BUDGET_MS.max())
                 .setTooltip(Component.translatable("config.respite.timeLapseTickBudgetMs.tooltip"))
                 .setSaveConsumer(v -> working.timeLapseTickBudgetMs = v)
                 .build());
@@ -69,7 +69,7 @@ final class ClothConfigScreenBuilder {
                 .build());
         timeLapse.addEntry(entry.startIntField(Component.translatable("config.respite.idleThresholdMinutes"), config.idleThresholdMinutes)
                 .setDefaultValue(defaults.idleThresholdMinutes)
-                .setMin(1).setMax(60)
+                .setMin(RespiteConfig.Bounds.IDLE_THRESHOLD_MINUTES.min()).setMax(RespiteConfig.Bounds.IDLE_THRESHOLD_MINUTES.max())
                 .setTooltip(Component.translatable("config.respite.idleThresholdMinutes.tooltip"))
                 .setSaveConsumer(v -> working.idleThresholdMinutes = v)
                 .build());
@@ -88,13 +88,13 @@ final class ClothConfigScreenBuilder {
                 .build());
         restful.addEntry(entry.startIntField(Component.translatable("config.respite.restfulHealIntervalTicks"), config.restfulHealIntervalTicks)
                 .setDefaultValue(defaults.restfulHealIntervalTicks)
-                .setMin(100).setMax(2400)
+                .setMin(RespiteConfig.Bounds.RESTFUL_HEAL_INTERVAL_TICKS.min()).setMax(RespiteConfig.Bounds.RESTFUL_HEAL_INTERVAL_TICKS.max())
                 .setTooltip(Component.translatable("config.respite.restfulHealIntervalTicks.tooltip"))
                 .setSaveConsumer(v -> working.restfulHealIntervalTicks = v)
                 .build());
         restful.addEntry(entry.startDoubleField(Component.translatable("config.respite.newMoonHealMultiplier"), config.newMoonHealMultiplier)
                 .setDefaultValue(defaults.newMoonHealMultiplier)
-                .setMin(1.0).setMax(4.0)
+                .setMin(RespiteConfig.Bounds.NEW_MOON_HEAL_MULTIPLIER.min()).setMax(RespiteConfig.Bounds.NEW_MOON_HEAL_MULTIPLIER.max())
                 .setTooltip(Component.translatable("config.respite.newMoonHealMultiplier.tooltip"))
                 .setSaveConsumer(v -> working.newMoonHealMultiplier = v)
                 .build());
@@ -108,7 +108,7 @@ final class ClothConfigScreenBuilder {
                 .build());
         phantoms.addEntry(entry.startIntField(Component.translatable("config.respite.phantomAltitudeMin"), config.phantomAltitudeMin)
                 .setDefaultValue(defaults.phantomAltitudeMin)
-                .setMin(-64).setMax(320)
+                .setMin(RespiteConfig.Bounds.PHANTOM_ALTITUDE_MIN.min()).setMax(RespiteConfig.Bounds.PHANTOM_ALTITUDE_MIN.max())
                 .setTooltip(Component.translatable("config.respite.phantomAltitudeMin.tooltip"))
                 .setSaveConsumer(v -> working.phantomAltitudeMin = v)
                 .build());
@@ -127,25 +127,25 @@ final class ClothConfigScreenBuilder {
                 .build());
         weariness.addEntry(entry.startIntField(Component.translatable("config.respite.wearinessThresholdDays"), config.wearinessThresholdDays)
                 .setDefaultValue(defaults.wearinessThresholdDays)
-                .setMin(1).setMax(30)
+                .setMin(RespiteConfig.Bounds.WEARINESS_THRESHOLD_DAYS.min()).setMax(RespiteConfig.Bounds.WEARINESS_THRESHOLD_DAYS.max())
                 .setTooltip(Component.translatable("config.respite.wearinessThresholdDays.tooltip"))
                 .setSaveConsumer(v -> working.wearinessThresholdDays = v)
                 .build());
         weariness.addEntry(entry.startDoubleField(Component.translatable("config.respite.wearinessRegenPenalty"), config.wearinessRegenPenalty)
                 .setDefaultValue(defaults.wearinessRegenPenalty)
-                .setMin(0.0).setMax(0.95)
+                .setMin(RespiteConfig.Bounds.WEARINESS_REGEN_PENALTY.min()).setMax(RespiteConfig.Bounds.WEARINESS_REGEN_PENALTY.max())
                 .setTooltip(Component.translatable("config.respite.wearinessRegenPenalty.tooltip"))
                 .setSaveConsumer(v -> working.wearinessRegenPenalty = v)
                 .build());
         weariness.addEntry(entry.startIntField(Component.translatable("config.respite.exhaustedThresholdDays"), config.exhaustedThresholdDays)
                 .setDefaultValue(defaults.exhaustedThresholdDays)
-                .setMin(2).setMax(60)
+                .setMin(RespiteConfig.Bounds.EXHAUSTED_THRESHOLD_DAYS.min()).setMax(RespiteConfig.Bounds.EXHAUSTED_THRESHOLD_DAYS.max())
                 .setTooltip(Component.translatable("config.respite.exhaustedThresholdDays.tooltip"))
                 .setSaveConsumer(v -> working.exhaustedThresholdDays = v)
                 .build());
         weariness.addEntry(entry.startDoubleField(Component.translatable("config.respite.exhaustedRegenPenalty"), config.exhaustedRegenPenalty)
                 .setDefaultValue(defaults.exhaustedRegenPenalty)
-                .setMin(0.0).setMax(0.95)
+                .setMin(RespiteConfig.Bounds.EXHAUSTED_REGEN_PENALTY.min()).setMax(RespiteConfig.Bounds.EXHAUSTED_REGEN_PENALTY.max())
                 .setTooltip(Component.translatable("config.respite.exhaustedRegenPenalty.tooltip"))
                 .setSaveConsumer(v -> working.exhaustedRegenPenalty = v)
                 .build());
@@ -156,13 +156,13 @@ final class ClothConfigScreenBuilder {
                 .build());
         weariness.addEntry(entry.startIntField(Component.translatable("config.respite.wellRestedSeconds"), config.wellRestedSeconds)
                 .setDefaultValue(defaults.wellRestedSeconds)
-                .setMin(0).setMax(600)
+                .setMin(RespiteConfig.Bounds.WELL_RESTED_SECONDS.min()).setMax(RespiteConfig.Bounds.WELL_RESTED_SECONDS.max())
                 .setTooltip(Component.translatable("config.respite.wellRestedSeconds.tooltip"))
                 .setSaveConsumer(v -> working.wellRestedSeconds = v)
                 .build());
         weariness.addEntry(entry.startDoubleField(Component.translatable("config.respite.wellRestedRegenBonus"), config.wellRestedRegenBonus)
                 .setDefaultValue(defaults.wellRestedRegenBonus)
-                .setMin(0.0).setMax(2.0)
+                .setMin(RespiteConfig.Bounds.WELL_RESTED_REGEN_BONUS.min()).setMax(RespiteConfig.Bounds.WELL_RESTED_REGEN_BONUS.max())
                 .setTooltip(Component.translatable("config.respite.wellRestedRegenBonus.tooltip"))
                 .setSaveConsumer(v -> working.wellRestedRegenBonus = v)
                 .build());
@@ -184,7 +184,7 @@ final class ClothConfigScreenBuilder {
                 .build());
         brew.addEntry(entry.startIntField(Component.translatable("config.respite.brewHasteSeconds"), config.brewHasteSeconds)
                 .setDefaultValue(defaults.brewHasteSeconds)
-                .setMin(0).setMax(600)
+                .setMin(RespiteConfig.Bounds.BREW_HASTE_SECONDS.min()).setMax(RespiteConfig.Bounds.BREW_HASTE_SECONDS.max())
                 .setTooltip(Component.translatable("config.respite.brewHasteSeconds.tooltip"))
                 .setSaveConsumer(v -> working.brewHasteSeconds = v)
                 .build());
@@ -198,7 +198,7 @@ final class ClothConfigScreenBuilder {
                 .build());
         bedroll.addEntry(entry.startDoubleField(Component.translatable("config.respite.bedrollRestfulMultiplier"), config.bedrollRestfulMultiplier)
                 .setDefaultValue(defaults.bedrollRestfulMultiplier)
-                .setMin(0.0).setMax(1.0)
+                .setMin(RespiteConfig.Bounds.BEDROLL_RESTFUL_MULTIPLIER.min()).setMax(RespiteConfig.Bounds.BEDROLL_RESTFUL_MULTIPLIER.max())
                 .setTooltip(Component.translatable("config.respite.bedrollRestfulMultiplier.tooltip"))
                 .setSaveConsumer(v -> working.bedrollRestfulMultiplier = v)
                 .build());

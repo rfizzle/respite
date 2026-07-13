@@ -24,6 +24,12 @@ public final class ChronometerTime {
     /** The {@code alarm_hour} blockstate value meaning "no alarm set". */
     public static final int ALARM_OFF = 24;
 
+    /** Lang key for the pre-noon meridiem marker — resolved on the client, never baked in. */
+    public static final String AM_KEY = "time.respite.am";
+
+    /** Lang key for the post-noon meridiem marker. */
+    public static final String PM_KEY = "time.respite.pm";
+
     /** Moon-phase lang-key suffixes, indexed by the vanilla phase number (0 = full moon). */
     private static final String[] MOON_PHASE_KEYS = {
             "full", "waning_gibbous", "third_quarter", "waning_crescent",
@@ -56,16 +62,25 @@ public final class ChronometerTime {
     }
 
     /**
-     * The 12-hour clock reading, e.g. {@code "7:12 pm"}. Hours derive as
+     * The numeric half of the 12-hour clock, e.g. {@code "7:12"} — colon-joined
+     * digits only, so it needs no translation. Hours derive as
      * {@code ((dayTime / 1000) + 6) mod 24} (day time 0 is 6:00 am), minutes as
-     * {@code (dayTime mod 1000) × 60 / 1000}.
+     * {@code (dayTime mod 1000) × 60 / 1000}. The meridiem marker is a separate
+     * lang key ({@link #meridiemKey}) so a non-English client reads its own; the
+     * two are assembled into a component at the display seam.
      */
-    public static String clockTime(long dayTime) {
+    public static String hourMinute(long dayTime) {
         long position = dayPosition(dayTime);
         int hours = (int) ((position / 1000 + 6) % 24);
         int minutes = (int) (position % 1000 * 60 / 1000);
         int hour12 = hours % 12 == 0 ? 12 : hours % 12;
-        return hour12 + ":" + (minutes < 10 ? "0" : "") + minutes + (hours < 12 ? " am" : " pm");
+        return hour12 + ":" + (minutes < 10 ? "0" : "") + minutes;
+    }
+
+    /** {@link #AM_KEY} before noon, {@link #PM_KEY} from noon on, for a day time. */
+    public static String meridiemKey(long dayTime) {
+        int hours = (int) ((dayPosition(dayTime) / 1000 + 6) % 24);
+        return hours < 12 ? AM_KEY : PM_KEY;
     }
 
     /** True in the night window — day-time position 12,000–23,999. */
@@ -112,7 +127,7 @@ public final class ChronometerTime {
 
     /**
      * The day-time position at which a wall-clock alarm hour (0–23) arrives:
-     * {@code ((hour − 6) mod 24) × 1000}, the inverse of {@link #clockTime}'s
+     * {@code ((hour − 6) mod 24) × 1000}, the inverse of {@link #hourMinute}'s
      * {@code hours = ((dayTime / 1000) + 6) mod 24}. Hour 6 (6 am) maps to 0,
      * hour 0 (midnight) to 18,000.
      */
@@ -142,16 +157,6 @@ public final class ChronometerTime {
      */
     public static int cycleAlarm(int alarmHour) {
         return Math.floorMod(alarmHour + 1, ALARM_OFF + 1);
-    }
-
-    /**
-     * A whole wall-clock hour (0–23) as a 12-hour label, e.g. {@code "6:00 am"},
-     * {@code "12:00 am"} for midnight, {@code "12:00 pm"} for noon.
-     */
-    public static String hourLabel(int hour) {
-        int h = Math.floorMod(hour, 24);
-        int h12 = h % 12 == 0 ? 12 : h % 12;
-        return h12 + ":00" + (h < 12 ? " am" : " pm");
     }
 
     /** Position within the current day, 0–23,999, safe for negative day times. */

@@ -18,6 +18,7 @@
             ["<code>getTicksSinceRest(ServerPlayer)</code>", "The player's time-since-rest in ticks"],
             ["<code>isWeary(ServerPlayer)</code>", "True if the player currently has the Weary effect"],
             ["<code>isExhausted(ServerPlayer)</code>", "True if the player currently has the Exhausted effect"],
+            ["<code>isWellRested(ServerPlayer)</code>", "True if the player currently has the Well-Rested effect"],
             ["<code>getChronometerSignal(Level)</code>", "The Chronometer signal (1–15) for the level's day time; 0 in fixed-time dimensions"]
           ]
         }

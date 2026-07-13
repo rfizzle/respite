@@ -53,18 +53,32 @@ class ChronometerTimeTest {
 
     @ParameterizedTest
     @CsvSource({
-            "0, 6:00 am",
-            "999, 6:59 am",       // 999 × 60 / 1000 truncates to 59
-            "1000, 7:00 am",
-            "6000, 12:00 pm",     // noon
-            "12500, 6:30 pm",
-            "13200, 7:12 pm",     // the spec's worked example
-            "18000, 12:00 am",    // midnight
-            "23999, 5:59 am",
-            "37200, 7:12 pm",     // day 2 reads the same clock
+            "0, 6:00",
+            "999, 6:59",       // 999 × 60 / 1000 truncates to 59
+            "1000, 7:00",
+            "6000, 12:00",     // noon
+            "12500, 6:30",
+            "13200, 7:12",     // the spec's worked example
+            "18000, 12:00",    // midnight
+            "23999, 5:59",
+            "37200, 7:12",     // day 2 reads the same clock
     })
-    void clockTime(long dayTime, String expected) {
-        assertEquals(expected, ChronometerTime.clockTime(dayTime));
+    void hourMinuteFormatsTheNumericClock(long dayTime, String expected) {
+        assertEquals(expected, ChronometerTime.hourMinute(dayTime));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "0, time.respite.am",       // 6 am
+            "5999, time.respite.am",    // last tick before noon
+            "6000, time.respite.pm",    // noon reads pm
+            "13200, time.respite.pm",   // 7:12 pm
+            "17999, time.respite.pm",   // last tick before midnight
+            "18000, time.respite.am",   // midnight reads am
+            "23999, time.respite.am",   // 5:59 am
+    })
+    void meridiemKeyMarksNoon(long dayTime, String expectedKey) {
+        assertEquals(expectedKey, ChronometerTime.meridiemKey(dayTime));
     }
 
     @ParameterizedTest
@@ -151,7 +165,7 @@ class ChronometerTimeTest {
     void alarmBoundaryInvertsTheClock(int hour, long expected) {
         assertEquals(expected, ChronometerTime.alarmBoundary(hour));
         // round-trips: the boundary day time reads back as the top of that hour
-        assertEquals(ChronometerTime.hourLabel(hour), ChronometerTime.clockTime(expected));
+        assertTrue(ChronometerTime.hourMinute(expected).endsWith(":00"));
     }
 
     @ParameterizedTest
@@ -187,14 +201,16 @@ class ChronometerTimeTest {
 
     @ParameterizedTest
     @CsvSource({
-            "0, 12:00 am",    // midnight
-            "6, 6:00 am",
-            "11, 11:00 am",
-            "12, 12:00 pm",   // noon
-            "18, 6:00 pm",
-            "23, 11:00 pm",
+            "0, 12:00, time.respite.am",    // midnight
+            "6, 6:00, time.respite.am",
+            "11, 11:00, time.respite.am",
+            "12, 12:00, time.respite.pm",   // noon
+            "18, 6:00, time.respite.pm",
+            "23, 11:00, time.respite.pm",
     })
-    void hourLabelFormatsWholeHours(int hour, String expected) {
-        assertEquals(expected, ChronometerTime.hourLabel(hour));
+    void wholeHourLabelSplitsNumericAndMeridiem(int hour, String expectedTime, String expectedKey) {
+        long boundary = ChronometerTime.alarmBoundary(hour);
+        assertEquals(expectedTime, ChronometerTime.hourMinute(boundary));
+        assertEquals(expectedKey, ChronometerTime.meridiemKey(boundary));
     }
 }

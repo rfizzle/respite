@@ -34,13 +34,23 @@
 | Bedroll item (32×32) | `art/glyphs/bedroll-item.glyph` | `assets/respite/textures/item/bedroll.png` |
 | Pocket Chronometer item (32×32) | `art/glyphs/pocket-chronometer.gen.py` → `art/glyphs/pocket-chronometer.glyph` | `assets/respite/textures/item/pocket_chronometer.png` |
 
+## Mob effect icons
+
+| Asset | Source | Final / derived copies |
+|---|---|---|
+| Weary effect icon (18×18) | `art/weary-effect.glyph` | `assets/respite/textures/mob_effect/weary.png` |
+| Exhausted effect icon (18×18) | `art/exhausted-effect.glyph` | `assets/respite/textures/mob_effect/exhausted.png` |
+| Well-Rested effect icon (18×18) | `art/well-rested-effect.glyph` | `assets/respite/textures/mob_effect/well_rested.png` |
+
+## Audio
+
+| Asset | Source | Final / derived copies |
+|---|---|---|
+| Time-lapse onset cue | `art/audio/time-lapse-start.sfx` | `assets/respite/sounds/ui/time_lapse_start.ogg` |
+| Time-lapse settle cue | `art/audio/time-lapse-end.sfx` | `assets/respite/sounds/ui/time_lapse_end.ogg` |
+
 ## Not yet created
 
 | Asset | Intended source | Destination |
 |---|---|---|
-| Weary effect icon | `/glyph` | `art/weary-effect.glyph` → `assets/respite/textures/mob_effect/weary.png` |
-| Exhausted effect icon | `/glyph` | `art/exhausted-effect.glyph` → `assets/respite/textures/mob_effect/exhausted.png` |
-| Well-Rested effect icon | `/glyph` | `art/well-rested-effect.glyph` → `assets/respite/textures/mob_effect/well_rested.png` |
-| Time-lapse onset cue | `/sfx` | `art/audio/time-lapse-start.sfx` → `assets/respite/sounds/time_lapse_start.ogg` — (planned, with implementation) |
-| Time-lapse settle cue | `/sfx` | `art/audio/time-lapse-end.sfx` → `assets/respite/sounds/time_lapse_end.ogg` — (planned, with implementation) |
-| OG image, favicons | Gemini / derived from logo | `site/assets/` — (planned, with site phase) |
+| Favicons | Derived from logo | `site/assets/` — (planned, with site phase) |

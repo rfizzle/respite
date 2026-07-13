@@ -228,8 +228,18 @@ public class ChronometerGameTest implements FabricGameTest {
     public void inspectShowsClockAndSignalByDay(GameTestHelper helper) {
         long dayTime = 6800L; // 12:48 pm, level 5
         assertInspectLine(helper, dayTime, "notification.respite.chronometer", contents -> {
-            helper.assertTrue(ChronometerTime.clockTime(dayTime).equals(contents.getArgs()[0]),
-                    "clock arg was " + contents.getArgs()[0]);
+            // The clock arg is a component: numeric time plus a translatable
+            // meridiem, so a non-English client renders its own "am"/"pm".
+            Component clock = (Component) contents.getArgs()[0];
+            TranslatableContents clockContents = (TranslatableContents) clock.getContents();
+            helper.assertTrue("time.respite.clock".equals(clockContents.getKey()),
+                    "clock arg key was " + clockContents.getKey());
+            helper.assertTrue(ChronometerTime.hourMinute(dayTime).equals(clockContents.getArgs()[0]),
+                    "clock numeric arg was " + clockContents.getArgs()[0]);
+            String meridiemKey = ((TranslatableContents) ((Component) clockContents.getArgs()[1])
+                    .getContents()).getKey();
+            helper.assertTrue(ChronometerTime.meridiemKey(dayTime).equals(meridiemKey),
+                    "clock meridiem key was " + meridiemKey);
             helper.assertTrue(Integer.valueOf(5).equals(contents.getArgs()[1]),
                     "signal arg was " + contents.getArgs()[1]);
         });

@@ -175,7 +175,7 @@ public class ChronometerBlock extends Block {
         return alarmHour == ChronometerTime.ALARM_OFF
                 ? Component.translatable("notification.respite.chronometer_alarm_off")
                 : Component.translatable("notification.respite.chronometer_alarm_set",
-                        ChronometerTime.hourLabel(alarmHour));
+                        ChronometerLines.hourLabel(alarmHour));
     }
 
     private static int currentSignal(Level level) {

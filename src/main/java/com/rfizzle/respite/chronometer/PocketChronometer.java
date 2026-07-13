@@ -49,7 +49,7 @@ public final class PocketChronometer {
         if (fixedTime) {
             return Component.translatable(KEY + "_still").withStyle(ChatFormatting.GRAY);
         }
-        String clock = ChronometerTime.clockTime(dayTime);
+        Component clock = ChronometerLines.clock(dayTime);
         MutableComponent line = switch (ChronometerTime.lineVariant(dayTime, false, moonPhase)) {
             case DAY -> Component.translatable(KEY, clock);
             case NEW_MOON -> Component.translatable(KEY + "_new_moon", clock);
