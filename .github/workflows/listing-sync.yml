@@ -3,7 +3,6 @@
 # the Modrinth project description on change. CurseForge has no description write
 # API, so listing-curseforge.md stays a manual copy-paste. Requires a
 # MODRINTH_TOKEN secret with the "Write projects" scope; absent -> the sync no-ops.
-# The modrinth-id `with:` input is added once the store project is registered.
 name: Listing sync
 
 on:
@@ -21,4 +20,6 @@ permissions:
 jobs:
   listing:
     uses: rfizzle/concord/.github/workflows/mod-listing-sync.yml@master
+    with:
+      modrinth-id: "Mz4an5lJ"
     secrets: inherit
