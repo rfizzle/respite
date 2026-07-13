@@ -53,6 +53,12 @@ public final class WearinessBlinkHandler {
         ClientTickEvents.END_CLIENT_TICK.register(WearinessBlinkHandler::onClientTick);
         HudRenderCallback.EVENT.register(WearinessBlinkHandler::onHudRender);
         AttackEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
+            // In singleplayer the callback fires on both logical sides; the blink
+            // is purely client state, so only the client side arms the window —
+            // otherwise the integrated server's pass double-writes it.
+            if (!level.isClientSide) {
+                return InteractionResult.PASS;
+            }
             // The callback fires on the attack input against any entity, before
             // damage resolves — so arm the window only for a hit that plausibly
             // lands damage on a living target (§4.4).
