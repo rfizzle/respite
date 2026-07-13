@@ -11,7 +11,10 @@ version = computeModVersion()
 group = project.maven_group
 
 tasks.register('printVersion') {
-    doLast { println project.version }
+    // Capture the value at configuration time: reaching for `project` inside a
+    // task action is a hard error under Gradle 10's configuration cache.
+    def resolvedVersion = version
+    doLast { println resolvedVersion }
 }
 
 // Derives a SemVer-compliant version from `mod_version` plus the git state:
