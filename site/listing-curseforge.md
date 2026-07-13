@@ -17,8 +17,9 @@ fades, and morning is simply there. Respite makes the night happen: sleeping
 accelerates time visibly while the world keeps running, a hearty supper heals
 you overnight, and phantoms trade their insomnia grudge for a real territory.
 
-**In development.** The design and full behavioral spec are committed and
-features are being built against them; this page describes the first release.
+**An overhaul, not an add-on.** Every feature toggles on its own, and outside
+the night the world you know is untouched — world generation, daytime mobs, and
+every block and item work exactly as before.
 
 ## At a glance
 
