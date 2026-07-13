@@ -11,12 +11,12 @@ sleep, rest, and the passage of night part of the game: a time-lapse instead of
 the vanilla night skip, overnight healing from saturation, repurposed phantoms,
 a weariness debuff, a time-of-day redstone block, and a campfire-steeped brew.
 
-**The repo is pre-implementation: the skeleton builds, no features exist yet.**
-The player promise is [`design/VISION.md`](design/VISION.md), the behavioral
-contract is [`design/SPEC.md`](design/SPEC.md), and the brand is
-[`design/DESIGN.md`](design/DESIGN.md). Implementation follows the spec — an
-implementer builds from it, and a reviewer calls divergence a bug. Java 21,
-Fabric Loader 0.16.10, Loom 1.9. Work is tracked in GitHub Issues — see the
+**The features are implemented and the mod ships.** The player promise is
+[`design/VISION.md`](design/VISION.md), the behavioral contract is
+[`design/SPEC.md`](design/SPEC.md), and the brand is
+[`design/DESIGN.md`](design/DESIGN.md). The spec is the source of truth — code
+conforms to it number-for-number, and a reviewer calls divergence a bug. Java
+21, Fabric Loader 0.16.10, Loom 1.9. Work is tracked in GitHub Issues — see the
 [Development lifecycle](#development-lifecycle) section below.
 
 ## Suite standards (Concord)
