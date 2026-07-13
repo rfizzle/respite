@@ -21,6 +21,7 @@
         "fabric-gametest": [
             "com.rfizzle.respite.gametest.RespiteSmokeGameTest",
             "com.rfizzle.respite.gametest.ChronometerGameTest",
+            "com.rfizzle.respite.gametest.PocketChronometerGameTest",
             "com.rfizzle.respite.gametest.TimeLapseGameTest",
             "com.rfizzle.respite.gametest.RestfulSaturationGameTest",
             "com.rfizzle.respite.gametest.WearinessGameTest",
