@@ -51,7 +51,7 @@ Shared neutrals (text and surfaces) follow the standard tokens as-is —
 
 ## 2. HUD Decision
 
-**No slot, by design.** The standard's test is *persistent ambient state the player needs while walking around*, and Respite carries none: the time-lapse is diegetic (the accelerating sky **is** the indicator), Weariness is an ordinary status effect with a vanilla effect icon, and the Chronometer's reading lives on the block — right-click feedback and a Jade/WTHIT line. Adding a badge would put a clock on the screen for a mod whose promise is that you read time from the world. Respite therefore ships no HUD element and no HUD accessors; its info surfaces are the status-effect icon, action-bar notifications, `/respite status`, and Jade/WTHIT.
+**No slot, by design.** The standard's test is *persistent ambient state the player needs while walking around*, and Respite carries none: the time-lapse is diegetic (the accelerating sky **is** the indicator), Weariness is an ordinary status effect with a vanilla effect icon, and the Chronometer's reading lives on the block — right-click feedback and a Jade/WTHIT line. Adding a badge would put a clock on the screen for a mod whose promise is that you read time from the world. Respite therefore ships no HUD slot badge and no HUD accessors; its info surfaces are the status-effect icon, action-bar notifications, `/respite status`, and Jade/WTHIT. The Exhausted eyelid blink is a transient full-screen cosmetic drawn through `HudRenderCallback` — it carries no state and reserves no slot, so it is not a HUD element in the Standard's sense and needs no coordination accessors.
 
 ---
 
