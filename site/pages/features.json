@@ -34,7 +34,7 @@
           "type": "prose",
           "html": [
             "Eat until your hunger bar is full, then sleep through the night: every 2 points of saturation restore 1 heart by morning — a supper of steak or golden carrots can carry you from battle-worn to full hearts by dawn. The reserve is spent doing it: you wake healed, but hungrier than you lay down. Cooking well before bed is mechanically worth it.",
-            "On a new moon — the darkest night, one in eight — sleep runs deepest: the same reserve heals double, so an ordinary supper heals like a feast and you wake deeply rested. Waking three hearts richer shows a quiet action-bar line either night."
+            "Sleep runs deeper the darker the moon. The heal per point ramps across the lunar cycle: plain at the full moon, half again as much at the quarters, up to double on the new moon — the darkest night, one in eight — when the same reserve heals like a feast and you wake deeply rested. Waking three hearts richer shows a quiet action-bar line on any night."
           ]
         }
       ]
@@ -108,7 +108,7 @@
           "type": "prose",
           "html": [
             "Craft a bedroll from a row of string over a row of any wool. Right-click the ground to unroll it and turn in — the block is placed and you begin to sleep in one action — then it rolls back into your inventory when you wake. It obeys every vanilla bed rule (night or thunderstorm, no monster at your back, not obstructed, natural dimensions only) and never explodes in the Nether; it just refuses to let you rest where a bed can't.",
-            "A bedroll sleeps like a bed for that night — the time-lapse runs, and your days-awake count resets — but it never sets your spawn: morning comes to you where you lie, not a new home. Overnight Restful Saturation heals at half a real bed's rate, so a bed at home stays the better night's sleep and a new moon under a bedroll heals like an ordinary night in your own bed. <code>enableBedroll = false</code> removes the recipe; a bedroll already placed keeps working."
+            "A bedroll sleeps like a bed for that night — the time-lapse runs, and your days-awake count resets — but it never sets your spawn: morning comes to you where you lie, not a new home. Overnight Restful Saturation heals at half a real bed's rate, so a bed at home stays the better night's sleep and a new moon under a bedroll heals like the full moon in your own bed. <code>enableBedroll = false</code> removes the recipe; a bedroll already placed keeps working."
           ]
         }
       ]

@@ -20,9 +20,10 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 /**
  * In-world coverage for {@code design/SPEC.md} §2: the interval conversion
  * with its 1:1 saturation spend, vanilla-regen suspension in bed and resume on
- * wake, the Deep Sleep double heal, the wake-feedback lines at the three-heart
- * threshold, the relaxed arming gate, vanilla parity with the feature off, and
- * total-preserving compression under an active time-lapse.
+ * wake, the Deep Sleep lunar gradient (its new-moon peak and a quarter-moon
+ * mid-step), the wake-feedback lines at the three-heart threshold, the relaxed
+ * arming gate, vanilla parity with the feature off, and total-preserving
+ * compression under an active time-lapse.
  *
  * <p>The framework facts from {@link TimeLapseGameTest} apply here too, plus
  * one of this feature's own: mock players sleep genuinely but vanilla never
@@ -41,8 +42,10 @@ public class RestfulSaturationGameTest implements FabricGameTest {
     private static final BlockPos BED_FOOT = new BlockPos(1, 2, 2);
     /** An ordinary night — moon phase 0, nowhere near the new moon. */
     private static final long NIGHT_START = 13000L;
-    /** Night of day 4 — moon phase 4, the new moon (Deep Sleep). */
+    /** Night of day 4 — moon phase 4, the new moon (Deep Sleep's peak). */
     private static final long NEW_MOON_NIGHT = 4 * 24000L + 13000L;
+    /** Night of day 2 — moon phase 2, a quarter moon (the gradient's mid-step, ×1.5). */
+    private static final long QUARTER_MOON_NIGHT = 2 * 24000L + 13000L;
     /** The interval range's legal floor — fast nights for the multi-conversion tests. */
     private static final int FAST_INTERVAL = 100;
 
@@ -282,6 +285,67 @@ public class RestfulSaturationGameTest implements FabricGameTest {
                 helper.assertTrue(overlayKeys(connected).contains("notification.respite.deep_rested"),
                         "a deep night at the threshold must say deeply rested; overlay keys: "
                                 + overlayKeys(connected));
+                cleanup.run();
+                helper.succeed();
+            }
+        }));
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "restfulGradient", timeoutTicks = 500)
+    public void quarterMoonConversionHealsTheRampedAmountWithoutTheDeepLine(GameTestHelper helper) {
+        int savedBudget = setUpStillNight(helper, QUARTER_MOON_NIGHT);
+        int savedInterval = RespiteConfig.get().restfulHealIntervalTicks;
+        RespiteConfig.get().restfulHealIntervalTicks = FAST_INTERVAL;
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer sleeper = connected.player();
+        Runnable cleanup = () -> {
+            RespiteConfig.get().timeLapseTickBudgetMs = savedBudget;
+            RespiteConfig.get().restfulHealIntervalTicks = savedInterval;
+            MockPlayers.retire(sleeper);
+        };
+        int[] realTick = {0};
+        int[] sleepTicks = {0};
+        long[] lastRealTick = {-1};
+        helper.onEachTick(() -> guarded(cleanup, () -> {
+            if (!newRealTick(lastRealTick)) {
+                return;
+            }
+            int t = ++realTick[0];
+            if (t >= 450) {
+                // fail (not framework timeout) so guarded() restores the config
+                helper.fail("the gradient checkpoints never fired; sleep ticks: " + sleepTicks[0]);
+            }
+            if (t == 2) {
+                primeVitals(sleeper, 20, 10.0f, 10.0f);
+                sleepInBed(helper, sleeper);
+                return;
+            }
+            if (t < 2 || !sleeper.isSleeping()) {
+                return;
+            }
+            sleeper.doTick();
+            int slept = ++sleepTicks[0];
+            if (slept == FAST_INTERVAL) {
+                // a quarter-moon conversion heals ×1.5 (10.0 → 11.5) for the same 1.0 saturation
+                helper.assertTrue(sleeper.getHealth() == 11.5f,
+                        "a quarter-moon conversion must heal 1.5 on the gradient, got "
+                                + sleeper.getHealth());
+                helper.assertTrue(sleeper.getFoodData().getSaturationLevel() == 9.0f,
+                        "the gradient conversion still spends exactly 1.0 saturation, got "
+                                + sleeper.getFoodData().getSaturationLevel());
+            } else if (slept == 4 * FAST_INTERVAL) {
+                // four ramped conversions: 6.0 restored — the threshold exactly, but no
+                // new moon ran, so the crown stays put: the plain rested line, never deep
+                helper.assertTrue(sleeper.getHealth() == 16.0f,
+                        "four quarter-moon conversions must restore 6.0, health was "
+                                + sleeper.getHealth());
+                connected.channel().outboundMessages().clear();
+                sleeper.stopSleepInBed(true, true);
+                helper.assertTrue(overlayKeys(connected).contains("notification.respite.rested"),
+                        "a bonus night at the threshold must say refreshed; overlay keys: "
+                                + overlayKeys(connected));
+                helper.assertTrue(!overlayKeys(connected).contains("notification.respite.deep_rested"),
+                        "only the new moon deepens the line — a quarter moon must not upgrade");
                 cleanup.run();
                 helper.succeed();
             }

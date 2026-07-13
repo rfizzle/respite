@@ -25,7 +25,7 @@
             ["<code>enableRestfulSaturation</code>", "bool", "<code>true</code>", "—", "Restful saturation"],
             ["<code>restfulRequiresFullHunger</code>", "bool", "<code>true</code>", "—", "Restful saturation"],
             ["<code>restfulHealIntervalTicks</code>", "int", "<code>600</code>", "100–2400", "Restful saturation"],
-            ["<code>newMoonHealMultiplier</code>", "double", "<code>2.0</code>", "1.0–4.0", "Restful saturation"],
+            ["<code>newMoonHealMultiplier</code>", "double", "<code>2.0</code>", "1.0–4.0", "Restful saturation — the gradient's new-moon peak; the heal ramps down to ×1.0 at the full moon"],
             ["<code>enablePhantomRework</code>", "bool", "<code>true</code>", "—", "Phantoms"],
             ["<code>phantomAltitudeMin</code>", "int", "<code>100</code>", "−64–320", "Phantoms"],
             ["<code>phantomNewMoon</code>", "bool", "<code>true</code>", "—", "Phantoms"],
