@@ -43,7 +43,7 @@
             ["<code>enableBedroll</code>", "bool", "<code>true</code>", "—", "Bedroll"],
             ["<code>bedrollRestfulMultiplier</code>", "double", "<code>0.5</code>", "0.0–1.0", "Bedroll"]
           ],
-          "note": "Setting <code>enablePhantomRework</code> to <code>false</code> restores full vanilla insomnia. Disabling the Chronometer, brew, or bedroll removes their recipes; placed blocks, held items, and placed bedrolls keep working."
+          "note": "Setting <code>enablePhantomRework</code> to <code>false</code> restores full vanilla insomnia. Disabling the Chronometer removes both the block and pocket-item recipes; disabling the brew or bedroll removes their recipes. Placed blocks, held items, and placed bedrolls keep working."
         }
       ]
     },
