@@ -71,9 +71,11 @@ Standing rules that apply from the first code commit:
   mod ID inlined.
 - **Mappings:** Official Mojang mappings (not Yarn). Use Mojang class/method
   names everywhere (`CompoundTag`, not `NbtCompound`; `Level`, not `World`).
-- **Mixin config:** `respite.mixins.json` in `src/main/resources` for
-  common/server mixins, plus a client-only `respite.client.mixins.json` in
-  `src/client/resources`. Mixin package: `com.rfizzle.respite.mixin`.
+- **Mixin config:** `respite.mixins.json` in `src/main/resources` holds every
+  mixin — all common/server. Respite needs no client mixins, so it ships no
+  client mixin config; a client mixin, if one is ever added, belongs in a
+  `respite.client.mixins.json` under `src/client/resources` registered as a
+  `client` config. Mixin package: `com.rfizzle.respite.mixin`.
 - **Performance hot path:** the time-lapse engine repeats the entire Overworld
   tick up to 60× under a millisecond budget (`design/SPEC.md` §1) — Respite's
   own per-tick handlers (rate evaluation, weariness sweep, conversion counters)

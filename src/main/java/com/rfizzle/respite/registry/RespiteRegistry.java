@@ -67,16 +67,16 @@ public final class RespiteRegistry {
 
     // The two weariness stages (design/SPEC.md §4). Muted Moonlight-indigo tint —
     // ambient with no particles, so the colour only ever shows in the icon frame.
-    // Holders are assigned in register(); the sweep applies them and the regen
-    // mixin reads them off the player to resolve the active stage.
-    public static Holder<MobEffect> WEARY;
-    public static Holder<MobEffect> EXHAUSTED;
+    // The sweep applies them and the regen mixin reads them off the player to
+    // resolve the active stage.
+    public static final Holder<MobEffect> WEARY = registerEffect("weary", new WearinessEffect(0x5A5A82));
+    public static final Holder<MobEffect> EXHAUSTED = registerEffect("exhausted", new WearinessEffect(0x3A3A5A));
 
     // The positive pole of the weariness ladder (design/SPEC.md §4): a beneficial,
     // behaviour-free marker granted on a dawn wake. Warm Candleglow tint — the
     // "wake refreshed" morning. The regen mixin reads it off the player to resolve
     // the bonus; the grant applies it, no sweep re-asserts it.
-    public static Holder<MobEffect> WELL_RESTED;
+    public static final Holder<MobEffect> WELL_RESTED = registerEffect("well_rested", new WellRestedEffect(0xF2C14E));
 
     // The Caffeinated Brew pair (design/SPEC.md §6). Both stack to 16. The
     // Unsteeped Brew is inert — a plain crafting intermediate. The Caffeinated
@@ -101,7 +101,11 @@ public final class RespiteRegistry {
     // The days-awake carrier the pocket chronometer writes server-side and its
     // tooltip reads client-side: TIME_SINCE_REST is server-only, so it rides the
     // stack (network-synced) rather than being read from the client's stat counter.
-    public static DataComponentType<Integer> AWAKE_TICKS;
+    public static final DataComponentType<Integer> AWAKE_TICKS = registerComponent("awake_ticks",
+            DataComponentType.<Integer>builder()
+                    .persistent(Codec.INT)
+                    .networkSynchronized(ByteBufCodecs.VAR_INT)
+                    .build());
 
     // The bedroll (design/SPEC.md §7) — a one-tile camp bed. Wool body → wool
     // sound and a warm map colour; ignited by lava, crushed like a bed by pistons.
@@ -138,10 +142,6 @@ public final class RespiteRegistry {
         Registry.register(BuiltInRegistries.ITEM, bedrollId,
                 new BedrollItem(BEDROLL, new Item.Properties().stacksTo(16)));
 
-        AWAKE_TICKS = registerComponent("awake_ticks", DataComponentType.<Integer>builder()
-                .persistent(Codec.INT)
-                .networkSynchronized(ByteBufCodecs.VAR_INT)
-                .build());
         registerItem("pocket_chronometer", POCKET_CHRONOMETER);
 
         registerItem("unsteeped_brew", UNSTEEPED_BREW);
@@ -149,10 +149,6 @@ public final class RespiteRegistry {
 
         registerSound(TIME_LAPSE_START);
         registerSound(TIME_LAPSE_END);
-
-        WEARY = registerEffect("weary", new WearinessEffect(0x5A5A82));
-        EXHAUSTED = registerEffect("exhausted", new WearinessEffect(0x3A3A5A));
-        WELL_RESTED = registerEffect("well_rested", new WellRestedEffect(0xF2C14E));
 
         // A redstone component belongs where builders look for redstone
         // components — the vanilla tab, not a one-block mod tab.

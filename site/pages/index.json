@@ -28,7 +28,7 @@
     {
       "title": "The Night, Overhauled",
       "band": true,
-      "lede": "Six systems that turn sleep from a skip button into part of the game. <a href='/features.html' class='text-accent hover:text-accent2 underline'>Full feature list →</a>",
+      "lede": "Seven systems that turn sleep from a skip button into part of the game. <a href='/features.html' class='text-accent hover:text-accent2 underline'>Full feature list →</a>",
       "blocks": [
         {
           "type": "cards",
@@ -65,6 +65,11 @@
               "icon": "&#127861;",
               "title": "The Caffeinated Brew",
               "html": ["A campfire-steeped cocoa drink that clears Weariness and grants 90 seconds of Haste — all-nighters, done deliberately."]
+            },
+            {
+              "icon": "&#128716;",
+              "title": "The Bedroll",
+              "html": ["A one-tile camp bed of string over wool — unroll it anywhere, sleep the night, and it rolls back into your pack at dawn. It never sets your spawn and heals at half a real bed's rate."]
             }
           ]
         }

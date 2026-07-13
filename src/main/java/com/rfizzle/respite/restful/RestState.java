@@ -3,9 +3,8 @@ package com.rfizzle.respite.restful;
 /**
  * One armed sleeper's night ({@code design/SPEC.md} §2): the interval
  * counter, the ticks slept, the health restored, and whether any Deep Sleep
- * conversion ran. The ticks-slept and health-restored tallies are shaped to
- * serve the future {@code RespiteRestCallback} (§Public API) without shipping
- * it yet.
+ * conversion ran. The ticks-slept and health-restored tallies feed the public
+ * {@code RespiteRestCallback} (§Public API) on wake.
  *
  * <p>Mutated in place once per world tick slept — the per-tick path allocates
  * nothing. Plain fields, no {@code net.minecraft} types.
