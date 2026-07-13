@@ -2,7 +2,7 @@
 
 **_Make the night count._**
 
-![Respite logo](https://respite.rfizzle.com/logo.png)
+![Respite logo](https://raw.githubusercontent.com/rfizzle/respite/master/art/logo.png)
 
 **Also on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/respite-vitality-overhaul)
 and [GitHub Releases](https://github.com/rfizzle/respite/releases).**
