@@ -39,6 +39,9 @@ class ChronometerResourceContractTest {
         List<String> problems = new ArrayList<>();
         // key → %s count the code passes to Component.translatable
         String[][] expectations = {
+                {"time.respite.clock", "2"},
+                {"time.respite.am", "0"},
+                {"time.respite.pm", "0"},
                 {"notification.respite.chronometer", "2"},
                 {"notification.respite.chronometer_night", "4"},
                 {"notification.respite.chronometer_new_moon", "2"},

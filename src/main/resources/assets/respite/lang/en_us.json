@@ -23,6 +23,10 @@
   "subtitles.respite.time_lapse_start": "Time quickens",
   "subtitles.respite.time_lapse_end": "Time settles",
 
+  "time.respite.clock": "%s %s",
+  "time.respite.am": "am",
+  "time.respite.pm": "pm",
+
   "notification.respite.chronometer": "✦ %s — signal %s",
   "notification.respite.chronometer_night": "✦ %s — signal %s — %s, new moon in %s nights",
   "notification.respite.chronometer_new_moon": "✦ %s — signal %s — new moon tonight",

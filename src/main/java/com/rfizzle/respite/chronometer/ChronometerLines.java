@@ -19,6 +19,23 @@ public final class ChronometerLines {
     private ChronometerLines() {
     }
 
+    /**
+     * The localized 12-hour clock component for a day time: the numeric
+     * {@link ChronometerTime#hourMinute} joined to a translatable meridiem
+     * marker, so a non-English client reads its own "am"/"pm". Nests as a
+     * {@code %s} argument inside any line key.
+     */
+    public static Component clock(long dayTime) {
+        return Component.translatable("time.respite.clock",
+                ChronometerTime.hourMinute(dayTime),
+                Component.translatable(ChronometerTime.meridiemKey(dayTime)));
+    }
+
+    /** The clock component for a whole wall-clock hour (0–23), e.g. "6:00 am". */
+    public static Component hourLabel(int hour) {
+        return clock(ChronometerTime.alarmBoundary(hour));
+    }
+
     /** The line for a placed block right now, reading its alarm hour off the state. */
     public static Component build(String keyPrefix, Level level, int alarmHour) {
         return build(keyPrefix, level.getDayTime(), level.dimensionType().hasFixedTime(),
@@ -27,7 +44,7 @@ public final class ChronometerLines {
 
     /** The line for explicit time facts (the seam the gametests drive). */
     public static Component build(String keyPrefix, long dayTime, boolean fixedTime, int moonPhase, int alarmHour) {
-        String clock = ChronometerTime.clockTime(dayTime);
+        Component clock = clock(dayTime);
         int signal = ChronometerTime.signalFor(dayTime, fixedTime);
         MutableComponent line = switch (ChronometerTime.lineVariant(dayTime, fixedTime, moonPhase)) {
             case DAY -> Component.translatable(keyPrefix, clock, signal);
@@ -37,7 +54,7 @@ public final class ChronometerLines {
                     ChronometerTime.nightsUntilNewMoon(moonPhase));
         };
         if (alarmHour != ChronometerTime.ALARM_OFF) {
-            line.append(Component.translatable(keyPrefix + "_alarm", ChronometerTime.hourLabel(alarmHour)));
+            line.append(Component.translatable(keyPrefix + "_alarm", hourLabel(alarmHour)));
         }
         return line;
     }
