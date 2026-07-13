@@ -79,21 +79,55 @@ public class RespiteConfig {
     public boolean showTimeLapseMessages = true;
     public boolean showExhaustionBlink = true;
 
+    /** Inclusive [min, max] range for an int config field. */
+    public record IntBound(int min, int max) {
+    }
+
+    /** Inclusive [min, max] range for a double config field. */
+    public record DoubleBound(double min, double max) {
+    }
+
+    /**
+     * The single source of every numeric field's valid range: {@link #clamp()}
+     * enforces it and the ModMenu editor caps its widgets from it, so the two
+     * never drift. (The published {@code site/pages/config.json} table mirrors
+     * these by hand — it can't read Java — and is guarded by its own doc test.)
+     */
+    public static final class Bounds {
+        public static final IntBound MAX_TIME_LAPSE_RATE = new IntBound(2, 100);
+        public static final IntBound TIME_LAPSE_TICK_BUDGET_MS = new IntBound(5, 45);
+        public static final IntBound IDLE_THRESHOLD_MINUTES = new IntBound(1, 60);
+        public static final IntBound RESTFUL_HEAL_INTERVAL_TICKS = new IntBound(100, 2400);
+        public static final DoubleBound NEW_MOON_HEAL_MULTIPLIER = new DoubleBound(1.0, 4.0);
+        public static final IntBound PHANTOM_ALTITUDE_MIN = new IntBound(-64, 320);
+        public static final IntBound WEARINESS_THRESHOLD_DAYS = new IntBound(1, 30);
+        public static final DoubleBound WEARINESS_REGEN_PENALTY = new DoubleBound(0.0, 0.95);
+        public static final IntBound EXHAUSTED_THRESHOLD_DAYS = new IntBound(2, 60);
+        public static final DoubleBound EXHAUSTED_REGEN_PENALTY = new DoubleBound(0.0, 0.95);
+        public static final IntBound WELL_RESTED_SECONDS = new IntBound(0, 600);
+        public static final DoubleBound WELL_RESTED_REGEN_BONUS = new DoubleBound(0.0, 2.0);
+        public static final IntBound BREW_HASTE_SECONDS = new IntBound(0, 600);
+        public static final DoubleBound BEDROLL_RESTFUL_MULTIPLIER = new DoubleBound(0.0, 1.0);
+
+        private Bounds() {
+        }
+    }
+
     public void clamp() {
-        maxTimeLapseRate = clampInt("maxTimeLapseRate", maxTimeLapseRate, 2, 100);
-        timeLapseTickBudgetMs = clampInt("timeLapseTickBudgetMs", timeLapseTickBudgetMs, 5, 45);
-        idleThresholdMinutes = clampInt("idleThresholdMinutes", idleThresholdMinutes, 1, 60);
-        restfulHealIntervalTicks = clampInt("restfulHealIntervalTicks", restfulHealIntervalTicks, 100, 2400);
-        newMoonHealMultiplier = clampDouble("newMoonHealMultiplier", newMoonHealMultiplier, 1.0, 4.0);
-        phantomAltitudeMin = clampInt("phantomAltitudeMin", phantomAltitudeMin, -64, 320);
-        wearinessThresholdDays = clampInt("wearinessThresholdDays", wearinessThresholdDays, 1, 30);
-        wearinessRegenPenalty = clampDouble("wearinessRegenPenalty", wearinessRegenPenalty, 0.0, 0.95);
-        exhaustedThresholdDays = clampInt("exhaustedThresholdDays", exhaustedThresholdDays, 2, 60);
-        exhaustedRegenPenalty = clampDouble("exhaustedRegenPenalty", exhaustedRegenPenalty, 0.0, 0.95);
-        wellRestedSeconds = clampInt("wellRestedSeconds", wellRestedSeconds, 0, 600);
-        wellRestedRegenBonus = clampDouble("wellRestedRegenBonus", wellRestedRegenBonus, 0.0, 2.0);
-        brewHasteSeconds = clampInt("brewHasteSeconds", brewHasteSeconds, 0, 600);
-        bedrollRestfulMultiplier = clampDouble("bedrollRestfulMultiplier", bedrollRestfulMultiplier, 0.0, 1.0);
+        maxTimeLapseRate = clampInt("maxTimeLapseRate", maxTimeLapseRate, Bounds.MAX_TIME_LAPSE_RATE);
+        timeLapseTickBudgetMs = clampInt("timeLapseTickBudgetMs", timeLapseTickBudgetMs, Bounds.TIME_LAPSE_TICK_BUDGET_MS);
+        idleThresholdMinutes = clampInt("idleThresholdMinutes", idleThresholdMinutes, Bounds.IDLE_THRESHOLD_MINUTES);
+        restfulHealIntervalTicks = clampInt("restfulHealIntervalTicks", restfulHealIntervalTicks, Bounds.RESTFUL_HEAL_INTERVAL_TICKS);
+        newMoonHealMultiplier = clampDouble("newMoonHealMultiplier", newMoonHealMultiplier, Bounds.NEW_MOON_HEAL_MULTIPLIER);
+        phantomAltitudeMin = clampInt("phantomAltitudeMin", phantomAltitudeMin, Bounds.PHANTOM_ALTITUDE_MIN);
+        wearinessThresholdDays = clampInt("wearinessThresholdDays", wearinessThresholdDays, Bounds.WEARINESS_THRESHOLD_DAYS);
+        wearinessRegenPenalty = clampDouble("wearinessRegenPenalty", wearinessRegenPenalty, Bounds.WEARINESS_REGEN_PENALTY);
+        exhaustedThresholdDays = clampInt("exhaustedThresholdDays", exhaustedThresholdDays, Bounds.EXHAUSTED_THRESHOLD_DAYS);
+        exhaustedRegenPenalty = clampDouble("exhaustedRegenPenalty", exhaustedRegenPenalty, Bounds.EXHAUSTED_REGEN_PENALTY);
+        wellRestedSeconds = clampInt("wellRestedSeconds", wellRestedSeconds, Bounds.WELL_RESTED_SECONDS);
+        wellRestedRegenBonus = clampDouble("wellRestedRegenBonus", wellRestedRegenBonus, Bounds.WELL_RESTED_REGEN_BONUS);
+        brewHasteSeconds = clampInt("brewHasteSeconds", brewHasteSeconds, Bounds.BREW_HASTE_SECONDS);
+        bedrollRestfulMultiplier = clampDouble("bedrollRestfulMultiplier", bedrollRestfulMultiplier, Bounds.BEDROLL_RESTFUL_MULTIPLIER);
         // Exhausted must sit at least one full day past Weary (SPEC §4); runs after the
         // range clamps so the raised value stays inside both fields' stated ranges.
         if (exhaustedThresholdDays < wearinessThresholdDays + 1) {
@@ -108,21 +142,21 @@ public class RespiteConfig {
      * hand-edited value was actually out of range (warn-and-clamp — a player
      * can see exactly which field their edit overrode).
      */
-    private static int clampInt(String name, int value, int min, int max) {
-        int clamped = Math.clamp(value, min, max);
+    private static int clampInt(String name, int value, IntBound bound) {
+        int clamped = Math.clamp(value, bound.min(), bound.max());
         if (clamped != value) {
             Respite.LOGGER.warn("Config '{}' value {} out of range [{}, {}]; clamped to {}",
-                    name, value, min, max, clamped);
+                    name, value, bound.min(), bound.max(), clamped);
         }
         return clamped;
     }
 
     /** Double counterpart of {@link #clampInt}. */
-    private static double clampDouble(String name, double value, double min, double max) {
-        double clamped = Math.clamp(value, min, max);
+    private static double clampDouble(String name, double value, DoubleBound bound) {
+        double clamped = Math.clamp(value, bound.min(), bound.max());
         if (clamped != value) {
             Respite.LOGGER.warn("Config '{}' value {} out of range [{}, {}]; clamped to {}",
-                    name, value, min, max, clamped);
+                    name, value, bound.min(), bound.max(), clamped);
         }
         return clamped;
     }
