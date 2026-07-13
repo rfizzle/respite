@@ -1,0 +1,36 @@
+{
+    "schemaVersion": 1,
+    "id": "respite-gametest",
+    "version": "1.0.0",
+    "name": "Respite Gametests",
+    "description": "Fabric gametests for Respite. Present only on the gametest run classpath — never bundled in the shipped jar.",
+    "authors": ["rfizzle"],
+    "license": "MIT",
+    "environment": "*",
+    "entrypoints": {
+        "fabric-gametest": [
+            "com.rfizzle.respite.gametest.RespiteSmokeGameTest",
+            "com.rfizzle.respite.gametest.ChronometerGameTest",
+            "com.rfizzle.respite.gametest.PocketChronometerGameTest",
+            "com.rfizzle.respite.gametest.TimeLapseGameTest",
+            "com.rfizzle.respite.gametest.RestfulSaturationGameTest",
+            "com.rfizzle.respite.gametest.WearinessGameTest",
+            "com.rfizzle.respite.gametest.WellRestedGameTest",
+            "com.rfizzle.respite.gametest.PhantomGameTest",
+            "com.rfizzle.respite.gametest.CaffeinatedBrewGameTest",
+            "com.rfizzle.respite.gametest.BedrollGameTest",
+            "com.rfizzle.respite.gametest.SleepVoteGameTest",
+            "com.rfizzle.respite.gametest.RespiteCommandGameTest",
+            "com.rfizzle.respite.gametest.AdvancementGameTest",
+            "com.rfizzle.respite.gametest.RespiteApiGameTest",
+            "com.rfizzle.respite.gametest.util.MockPlayersGameTest"
+        ]
+    },
+    "depends": {
+        "fabricloader": ">=0.16.10",
+        "minecraft": "~1.21.1",
+        "java": ">=21",
+        "fabric-api": "*",
+        "respite": "*"
+    }
+}
