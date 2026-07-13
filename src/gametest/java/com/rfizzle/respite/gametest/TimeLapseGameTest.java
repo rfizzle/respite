@@ -1,14 +1,21 @@
 package com.rfizzle.respite.gametest;
 
+import com.rfizzle.respite.api.RespiteTimeLapseCallback;
 import com.rfizzle.respite.config.RespiteConfig;
 import com.rfizzle.respite.gametest.util.MockPlayers;
 import com.rfizzle.respite.timelapse.LapseState;
 import com.rfizzle.respite.timelapse.TimeLapseEngine;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -24,8 +31,10 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  * In-world coverage for {@code design/SPEC.md} §1: continuous acceleration
  * with a genuine sleeper, skip suppression at deep sleep, the budget governor,
  * rate recomputation on sleeper removal, the peril brake's clamp and 100-real-
- * tick release, the awake/sleeping body-timer split, the recursion guard, and
- * vanilla parity with the feature off.
+ * tick release, the awake/sleeping body-timer split, the recursion guard, the
+ * notifier's per-edge send loop plus its {@code announceTimeLapse} gate, the
+ * public {@link RespiteTimeLapseCallback} rate-edge fire, and vanilla parity
+ * with the feature off.
  *
  * <p>Two framework facts shape every test here. First, the gametest scheduler
  * measures sequence delays and test timeouts in Overworld <em>game time</em> —
@@ -47,6 +56,59 @@ public class TimeLapseGameTest implements FabricGameTest {
     private static final long NIGHT_START = 13000L;
     /** Low cap so accelerated game time stays within the framework's timeout math. */
     private static final int TEST_RATE_CAP = 4;
+
+    // A single recording listener on the public rate-change callback, registered
+    // once — Fabric events don't unregister. Only the two notifier tests arm it,
+    // and each resets its counters first, so a lapse from another batch never
+    // pollutes what these assertions read.
+    private static volatile boolean callbackArmed = false;
+    private static volatile int callbackOldRate = -1;
+    private static volatile int callbackNewRate = -1;
+    private static volatile int startEdges = 0;
+    private static volatile int endEdges = 0;
+
+    static {
+        RespiteTimeLapseCallback.EVENT.register((level, oldRate, newRate, sleeping, total) -> {
+            if (!callbackArmed) {
+                return;
+            }
+            callbackOldRate = oldRate;
+            callbackNewRate = newRate;
+            if (oldRate == 1 && newRate > 1) {
+                startEdges++;
+            }
+            if (newRate == 1 && oldRate > 1) {
+                endEdges++;
+            }
+        });
+    }
+
+    private static void armCallback() {
+        startEdges = 0;
+        endEdges = 0;
+        callbackOldRate = -1;
+        callbackNewRate = -1;
+        callbackArmed = true;
+    }
+
+    /**
+     * The action-bar (overlay) translation keys currently in the mock's channel —
+     * the vanilla-client fallback the notifier sends to a connectionless mock,
+     * which {@code canSend} always reports unreachable by the mod's payload. The
+     * server batch-flushes connections mid-tick, so the channel is flushed here
+     * before reading.
+     */
+    private static List<String> overlayKeys(MockPlayers.Connected connected) {
+        connected.channel().flush();
+        List<String> keys = new ArrayList<>();
+        for (Object message : connected.channel().outboundMessages()) {
+            if (message instanceof ClientboundSystemChatPacket packet && packet.overlay()
+                    && packet.content().getContents() instanceof TranslatableContents contents) {
+                keys.add(contents.getKey());
+            }
+        }
+        return keys;
+    }
 
     private void placeBed(GameTestHelper helper) {
         for (int x = 0; x <= 2; x++) {
@@ -427,6 +489,121 @@ public class TimeLapseGameTest implements FabricGameTest {
             } else if (t >= 250) {
                 helper.fail("vanilla skip never fired with the feature off; dayTime is "
                         + overworld.getDayTime());
+            }
+        }));
+    }
+
+    /**
+     * The notifier's send loop and the public callback, driven by a genuine
+     * lapse with {@code announceTimeLapse} on: the start edge fires the callback
+     * (old rate 1 → running) and pushes the active line to the connectionless
+     * mock's fallback channel; waking the sleeper settles the rate, firing the
+     * end edge (→ 1) and the settle line.
+     */
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "timeLapseNotifier", timeoutTicks = 400)
+    public void notifierAndCallbackReportRateEdges(GameTestHelper helper) {
+        int savedRate = setUpNight(helper);
+        boolean savedAnnounce = RespiteConfig.get().announceTimeLapse;
+        RespiteConfig.get().announceTimeLapse = true;
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer sleeper = connected.player();
+        armCallback();
+        Runnable cleanup = () -> {
+            callbackArmed = false;
+            RespiteConfig.get().maxTimeLapseRate = savedRate;
+            RespiteConfig.get().announceTimeLapse = savedAnnounce;
+            MockPlayers.retire(sleeper);
+        };
+        int[] realTick = {0};
+        long[] lastRealTick = {-1};
+        boolean[] woke = {false};
+        Set<String> activeKeys = new HashSet<>();
+        Set<String> settledKeys = new HashSet<>();
+        helper.onEachTick(() -> guarded(cleanup, () -> {
+            if (!newRealTick(lastRealTick)) {
+                return;
+            }
+            int t = ++realTick[0];
+            if (t == 2) {
+                sleepInBed(helper, sleeper);
+                return;
+            }
+            if (t < 2) {
+                return;
+            }
+            if (!woke[0]) {
+                activeKeys.addAll(overlayKeys(connected));
+                if (TimeLapseEngine.getEffectiveRate() > 1 && startEdges >= 1
+                        && activeKeys.contains("notification.respite.time_lapse")) {
+                    helper.assertTrue(callbackOldRate == 1 && callbackNewRate > 1,
+                            "the start edge must report old rate 1 to a running rate, got "
+                                    + callbackOldRate + " -> " + callbackNewRate);
+                    connected.channel().outboundMessages().clear();
+                    sleeper.stopSleepInBed(true, true);
+                    woke[0] = true;
+                } else if (t >= 120) {
+                    helper.fail("no start edge announced within 120 real ticks; keys=" + activeKeys);
+                }
+            } else {
+                settledKeys.addAll(overlayKeys(connected));
+                if (TimeLapseEngine.getEffectiveRate() == 1 && endEdges >= 1
+                        && settledKeys.contains("notification.respite.time_lapse_end")) {
+                    helper.assertTrue(callbackNewRate == 1,
+                            "the end edge must report a settle to rate 1, got " + callbackNewRate);
+                    cleanup.run();
+                    helper.succeed();
+                } else if (t >= 240) {
+                    helper.fail("no settle edge announced after the sleeper woke; keys=" + settledKeys);
+                }
+            }
+        }));
+    }
+
+    /**
+     * The {@code announceTimeLapse} gate is server-side and player-facing only:
+     * with it off, a genuine lapse fires the public callback exactly as before
+     * but sends no action-bar line to any client.
+     */
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "timeLapseNotifierGate", timeoutTicks = 400)
+    public void announceToggleOffKeepsTheCallbackButSuppressesTheLine(GameTestHelper helper) {
+        int savedRate = setUpNight(helper);
+        boolean savedAnnounce = RespiteConfig.get().announceTimeLapse;
+        RespiteConfig.get().announceTimeLapse = false;
+        MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
+        ServerPlayer sleeper = connected.player();
+        armCallback();
+        Runnable cleanup = () -> {
+            callbackArmed = false;
+            RespiteConfig.get().maxTimeLapseRate = savedRate;
+            RespiteConfig.get().announceTimeLapse = savedAnnounce;
+            MockPlayers.retire(sleeper);
+        };
+        int[] realTick = {0};
+        long[] lastRealTick = {-1};
+        Set<String> seenKeys = new HashSet<>();
+        helper.onEachTick(() -> guarded(cleanup, () -> {
+            if (!newRealTick(lastRealTick)) {
+                return;
+            }
+            int t = ++realTick[0];
+            if (t == 2) {
+                sleepInBed(helper, sleeper);
+                return;
+            }
+            if (t < 2) {
+                return;
+            }
+            seenKeys.addAll(overlayKeys(connected));
+            if (TimeLapseEngine.getEffectiveRate() > 1 && startEdges >= 1) {
+                helper.assertTrue(callbackOldRate == 1 && callbackNewRate > 1,
+                        "the callback must still fire the start edge with the announce gate off, got "
+                                + callbackOldRate + " -> " + callbackNewRate);
+                helper.assertTrue(seenKeys.stream().noneMatch(k -> k.startsWith("notification.respite.time_")),
+                        "the announce gate off must suppress every time-lapse line, saw " + seenKeys);
+                cleanup.run();
+                helper.succeed();
+            } else if (t >= 120) {
+                helper.fail("the lapse never started within 120 real ticks");
             }
         }));
     }
