@@ -13,7 +13,7 @@
           "items": [
             {
               "q": "Is Respite released?",
-              "a": "Not yet — it is in development. The design is committed (vision, full behavioral spec, brand), the repo builds, and features are being implemented against the spec. Watch <a href='https://github.com/rfizzle/respite/releases' class='text-accent hover:text-accent2 underline'>GitHub Releases</a>."
+              "a": "Yes. Download it from <a href='https://modrinth.com/mod/respite-vitality-overhaul' class='text-accent hover:text-accent2 underline'>Modrinth</a>, <a href='https://www.curseforge.com/minecraft/mc-mods/respite-vitality-overhaul' class='text-accent hover:text-accent2 underline'>CurseForge</a>, or <a href='https://github.com/rfizzle/respite/releases' class='text-accent hover:text-accent2 underline'>GitHub Releases</a>. It targets Minecraft 1.21.1 on Fabric and needs Fabric API."
             },
             {
               "q": "Does sleeping still skip the night?",

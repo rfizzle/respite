@@ -3,7 +3,7 @@
   "name": "Respite",
   "domain": "respite.rfizzle.com",
   "url": "https://respite.rfizzle.com",
-  "description": "A vitality overhaul for Minecraft 1.21.1 (Fabric) — sleep, rest, and the passage of night. In development.",
+  "description": "A vitality overhaul for Minecraft 1.21.1 (Fabric) — sleep, rest, and the passage of night.",
   "metaKeywords": "Minecraft, Fabric mod, sleep mod, time lapse, phantom rework, chronometer, vitality, 1.21.1",
   "github": "https://github.com/rfizzle/respite",
   "defaultBranch": "master",

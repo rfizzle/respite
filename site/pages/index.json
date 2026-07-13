@@ -2,9 +2,9 @@
   "type": "home",
   "nav": "Home",
   "metaTitle": "Respite — Vitality Overhaul for Minecraft",
-  "metaDescription": "Respite is a Minecraft 1.21.1 Fabric mod in development that makes the night worth living through: sleep accelerates time instead of skipping it, supper heals you overnight, and phantoms guard the heights and the new moon.",
+  "metaDescription": "Respite is a Minecraft 1.21.1 Fabric mod that makes the night worth living through: sleep accelerates time instead of skipping it, supper heals you overnight, and phantoms guard the heights and the new moon.",
   "ogTitle": "Respite — Vitality Overhaul for Minecraft",
-  "ogDescription": "A vitality overhaul for Minecraft 1.21.1 Fabric, in development. Sleep accelerates time instead of skipping it; the night becomes part of the game.",
+  "ogDescription": "A vitality overhaul for Minecraft 1.21.1 Fabric. Sleep accelerates time instead of skipping it; the night becomes part of the game.",
   "hero": {
     "lede": "Make the night count.",
     "sub": "Respite takes over the night: sleeping rushes time visibly past while furnaces smelt and crops grow, a hearty supper heals you overnight, and phantoms trade their insomnia grudge for a territory — the high peaks and the new moon.",
@@ -21,7 +21,7 @@
         {
           "type": "note",
           "center": true,
-          "html": "Respite is <span class='text-accent2'>in development</span> — the behavior below is the committed spec, not yet a shipped jar. Watch <a href='https://github.com/rfizzle/respite/releases' class='text-accent hover:text-accent2 underline'>GitHub Releases</a> for the first build."
+          "html": "Respite is <span class='text-accent2'>out now</span> for Minecraft 1.21.1 on Fabric. Download it from <a href='https://modrinth.com/mod/respite-vitality-overhaul' class='text-accent hover:text-accent2 underline'>Modrinth</a>, <a href='https://www.curseforge.com/minecraft/mc-mods/respite-vitality-overhaul' class='text-accent hover:text-accent2 underline'>CurseForge</a>, or <a href='https://github.com/rfizzle/respite/releases' class='text-accent hover:text-accent2 underline'>GitHub Releases</a>."
         }
       ]
     },
