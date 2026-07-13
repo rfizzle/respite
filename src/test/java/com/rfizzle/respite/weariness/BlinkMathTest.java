@@ -89,4 +89,20 @@ class BlinkMathTest {
         assertFalse(BlinkMath.shouldStartBlink(999, 1000, -1, false));
         assertTrue(BlinkMath.shouldStartBlink(1000, 1000, -1, false));
     }
+
+    @Test
+    void onlyADamagingHitCountsAsCombat() {
+        // alive, attackable, not invulnerable: a real hit — arms the window.
+        assertTrue(BlinkMath.attackDealsDamage(true, true, false),
+                "a live, attackable, vulnerable target counts as dealing damage");
+        // An invulnerable target lands no damage — the issue's repro case.
+        assertFalse(BlinkMath.attackDealsDamage(true, true, true),
+                "an invulnerable target never arms the window");
+        // Unattackable (marker armor stand, spectator): no damage.
+        assertFalse(BlinkMath.attackDealsDamage(true, false, false),
+                "an unattackable target never arms the window");
+        // A corpse in a post-kill client frame: no damage.
+        assertFalse(BlinkMath.attackDealsDamage(false, true, false),
+                "a dead target never arms the window");
+    }
 }
