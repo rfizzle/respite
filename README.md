@@ -35,8 +35,9 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
   vanilla sleep system, `playersSleepingPercentage` included.
 - **Restful Saturation** — going to bed on a full hunger bar arms the night:
   while you sleep, every 600 world ticks converts 1 point of saturation into
-  half a heart — up to 10 hearts across a full night, and double per point
-  under a new moon, when sleep runs deepest. Vanilla food regeneration stands
+  half a heart — up to 10 hearts across a full night. Sleep runs deeper the
+  darker the moon: the heal per point ramps from plain at the full moon up to
+  double at the new moon, when it runs deepest. Vanilla food regeneration stands
   down in bed (the conversion replaces it) and the hunger bar never drops
   overnight; healing stops at the saturation floor, full health, or leaving
   the bed, and waking three hearts richer earns a quiet action-bar line. The
@@ -90,7 +91,7 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
   it rolls back into your inventory when you wake. It sleeps like a bed — the
   time-lapse runs and your days-awake count resets — but never sets your spawn,
   and overnight Restful Saturation heals at half a real bed's rate (a new moon
-  under a bedroll heals like an ordinary night in a real bed). Every vanilla bed
+  under a bedroll heals like the full moon in a real bed). Every vanilla bed
   rule applies and it never explodes in the Nether; `enableBedroll = false`
   removes the recipe while placed bedrolls keep working.
 

@@ -78,7 +78,7 @@
   "config.respite.restfulHealIntervalTicks": "Heal Interval (Ticks)",
   "config.respite.restfulHealIntervalTicks.tooltip": "World ticks between overnight heal pulses (100–2400).",
   "config.respite.newMoonHealMultiplier": "New-Moon Heal Multiplier",
-  "config.respite.newMoonHealMultiplier.tooltip": "Overnight healing multiplier on new-moon nights (1.0–4.0).",
+  "config.respite.newMoonHealMultiplier.tooltip": "Peak overnight healing multiplier at the new moon; tapers to 1.0 at the full moon (1.0–4.0).",
 
   "config.respite.enablePhantomRework": "Enable Phantom Rework",
   "config.respite.enablePhantomRework.tooltip": "Phantoms guard the heights and the new moon instead of punishing insomnia. Off restores vanilla insomnia.",
