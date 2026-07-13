@@ -3,7 +3,7 @@
   "metaTitle": "Config — Respite",
   "metaDescription": "Respite's full configuration reference as specced: time-lapse rate and budget, restful saturation, phantom rules, weariness, Chronometer, and brew options.",
   "title": "Configuration",
-  "lede": "Every option, as specced in <a href='https://github.com/rfizzle/respite/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a> — the file is <code>config/respite.json</code>, created with defaults on first launch, with a ModMenu + Cloth Config screen when those mods are present. Respite is in development; the config surface ships today, and each feature reads its keys as it lands.",
+  "lede": "Every option, as specced in <a href='https://github.com/rfizzle/respite/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a> — the file is <code>config/respite.json</code>, created with defaults on first launch, with a ModMenu + Cloth Config screen when those mods are present.",
   "width": "5xl",
   "sections": [
     {

@@ -3,7 +3,7 @@
   "metaTitle": "Features — Respite",
   "metaDescription": "Respite's feature set as specced: continuous time-lapse sleep, restful saturation, phantoms of the heights, weariness, the Chronometer, the Caffeinated Brew, and the bedroll.",
   "title": "Features",
-  "lede": "The seven headline systems, as specced in <a href='https://github.com/rfizzle/respite/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a>. Respite is in development — these are commitments, not yet a shipped jar.",
+  "lede": "The seven headline systems, as specced in <a href='https://github.com/rfizzle/respite/blob/master/design/SPEC.md' class='text-accent hover:text-accent2 underline'>design/SPEC.md</a> and shipping today.",
   "width": "5xl",
   "scale": "lg",
   "sections": [
