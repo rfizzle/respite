@@ -1,10 +1,12 @@
 package com.rfizzle.respite.registry;
 
+import com.mojang.serialization.Codec;
 import com.rfizzle.respite.Respite;
 import com.rfizzle.respite.bedroll.BedrollBlock;
 import com.rfizzle.respite.bedroll.BedrollItem;
 import com.rfizzle.respite.block.ChronometerBlock;
 import com.rfizzle.respite.brew.CaffeinatedBrewItem;
+import com.rfizzle.respite.chronometer.PocketChronometerItem;
 import com.rfizzle.respite.condition.FeatureEnabledCondition;
 import com.rfizzle.respite.effect.WearinessEffect;
 import com.rfizzle.respite.effect.WellRestedEffect;
@@ -16,7 +18,9 @@ import java.util.Map;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
@@ -87,6 +91,18 @@ public final class RespiteRegistry {
                     .stacksTo(16)
                     .food(new FoodProperties.Builder().alwaysEdible().build()));
 
+    // The pocket chronometer (design/SPEC.md §5) — the portable half of the
+    // Chronometer's job: a carried timepiece whose tooltip reads the hour, the moon,
+    // the nights until the new moon, and the holder's days awake. It places nothing
+    // and emits no signal, so it is a plain standalone item.
+    public static final PocketChronometerItem POCKET_CHRONOMETER =
+            new PocketChronometerItem(new Item.Properties());
+
+    // The days-awake carrier the pocket chronometer writes server-side and its
+    // tooltip reads client-side: TIME_SINCE_REST is server-only, so it rides the
+    // stack (network-synced) rather than being read from the client's stat counter.
+    public static DataComponentType<Integer> AWAKE_TICKS;
+
     // The bedroll (design/SPEC.md §7) — a one-tile camp bed. Wool body → wool
     // sound and a warm map colour; ignited by lava, crushed like a bed by pistons.
     // A genuine BedBlock so vanilla's sleeper machinery treats it as one; Respite
@@ -122,6 +138,12 @@ public final class RespiteRegistry {
         Registry.register(BuiltInRegistries.ITEM, bedrollId,
                 new BedrollItem(BEDROLL, new Item.Properties().stacksTo(16)));
 
+        AWAKE_TICKS = registerComponent("awake_ticks", DataComponentType.<Integer>builder()
+                .persistent(Codec.INT)
+                .networkSynchronized(ByteBufCodecs.VAR_INT)
+                .build());
+        registerItem("pocket_chronometer", POCKET_CHRONOMETER);
+
         registerItem("unsteeped_brew", UNSTEEPED_BREW);
         registerItem("caffeinated_brew", CAFFEINATED_BREW);
 
@@ -146,10 +168,14 @@ public final class RespiteRegistry {
                     entries.accept(CAFFEINATED_BREW);
                 });
 
-        // The bedroll is a camp utility — it sits with the other tools and
-        // utility items, not in the vanilla bed tab (functional blocks).
+        // The bedroll and the pocket chronometer are camp/travel utilities — they
+        // sit with the other tools and utility items (where vanilla keeps the clock),
+        // not in the vanilla bed tab or the Chronometer block's redstone tab.
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.TOOLS_AND_UTILITIES)
-                .register(entries -> entries.accept(BEDROLL));
+                .register(entries -> {
+                    entries.accept(BEDROLL);
+                    entries.accept(POCKET_CHRONOMETER);
+                });
 
         // Datapack-side feature gates (recipes and their unlock advancements).
         ResourceConditions.register(FeatureEnabledCondition.TYPE);
@@ -163,6 +189,10 @@ public final class RespiteRegistry {
         Registry.register(BuiltInRegistries.ITEM, Respite.id(name), item);
         STANDALONE_ITEMS.add(item);
         return item;
+    }
+
+    private static <T> DataComponentType<T> registerComponent(String name, DataComponentType<T> type) {
+        return Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, Respite.id(name), type);
     }
 
     private static Holder<MobEffect> registerEffect(String name, MobEffect effect) {
