@@ -66,6 +66,10 @@
   "config.respite.announceTimeLapse.tooltip": "Announce rate changes on the action bar of Overworld players.",
   "config.respite.announceSleepVote": "Announce Who's Sleeping",
   "config.respite.announceSleepVote.tooltip": "Whisper a chat line when a player enters or leaves a bed at night, with the tally of who's asleep.",
+  "config.respite.excludeIdleFromShare": "Exclude Idle Players",
+  "config.respite.excludeIdleFromShare.tooltip": "Drop idle players from the sleep share, so an AFK player neither speeds the night nor drags it down. Turn off for strict vanilla-style counting of everyone online.",
+  "config.respite.idleThresholdMinutes": "Idle Threshold (minutes)",
+  "config.respite.idleThresholdMinutes.tooltip": "Real minutes without input before a player counts as idle. They rejoin the share the moment they move or interact.",
 
   "config.respite.enableRestfulSaturation": "Enable Restful Saturation",
   "config.respite.enableRestfulSaturation.tooltip": "Saturation heals sleeping players through the night.",

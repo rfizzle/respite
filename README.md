@@ -29,8 +29,10 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
   and a start/settle sound pair mark the lapse — both toggleable. On a shared
   server a quiet chat whisper names who climbs into or out of bed with the
   running tally (`Alex is in bed (2/4)`), so the night stays a negotiation;
-  `announceSleepVote = false` silences it. `enableTimeLapse = false` restores
-  the entire vanilla sleep system, `playersSleepingPercentage` included.
+  `announceSleepVote = false` silences it. An AFK player idle a few minutes
+  (tunable) drops out of the share entirely, so the night runs at the speed of
+  the people actually present. `enableTimeLapse = false` restores the entire
+  vanilla sleep system, `playersSleepingPercentage` included.
 - **Restful Saturation** — going to bed on a full hunger bar arms the night:
   while you sleep, every 600 world ticks converts 1 point of saturation into
   half a heart — up to 10 hearts across a full night, and double per point

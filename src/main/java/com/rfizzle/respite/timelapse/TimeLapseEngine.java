@@ -142,11 +142,17 @@ public final class TimeLapseEngine {
         rateEvaluations++;
 
         List<ServerPlayer> players = overworld.players();
+        // Idle players count for nothing on either side of the share (§1). One
+        // real-time read (monotonic millis) for the whole evaluation; per-player
+        // getLastActionTime() is a plain field read, allocation-free on the hot path.
+        long nowMillis = Util.getMillis();
         int n = 0;
         int k = 0;
         for (int i = 0, size = players.size(); i < size; i++) {
             ServerPlayer player = players.get(i);
-            if (player.isSpectator()) {
+            if (player.isSpectator()
+                    || TimeLapseMath.isIdle(config.excludeIdleFromShare, nowMillis,
+                            player.getLastActionTime(), config.idleThresholdMinutes)) {
                 continue;
             }
             n++;
@@ -163,7 +169,11 @@ public final class TimeLapseEngine {
         if (target > 1 && config.combatHoldsTime) {
             for (int i = 0, size = players.size(); i < size; i++) {
                 ServerPlayer player = players.get(i);
-                if (player.isSpectator() || player.isSleeping()) {
+                // An idle player is absent from the fight too: they can't hold the
+                // night for everyone else (§1, Idle exclusion).
+                if (player.isSpectator() || player.isSleeping()
+                        || TimeLapseMath.isIdle(config.excludeIdleFromShare, nowMillis,
+                                player.getLastActionTime(), config.idleThresholdMinutes)) {
                     continue;
                 }
                 if (PERIL.isInPeril(player.getUUID(), realTickCount, PERIL_WINDOW_TICKS)) {

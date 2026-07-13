@@ -37,8 +37,11 @@ public interface RespiteTimeLapseCallback {
      * @param level    the Overworld the lapse runs in
      * @param oldRate  the effective rate before this change
      * @param newRate  the effective rate after this change
-     * @param sleeping non-spectator Overworld players in bed at this evaluation
-     * @param total    non-spectator Overworld players at this evaluation
+     * @param sleeping active (non-spectator, non-idle) Overworld players in bed
+     *                 at this evaluation — the {@code k} the rate is computed over
+     * @param total    active (non-spectator, non-idle) Overworld players at this
+     *                 evaluation — the {@code n} the rate is computed over, not the
+     *                 full online roster (an idle player counts for nothing; SPEC §1)
      */
     void onRateChanged(ServerLevel level, int oldRate, int newRate, int sleeping, int total);
 }

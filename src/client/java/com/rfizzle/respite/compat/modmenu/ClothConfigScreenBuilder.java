@@ -62,6 +62,17 @@ final class ClothConfigScreenBuilder {
                 .setTooltip(Component.translatable("config.respite.announceSleepVote.tooltip"))
                 .setSaveConsumer(v -> working.announceSleepVote = v)
                 .build());
+        timeLapse.addEntry(entry.startBooleanToggle(Component.translatable("config.respite.excludeIdleFromShare"), config.excludeIdleFromShare)
+                .setDefaultValue(defaults.excludeIdleFromShare)
+                .setTooltip(Component.translatable("config.respite.excludeIdleFromShare.tooltip"))
+                .setSaveConsumer(v -> working.excludeIdleFromShare = v)
+                .build());
+        timeLapse.addEntry(entry.startIntField(Component.translatable("config.respite.idleThresholdMinutes"), config.idleThresholdMinutes)
+                .setDefaultValue(defaults.idleThresholdMinutes)
+                .setMin(1).setMax(60)
+                .setTooltip(Component.translatable("config.respite.idleThresholdMinutes.tooltip"))
+                .setSaveConsumer(v -> working.idleThresholdMinutes = v)
+                .build());
 
         // --- Restful saturation (§2) ---
         ConfigCategory restful = builder.getOrCreateCategory(Component.translatable("config.respite.category.restful"));

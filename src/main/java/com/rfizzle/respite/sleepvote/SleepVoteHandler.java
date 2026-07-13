@@ -2,8 +2,10 @@ package com.rfizzle.respite.sleepvote;
 
 import com.rfizzle.respite.Respite;
 import com.rfizzle.respite.config.RespiteConfig;
+import com.rfizzle.respite.timelapse.TimeLapseMath;
 import java.util.List;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -52,13 +54,13 @@ public final class SleepVoteHandler {
             return;
         }
         try {
-            whisper(actor, enter);
+            whisper(actor, enter, config);
         } catch (Exception e) {
             Respite.LOGGER.error("Sleep whisper failed for {}", actor.getName().getString(), e);
         }
     }
 
-    private static void whisper(ServerPlayer actor, boolean enter) {
+    private static void whisper(ServerPlayer actor, boolean enter, RespiteConfig config) {
         ServerLevel level = actor.serverLevel();
 
         // A leave once the night is over (dawn, or a thunderstorm blowing out) is
@@ -68,12 +70,18 @@ public final class SleepVoteHandler {
             return;
         }
 
+        // The whisper's share is the rate share (SPEC §1): counted over the same
+        // active, non-spectator players k/n the time-lapse uses, so an idle player
+        // is dropped from the tally exactly as it is dropped from the rate.
+        long nowMillis = Util.getMillis();
         int total = 0;
         int sleeping = 0;
         List<ServerPlayer> players = level.players();
         for (int i = 0, size = players.size(); i < size; i++) {
             ServerPlayer player = players.get(i);
-            if (player.isSpectator()) {
+            if (player.isSpectator()
+                    || TimeLapseMath.isIdle(config.excludeIdleFromShare, nowMillis,
+                            player.getLastActionTime(), config.idleThresholdMinutes)) {
                 continue;
             }
             total++;

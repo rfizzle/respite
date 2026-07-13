@@ -37,6 +37,9 @@ public class RespiteConfig {
     public boolean combatHoldsTime = true;
     public boolean announceTimeLapse = true;
     public boolean announceSleepVote = true;
+    // Idle exclusion (§1): an AFK player counts for nothing on either side of the k/n share.
+    public boolean excludeIdleFromShare = true;
+    public int idleThresholdMinutes = 5;
 
     // Restful saturation (§2)
     public boolean enableRestfulSaturation = true;
@@ -79,6 +82,7 @@ public class RespiteConfig {
     public void clamp() {
         maxTimeLapseRate = clampInt("maxTimeLapseRate", maxTimeLapseRate, 2, 100);
         timeLapseTickBudgetMs = clampInt("timeLapseTickBudgetMs", timeLapseTickBudgetMs, 5, 45);
+        idleThresholdMinutes = clampInt("idleThresholdMinutes", idleThresholdMinutes, 1, 60);
         restfulHealIntervalTicks = clampInt("restfulHealIntervalTicks", restfulHealIntervalTicks, 100, 2400);
         newMoonHealMultiplier = clampDouble("newMoonHealMultiplier", newMoonHealMultiplier, 1.0, 4.0);
         phantomAltitudeMin = clampInt("phantomAltitudeMin", phantomAltitudeMin, -64, 320);

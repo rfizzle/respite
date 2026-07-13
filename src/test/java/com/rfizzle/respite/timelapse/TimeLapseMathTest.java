@@ -72,4 +72,30 @@ class TimeLapseMathTest {
     void fullHouseAlwaysHitsTheMax(int players) {
         assertEquals(60, TimeLapseMath.targetRate(60, players, players));
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            // enabled, now, lastAction, thresholdMinutes, expectedIdle
+            // the 5-minute (300_000 ms) boundary: at the threshold is idle
+            "true, 300000, 0, 5, true",
+            "true, 299999, 0, 5, false",
+            "true, 300001, 0, 5, true",
+            // the 1-minute (60_000 ms) boundary
+            "true, 60000, 0, 1, true",
+            "true, 59999, 0, 1, false",
+            // freshly active (no gap) and clock-skew (last in the future) never read as idle
+            "true, 1000, 1000, 5, false",
+            "true, 500, 1000, 5, false",
+            // disabled exclusion → never idle, however large the gap
+            "false, 100000000, 0, 5, false",
+            // a non-positive threshold → never idle (defensive; clamp keeps it ≥ 1 in practice)
+            "true, 100000000, 0, 0, false",
+            "true, 100000000, 0, -1, false",
+            // realistic millis magnitudes, well past the 32-bit range
+            "true, 1700000600000, 1700000000000, 5, true",
+            "true, 1700000200000, 1700000000000, 5, false",
+    })
+    void isIdleTruthTable(boolean enabled, long now, long lastAction, int thresholdMinutes, boolean expected) {
+        assertEquals(expected, TimeLapseMath.isIdle(enabled, now, lastAction, thresholdMinutes));
+    }
 }
