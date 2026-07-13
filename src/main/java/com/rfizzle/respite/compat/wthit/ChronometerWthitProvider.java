@@ -17,7 +17,7 @@ public enum ChronometerWthitProvider implements IBlockComponentProvider {
 
     @Override
     public void appendBody(ITooltip tooltip, IBlockAccessor accessor, IPluginConfig config) {
-        tooltip.addLine(ChronometerLines.build("tooltip.respite.chronometer", accessor.getWorld(),
+        tooltip.addLine(ChronometerLines.build("tooltip.respite.chronometer", accessor.getLevel(),
                 accessor.getBlockState().getValue(ChronometerBlock.ALARM_HOUR)));
     }
 }
