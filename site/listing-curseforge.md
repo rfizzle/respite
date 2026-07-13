@@ -111,17 +111,17 @@ rest-state testing levers. Full reference:
 Respite detects and integrates with these mods when present. **None are
 bundled** — install whichever you already use.
 
-- [Mod Menu](https://www.curseforge.com/minecraft/mc-mods/modmenu) — config screen entry
-- [Cloth Config](https://www.curseforge.com/minecraft/mc-mods/cloth-config) — settings GUI
-- [Jade](https://www.curseforge.com/minecraft/mc-mods/jade) / [WTHIT](https://www.curseforge.com/minecraft/mc-mods/wthit)
+- [Mod Menu](https://modrinth.com/mod/modmenu) — config screen entry
+- [Cloth Config](https://modrinth.com/mod/cloth-config) — settings GUI
+- [Jade](https://modrinth.com/mod/jade) / [WTHIT](https://modrinth.com/mod/wthit)
   — Chronometer clock time and signal at a glance
 
 **Enhanced by** its Concord siblings, never required: with
-[Tribulation](https://www.curseforge.com/minecraft/mc-mods/tribulation-difficulty-overhaul) its
+[Tribulation](https://modrinth.com/mod/tribulation-difficulty-overhaul) its
 difficulty scaling reaches Respite's phantoms automatically; with
-[Mercantile](https://www.curseforge.com/minecraft/mc-mods/mercantile-villager-overhaul) village
+[Mercantile](https://modrinth.com/mod/mercantile-villager-overhaul) village
 standing can put cocoa and brews on a trader's counter; with
-[Prosperity](https://www.curseforge.com/minecraft/mc-mods/prosperity-loot-overhaul) a Chronometer
+[Prosperity](https://modrinth.com/mod/prosperity-loot-overhaul) a Chronometer
 may turn up in a far-flung chest.
 
 ## Requirements
