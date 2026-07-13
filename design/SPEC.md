@@ -615,7 +615,7 @@ Tiering per the `mc-mod-testing` skill.
 ### Unit tests (JUnit, pure)
 
 - Rate formula: `k/n` sweep (including k=0, n=0, n=1, rounding at every k for n=4), clamp to `maxTimeLapseRate`; peril-brake clamp and the 100-real-tick peril window decay.
-- Idle predicate (`isIdle`): the threshold boundary (at / just under / just over), a fresh gap and a clock-skewed negative gap reading not-idle, the disabled switch and a non-positive threshold reading not-idle, at realistic wall-clock magnitudes.
+- Idle predicate (`isIdle`): the threshold boundary (at / just under / just over), a fresh gap and a clock-skewed negative gap reading not-idle, the disabled switch and a non-positive threshold reading not-idle, at realistic millis magnitudes.
 - Chronometer signal function: boundary ticks 0, 1,599, 1,600, 11,200, 12,000, 17,999, 18,000, 22,400, 23,999; fixed-time → 0; the clock-time formatting math; the `(4 − phase) mod 8` new-moon countdown for all eight phases and the night-window gate for the moon line.
 - Chronometer moon/alarm math: `moonFullness` 0–15 ramp for all eight phases; `alarmBoundary` clock inversion; `alarmFires` window predicate (at the boundary, last window tick, one tick past, off never fires); `cycleAlarm` off-wrap; `hourLabel` 12-hour formatting.
 - Restful-saturation accounting: 20-interval night totals, stop conditions (saturation floor, full health), penalty-exemption arithmetic, Deep Sleep multiplier arithmetic (default and range extremes).

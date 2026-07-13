@@ -91,7 +91,7 @@ class TimeLapseMathTest {
             // a non-positive threshold → never idle (defensive; clamp keeps it ≥ 1 in practice)
             "true, 100000000, 0, 0, false",
             "true, 100000000, 0, -1, false",
-            // realistic wall-clock magnitudes, well past the 32-bit range
+            // realistic millis magnitudes, well past the 32-bit range
             "true, 1700000600000, 1700000000000, 5, true",
             "true, 1700000200000, 1700000000000, 5, false",
     })

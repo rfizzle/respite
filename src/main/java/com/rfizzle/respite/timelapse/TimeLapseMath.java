@@ -32,10 +32,11 @@ public final class TimeLapseMath {
      * k/n share ({@code design/SPEC.md} §1, Idle exclusion): idle when the
      * exclusion is enabled and no input has arrived for at least
      * {@code thresholdMinutes} of real time. {@code nowMillis} and
-     * {@code lastActionMillis} are the vanilla wall-clock idle signal
-     * ({@link net.minecraft.server.level.ServerPlayer#getLastActionTime()},
-     * refreshed on every input packet — the same signal {@code player-idle-timeout}
-     * uses), so a returning player rejoins the moment they move or interact.
+     * {@code lastActionMillis} are the vanilla real-time idle signal
+     * ({@link net.minecraft.server.level.ServerPlayer#getLastActionTime()}, a
+     * monotonic {@code Util.getMillis()} stamp refreshed on every input packet —
+     * the same signal {@code player-idle-timeout} uses), so a returning player
+     * rejoins the moment they move or interact.
      *
      * <p>Disabled exclusion, a non-positive threshold, or a not-yet-elapsed (or
      * clock-skewed negative) gap all read as not idle — the strict, count-everyone

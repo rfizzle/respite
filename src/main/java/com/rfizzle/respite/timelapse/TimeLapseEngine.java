@@ -143,8 +143,8 @@ public final class TimeLapseEngine {
 
         List<ServerPlayer> players = overworld.players();
         // Idle players count for nothing on either side of the share (§1). One
-        // wall-clock read for the whole evaluation; per-player getLastActionTime()
-        // is a plain field read, allocation-free on the hot path.
+        // real-time read (monotonic millis) for the whole evaluation; per-player
+        // getLastActionTime() is a plain field read, allocation-free on the hot path.
         long nowMillis = Util.getMillis();
         int n = 0;
         int k = 0;
