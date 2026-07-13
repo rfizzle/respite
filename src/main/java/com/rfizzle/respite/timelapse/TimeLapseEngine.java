@@ -105,6 +105,13 @@ public final class TimeLapseEngine {
             total = 0;
             state = LapseState.SETTLED;
         } else {
+            if (!config.combatHoldsTime && !PERIL.isEmpty()) {
+                // combatHoldsTime toggled off while the lapse stays on: no new peril
+                // is recorded (the event handlers bail early), but live targeting
+                // counts would otherwise hold the brake once it is re-enabled, until
+                // every claiming mob retargets or unloads. Drop the residue now.
+                PERIL.clear();
+            }
             try {
                 evaluateAndRun(overworld, config);
             } catch (ReportedException e) {

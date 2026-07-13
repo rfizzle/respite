@@ -14,6 +14,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(RespitePhantomSpawner.class)
 public interface RespitePhantomSpawnerAccessor {
 
-    @Accessor("nextTick")
+    // remap = false: nextTick is a field on Respite's own class, not a Mojang
+    // mapping, so it must not go through the remapper.
+    @Accessor(value = "nextTick", remap = false)
     int respite$getNextTick();
 }
