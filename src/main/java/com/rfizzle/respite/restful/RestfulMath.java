@@ -11,8 +11,17 @@ package com.rfizzle.respite.restful;
  */
 public final class RestfulMath {
 
-    /** Moon phase index of the new moon — Deep Sleep's key (§2.3). */
+    /** Moon phase index of the new moon — Deep Sleep's peak (§2.3). */
     public static final int NEW_MOON_PHASE = 4;
+
+    /** Moon phase index of the full moon — Deep Sleep's floor, no bonus (§2.3). */
+    public static final int FULL_MOON_PHASE = 0;
+
+    /** The eight vanilla moon phases (§2.3). */
+    public static final int MOON_PHASE_COUNT = 8;
+
+    /** Greatest phase distance from the new moon — the full moon, four phases off (§2.3). */
+    public static final int MAX_MOON_DISTANCE = 4;
 
     /** Saturation spent by one conversion step (§2.2). */
     public static final float SATURATION_COST_PER_STEP = 1.0f;
@@ -51,8 +60,27 @@ public final class RestfulMath {
     }
 
     /**
-     * Health healed by one conversion step for the same 1.0 saturation:
-     * the base amount, or {@code × newMoonHealMultiplier} under Deep Sleep.
+     * Deep Sleep's heal multiplier for a moon phase (§2.3): a linear ramp in
+     * lunar darkness. The new moon (phase 4) is the peak at the full
+     * {@code newMoonHealMultiplier}; the full moon (phase 0) is the floor at
+     * 1.0 (no bonus); the phases between step down evenly — at the default peak
+     * of 2.0 the crescents heal ×1.75, the quarters ×1.5, the gibbous nights
+     * ×1.25. Shares the {@code |phase − 4|} distance shape the Chronometer's
+     * moon-fullness ramp uses, kept local so this pure class owns its own math.
+     *
+     * <p>Allocation-free integer/double arithmetic for the per-step sleeper hot
+     * path (§2.2, up to 60× per real tick under the time-lapse).
+     */
+    public static double deepSleepMultiplier(int moonPhase, double newMoonHealMultiplier) {
+        int distanceFromNewMoon = Math.abs(Math.floorMod(moonPhase, MOON_PHASE_COUNT) - NEW_MOON_PHASE);
+        double darkness = (MAX_MOON_DISTANCE - distanceFromNewMoon) / (double) MAX_MOON_DISTANCE;
+        return 1.0 + (newMoonHealMultiplier - 1.0) * darkness;
+    }
+
+    /**
+     * Health healed by one conversion step for the same 1.0 saturation: the
+     * base amount scaled by the Deep Sleep lunar gradient
+     * ({@link #deepSleepMultiplier}).
      */
     public static float healPerStep(int moonPhase, double newMoonHealMultiplier) {
         return healPerStep(moonPhase, newMoonHealMultiplier, 1.0);
@@ -61,14 +89,12 @@ public final class RestfulMath {
     /**
      * As {@link #healPerStep(int, double)}, scaled by a bed-strength multiplier
      * (§7): a real bed is 1.0, a bedroll is {@code bedrollRestfulMultiplier}
-     * (default 0.5). The bedroll's half strength stacks with Deep Sleep — a
-     * bedroll on a new moon heals the same as a full bed on an ordinary night,
-     * and a real bed is always the best night's sleep.
+     * (default 0.5). The bedroll's half strength stacks with the lunar gradient —
+     * a bedroll on a new moon heals the same as a full bed on the full moon, and
+     * a real bed is always the best night's sleep.
      */
     public static float healPerStep(int moonPhase, double newMoonHealMultiplier, double strengthMultiplier) {
-        double base = moonPhase == NEW_MOON_PHASE
-                ? BASE_HEAL_PER_STEP * newMoonHealMultiplier
-                : BASE_HEAL_PER_STEP;
+        double base = BASE_HEAL_PER_STEP * deepSleepMultiplier(moonPhase, newMoonHealMultiplier);
         return (float) (base * strengthMultiplier);
     }
 

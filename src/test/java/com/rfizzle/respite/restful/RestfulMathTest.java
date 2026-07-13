@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * The restful-saturation arithmetic ({@code design/SPEC.md} §2): the arming
  * gate at both strictness levels, the per-step stop conditions, the Deep
- * Sleep multiplier at default and range extremes, the wake-line choice, and
- * full-night accounting — 20 intervals across a 12,000-tick night, the
+ * Sleep lunar gradient at default and range extremes, the wake-line choice,
+ * and full-night accounting — 20 intervals across a 12,000-tick night, the
  * 10-saturation Deep Sleep full heal, and both stop conditions mid-night.
  */
 class RestfulMathTest {
@@ -50,45 +50,79 @@ class RestfulMathTest {
         assertTrue(RestfulMath.stepAllowed(5.0f, 19.5f, 20.0f));
     }
 
-    // --- Deep Sleep multiplier (§2.3) ---
+    // --- Deep Sleep lunar gradient (§2.3) ---
 
     @Test
-    void newMoonDoublesTheHealAtTheDefault() {
+    void newMoonHealsAtTheFullPeak() {
         assertEquals(2.0f, RestfulMath.healPerStep(RestfulMath.NEW_MOON_PHASE, 2.0), EPS);
     }
 
     @Test
-    void everyOtherPhaseHealsTheBaseAmount() {
+    void fullMoonHealsTheBaseFloorNoBonus() {
+        assertEquals(1.0f, RestfulMath.healPerStep(RestfulMath.FULL_MOON_PHASE, 2.0), EPS);
+    }
+
+    @Test
+    void healRampsLinearlyAcrossThePhasesAtTheDefaultPeak() {
+        // phases 0..7 (full, waning gibbous, third quarter, waning crescent,
+        // new, waxing crescent, first quarter, waxing gibbous): the darkness
+        // ramp at the default peak 2.0 — floor 1.0 at the full moon, +0.25 per
+        // phase toward the new moon, symmetric about it.
+        float[] expected = {1.0f, 1.25f, 1.5f, 1.75f, 2.0f, 1.75f, 1.5f, 1.25f};
         for (int phase = 0; phase < 8; phase++) {
-            if (phase == RestfulMath.NEW_MOON_PHASE) {
-                continue;
-            }
-            assertEquals(1.0f, RestfulMath.healPerStep(phase, 2.0), EPS,
-                    "phase " + phase + " must heal the base amount");
+            assertEquals(expected[phase], RestfulMath.healPerStep(phase, 2.0), EPS,
+                    "phase " + phase + " heal on the default gradient");
         }
     }
 
     @Test
-    void multiplierRangeExtremesApplyOnTheNewMoon() {
+    void deepSleepMultiplierIsTheGradientDirectly() {
+        // the pure multiplier: 1 at the full moon, the peak at the new moon,
+        // stepping evenly between — the same ramp healPerStep scales the base by.
+        double[] expected = {1.0, 1.25, 1.5, 1.75, 2.0, 1.75, 1.5, 1.25};
+        for (int phase = 0; phase < 8; phase++) {
+            assertEquals(expected[phase], RestfulMath.deepSleepMultiplier(phase, 2.0), EPS,
+                    "phase " + phase + " multiplier on the default gradient");
+        }
+    }
+
+    @Test
+    void gradientCollapsesToTheFloorWhenThePeakIsOne() {
+        // peak 1.0 (the low range extreme) — no bonus at any phase
+        for (int phase = 0; phase < 8; phase++) {
+            assertEquals(1.0f, RestfulMath.healPerStep(phase, 1.0), EPS,
+                    "phase " + phase + " must heal the floor when the peak is 1.0");
+        }
+    }
+
+    @Test
+    void multiplierRangeExtremesRampFromTheFullMoonToThePeak() {
+        // the SPEC's "range extremes" (§2.3): the new moon still hits the peak,
+        // the full moon still floors at 1.0, and a mid-phase interpolates. At the
+        // high extreme 4.0 the quarter moon (phase 2) heals 1 + 3×0.5 = 2.5.
         assertEquals(1.0f, RestfulMath.healPerStep(RestfulMath.NEW_MOON_PHASE, 1.0), EPS);
         assertEquals(4.0f, RestfulMath.healPerStep(RestfulMath.NEW_MOON_PHASE, 4.0), EPS);
+        assertEquals(1.0f, RestfulMath.healPerStep(RestfulMath.FULL_MOON_PHASE, 4.0), EPS);
+        assertEquals(2.5f, RestfulMath.healPerStep(2, 4.0), EPS);
     }
 
     // --- Bedroll half-strength (§7) ---
 
     @Test
-    void bedrollHalvesAnOrdinaryNightsHeal() {
-        // half strength on an ordinary night: 0.5 HP per step vs a full bed's 1.0
-        assertEquals(0.5f, RestfulMath.healPerStep(0, 2.0, 0.5), EPS);
-        assertEquals(1.0f, RestfulMath.healPerStep(0, 2.0, 1.0), EPS);
+    void bedrollHalvesTheFullMoonHeal() {
+        // half strength on the full-moon floor: 0.5 HP per step vs a full bed's 1.0
+        assertEquals(0.5f, RestfulMath.healPerStep(RestfulMath.FULL_MOON_PHASE, 2.0, 0.5), EPS);
+        assertEquals(1.0f, RestfulMath.healPerStep(RestfulMath.FULL_MOON_PHASE, 2.0, 1.0), EPS);
     }
 
     @Test
-    void bedrollHalfStrengthStacksWithDeepSleep() {
+    void bedrollHalfStrengthStacksWithTheGradient() {
         // a bedroll on a new moon heals ×2 × 0.5 = ×1.0 — exactly a full bed on
-        // an ordinary night, and a real bed on a new moon still beats it (2.0).
+        // the full moon, and a real bed on a new moon still beats it (2.0).
         assertEquals(1.0f, RestfulMath.healPerStep(RestfulMath.NEW_MOON_PHASE, 2.0, 0.5), EPS);
         assertEquals(2.0f, RestfulMath.healPerStep(RestfulMath.NEW_MOON_PHASE, 2.0, 1.0), EPS);
+        // and stacks mid-gradient: a bedroll on a quarter moon heals ×1.5 × 0.5 = ×0.75
+        assertEquals(0.75f, RestfulMath.healPerStep(2, 2.0, 0.5), EPS);
     }
 
     @Test
