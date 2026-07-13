@@ -1,5 +1,6 @@
 package com.rfizzle.respite.gametest;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.CommandNode;
 import com.rfizzle.respite.config.RespiteConfig;
 import com.rfizzle.respite.gametest.util.MockPlayers;
@@ -44,6 +45,47 @@ public class RespiteCommandGameTest implements FabricGameTest {
         helper.assertTrue(root.getChild("reload").canUse(op), "reload should allow ops");
         helper.assertTrue(!root.getChild("rest").canUse(nonOp), "rest should deny non-ops");
         helper.assertTrue(root.getChild("rest").canUse(op), "rest should allow ops");
+        helper.succeed();
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "commandStatus", timeoutTicks = 100)
+    public void statusExecutesTheReadForAnyPlayer(GameTestHelper helper) {
+        MockPlayers.retireLeaked(helper);
+        MinecraftServer server = helper.getLevel().getServer();
+        ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
+        Runnable cleanup = () -> MockPlayers.retire(player);
+        guarded(cleanup, () -> {
+            // status is perm-0 and self-scoped: run it from the player's own source
+            // and assert the body ran to its success return, driving the lapse,
+            // awake-stage, moon, and looked-at-Chronometer reads end to end.
+            int result;
+            try {
+                result = server.getCommands().getDispatcher()
+                        .execute("respite status", player.createCommandSourceStack());
+            } catch (CommandSyntaxException e) {
+                throw new AssertionError("respite status should parse and execute", e);
+            }
+            helper.assertTrue(result == 1, "respite status should return success, got " + result);
+            cleanup.run();
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "commandReload", timeoutTicks = 200)
+    public void reloadRunsTheConfigAndResourceReload(GameTestHelper helper) {
+        // reload rereads the config from disk, diffs it, and re-fires the vanilla
+        // resource reload (the config-bound recipe/advancement gates). Run the whole
+        // op-gated body and assert it returns success — the async resource reload is
+        // fired but not awaited, matching /reload.
+        MinecraftServer server = helper.getLevel().getServer();
+        CommandSourceStack op = server.createCommandSourceStack().withPermission(2);
+        int result;
+        try {
+            result = server.getCommands().getDispatcher().execute("respite reload", op);
+        } catch (CommandSyntaxException e) {
+            throw new AssertionError("respite reload should parse and execute", e);
+        }
+        helper.assertTrue(result == 1, "respite reload should reload and return success, got " + result);
         helper.succeed();
     }
 
