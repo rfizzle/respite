@@ -32,6 +32,7 @@
 | Unsteeped Brew item (16×16) | `art/unsteeped-brew.glyph` | `assets/respite/textures/item/unsteeped_brew.png` |
 | Caffeinated Brew item (16×16) | `art/caffeinated-brew.glyph` | `assets/respite/textures/item/caffeinated_brew.png` |
 | Bedroll item (32×32) | `art/glyphs/bedroll-item.glyph` | `assets/respite/textures/item/bedroll.png` |
+| Pocket Chronometer item (32×32) | `art/glyphs/pocket-chronometer.gen.py` → `art/glyphs/pocket-chronometer.glyph` | `assets/respite/textures/item/pocket_chronometer.png` |
 
 ## Not yet created
 

@@ -1,5 +1,6 @@
 package com.rfizzle.respite.client;
 
+import com.rfizzle.respite.client.chronometer.PocketChronometerTooltip;
 import net.fabricmc.api.ClientModInitializer;
 
 public class RespiteClient implements ClientModInitializer {
@@ -11,5 +12,8 @@ public class RespiteClient implements ClientModInitializer {
         TimeLapseClientHandler.register();
         WearinessBlinkHandler.register();
         BedrollSleepClientHandler.register();
+        // The pocket chronometer's tooltip needs the live client level for the hour
+        // and moon, which only client code may read (design/SPEC.md §5).
+        PocketChronometerTooltip.register();
     }
 }

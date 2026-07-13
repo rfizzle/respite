@@ -74,8 +74,11 @@ The website is [respite.rfizzle.com](https://respite.rfizzle.com).
   sweeps the sun and moon across the day. Right-click reads out the exact time —
   plus the moon phase and new-moon countdown at night — and sneak-right-click
   sets an alarm hour, at which the block rings a bell once. In dimensions without
-  a day-night cycle it honestly emits nothing. `enableChronometer = false`
-  removes the recipe; placed blocks keep working.
+  a day-night cycle it honestly emits nothing. Ring a clock with copper for the
+  **pocket chronometer**, a carried timepiece whose tooltip reads the hour — plus
+  the moon phase and new-moon countdown at night — alongside your own days awake:
+  the portable, read-only half of the same instrument. `enableChronometer = false`
+  removes both recipes; placed blocks and held items keep working.
 - **The Caffeinated Brew** — deliberate counterplay to Weariness, never the
   brewing stand. Craft an Unsteeped Brew from a water bottle, two cocoa beans,
   and any leaves, then steep it over a campfire for 30 seconds into the

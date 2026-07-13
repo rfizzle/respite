@@ -310,6 +310,24 @@ Vanilla's only time-automation primitive is the daylight detector, which reads *
 - The level function lives in one static, pure method (`ChronometerTime.signalFor(long dayTime, boolean fixedTime)`) shared by the block, the inspect line, `/respite status`, and the API — one formula, one home. `moonFullness`, `alarmBoundary`, `alarmFires`, `cycleAlarm`, and `hourLabel` join it there.
 - Recipe JSON gated by a Fabric resource condition bound to the config (evaluated at datapack load; `/respite reload` + `/reload` re-evaluates).
 
+### Pocket chronometer
+
+The portable half of the Chronometer: a carried `respite:pocket_chronometer` item — a vanilla clock upgraded with copper — that reads the time on expedition, where the only vanilla clock answers one of the four questions. It is a plain item: no placement, no redstone, no signal, no alarm. The placed block keeps the wire signal, the moon comparator, the alarm, and tap-to-read as its own ground; the pocket version is strictly a read-only travel companion.
+
+1. **Recipe** — shaped, 3×3, yields 1: a clock ringed by eight copper ingots (`CCC`/`CKC`/`CCC`, `C` = copper ingot, `K` = clock). Category `misc`, with a matching recipe-unlock advancement.
+2. **Tooltip** — the whole surface (no HUD, no held-item overlay beyond a vanilla clock's). It reads, top to bottom:
+   - the 12-hour clock, e.g. `7:12 pm` (`tooltip.respite.pocket_chronometer`), by day;
+   - at night (day-time position 12,000–23,999) the clock gains the moon: `7:12 pm — waning crescent, new moon in 2 nights` (`tooltip.respite.pocket_chronometer_night`), or `7:12 pm — new moon tonight` (`_new_moon`) when the count is 0 — the same phase name and `(4 − moonPhase) mod 8` countdown as the block's inspect line, without the redstone signal;
+   - a second line always present: the holder's days awake, `Awake 3.5 days` (`_awake`), formatted identically to `/respite status` (`StatusFormat.awakeDays`).
+3. **Fixed-time dimensions** — the clock spins uselessly in the Nether/End, so the time line reads an honest `— still —` (`_still`) instead of a frozen clock, mirroring the block's still dial. The days-awake line still shows — it is the holder's, not the sky's.
+
+**Config** — shares `enableChronometer` with the block: off removes both recipes, and a held pocket chronometer keeps working (an already-crafted item is never bricked).
+
+**Implementation notes**
+
+- The clock, moon, and countdown are read live off the viewer's client level (`getDayTime`, `getMoonPhase`, `dimensionType().hasFixedTime()`) through the same pure `ChronometerTime` decisions the block uses, so the item and block agree by construction. Days awake is the holder's `TIME_SINCE_REST`, which is server-only state a client tooltip cannot read, so it rides the stack: a `respite:awake_ticks` data component (`persistent` + `networkSynchronized`) written server-side in `PocketChronometerItem.inventoryTick` on a 20-tick re-check grid, rewritten only when the displayed tenth-of-a-day changes — so a held item never resyncs its stack every tick.
+- The tooltip is drawn by a client `ItemTooltipCallback`, not `Item.appendHoverText`: the tooltip context carries no day time, so a live clock needs the client level, which only client code may touch. The reading is inserted just below the item name so it sits above any recipe-viewer footer.
+
 ---
 
 ## 6. The Caffeinated Brew
@@ -565,7 +583,7 @@ All user-facing strings are translation keys in `assets/respite/lang/en_us.json`
 | Key | Surface |
 |---|---|
 | `block.respite.chronometer`, `block.respite.bedroll` | Block names |
-| `item.respite.unsteeped_brew`, `item.respite.caffeinated_brew` | Item names |
+| `item.respite.unsteeped_brew`, `item.respite.caffeinated_brew`, `item.respite.pocket_chronometer` | Item names |
 | `effect.respite.weary`, `effect.respite.exhausted`, `effect.respite.well_rested` | Effect names |
 | `notification.respite.time_lapse` | `✦ Time ×%s — %s of %s asleep` |
 | `notification.respite.time_lapse_end` | `✦ Time settles` |
@@ -583,6 +601,7 @@ All user-facing strings are translation keys in `assets/respite/lang/en_us.json`
 | `command.respite.*` | All command feedback (status lines, reload result, rest set/clear confirmations) |
 | `config.respite.<key>` + `.tooltip` | Every config option, label + tooltip pairs |
 | `tooltip.respite.chronometer` (+ `_night`, `_new_moon`, `_alarm`) | Jade/WTHIT line — same variants as the inspect notification, without the ✦ |
+| `tooltip.respite.pocket_chronometer` (+ `_night`, `_new_moon`, `_still`, `_awake`) | Pocket chronometer tooltip — the four facts (hour, moon, countdown, days awake), no signal |
 | `subtitles.respite.time_lapse_start`, `subtitles.respite.time_lapse_end` | Sound subtitles |
 | `advancements.respite.<id>.title` / `.description` | Advancement pairs (below) |
 | `key.categories.respite` | Reserved; no keybinds ship at v0.1 |
