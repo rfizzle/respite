@@ -12,6 +12,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.CrashReport;
+import net.minecraft.ReportedException;
 import net.minecraft.Util;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.server.MinecraftServer;
@@ -105,6 +107,12 @@ public final class TimeLapseEngine {
         } else {
             try {
                 evaluateAndRun(overworld, config);
+            } catch (ReportedException e) {
+                // An extra tick is a genuine world tick (§1); a crash inside it is
+                // a world-corruption event and must fail fast exactly as vanilla's
+                // world tick does — never be settled-and-logged, which would only
+                // respawn the same crash and log-spam it every real tick.
+                throw e;
             } catch (Exception e) {
                 Respite.LOGGER.error("Time-lapse evaluation failed; settling to ×1", e);
                 effectiveRate = 1;
@@ -193,8 +201,7 @@ public final class TimeLapseEngine {
                 extraTicksInProgress = true;
                 try {
                     while (extras < target - 1 && Util.getNanos() - extrasStart < budgetNanos) {
-                        overworld.tick(HAS_TIME);
-                        tickSleepers(overworld);
+                        runExtraTick(overworld);
                         extras++;
                     }
                 } finally {
@@ -219,6 +226,29 @@ public final class TimeLapseEngine {
                     new ClientboundSetTimePacket(overworld.getGameTime(), overworld.getDayTime(),
                             overworld.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)),
                     overworld.dimension());
+        }
+    }
+
+    /**
+     * One extra Overworld tick, run exactly as the whole world experiences a
+     * vanilla tick (§1): a genuine {@link ServerLevel#tick} plus the sleepers'
+     * body timers. A failure inside is a world-corruption event, so it fails
+     * fast with the same crash report vanilla raises for a world tick rather
+     * than being caught-and-settled — the settle path upstream is for Respite's
+     * own rate math, and swallowing a corrupt world tick would respawn it every
+     * real tick while leaving other mods' world-tick START/END events unpaired.
+     */
+    private static void runExtraTick(ServerLevel overworld) {
+        try {
+            overworld.tick(HAS_TIME);
+            tickSleepers(overworld);
+        } catch (ReportedException e) {
+            // Already a vanilla crash report from deep in the tick — pass it up intact.
+            throw e;
+        } catch (Throwable t) {
+            CrashReport report = CrashReport.forThrowable(t, "Exception ticking world");
+            overworld.fillReportDetails(report);
+            throw new ReportedException(report);
         }
     }
 

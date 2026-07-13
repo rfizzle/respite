@@ -148,6 +148,17 @@ public class WellRestedGameTest implements FabricGameTest {
             boolean savedWellRested = config.enableWellRested;
             config.enableWeariness = true;
             config.enableWellRested = true;
+            // The global weariness sweep reconciles effects off TIME_SINCE_REST
+            // every hundred ticks; this mock player's stat reads zero, so a sweep
+            // that lands between setup and the heal settles it to stage NONE and
+            // strips the admin-forced Exhausted marker — the heal would then
+            // compose ×1.5 instead of ×0.75. Re-assert the pole inside the same
+            // synchronous set→heal→restore block so no prior-tick sweep can drop
+            // it. Well-Rested needs no re-assert: the sweep never touches it.
+            if (alsoExhausted && !player.hasEffect(RespiteRegistry.EXHAUSTED)) {
+                player.addEffect(new MobEffectInstance(
+                        RespiteRegistry.EXHAUSTED, MobEffectInstance.INFINITE_DURATION, 0, true, false, true));
+            }
             float before = player.getHealth();
             try {
                 player.doTick();
