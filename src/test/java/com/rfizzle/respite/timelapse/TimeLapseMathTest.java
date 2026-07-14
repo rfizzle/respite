@@ -15,7 +15,7 @@ class TimeLapseMathTest {
 
     @ParameterizedTest
     @CsvSource({
-            // the spec's own worked example: default 60, n = 4
+            // the k/n share at maxRate 60, n = 4: quarter-shares round exactly
             "60, 0, 4, 1",
             "60, 1, 4, 15",
             "60, 2, 4, 30",

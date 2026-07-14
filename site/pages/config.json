@@ -15,7 +15,7 @@
           "nowrapHeaders": true,
           "rows": [
             ["<code>enableTimeLapse</code>", "bool", "<code>true</code>", "—", "Time-lapse"],
-            ["<code>maxTimeLapseRate</code>", "int", "<code>60</code>", "2–100", "Time-lapse"],
+            ["<code>maxTimeLapseRate</code>", "int", "<code>20</code>", "2–100", "Time-lapse"],
             ["<code>timeLapseTickBudgetMs</code>", "int", "<code>40</code>", "5–45", "Time-lapse"],
             ["<code>combatHoldsTime</code>", "bool", "<code>true</code>", "—", "Time-lapse"],
             ["<code>announceTimeLapse</code>", "bool", "<code>true</code>", "—", "Time-lapse"],

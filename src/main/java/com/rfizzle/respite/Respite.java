@@ -4,6 +4,7 @@ import com.rfizzle.respite.advancement.RespiteCriteria;
 import com.rfizzle.respite.bedroll.Bedroll;
 import com.rfizzle.respite.command.RespiteCommand;
 import com.rfizzle.respite.config.RespiteConfig;
+import com.rfizzle.respite.config.RespiteConfigSync;
 import com.rfizzle.respite.registry.RespiteRegistry;
 import com.rfizzle.respite.restful.RestfulSleepHandler;
 import com.rfizzle.respite.sleepvote.SleepVoteHandler;
@@ -27,6 +28,10 @@ public class Respite implements ModInitializer {
     public void onInitialize() {
         // Eager load: first launch writes config/respite.json with defaults.
         RespiteConfig.get();
+
+        // Server→client config sync: registers the S2C payload type (both sides)
+        // and pushes the server's config to each client on join.
+        RespiteConfigSync.register();
 
         RespiteRegistry.register();
 

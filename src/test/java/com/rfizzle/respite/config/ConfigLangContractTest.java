@@ -93,10 +93,11 @@ class ConfigLangContractTest {
                 "lang must not fork into the client resource root");
     }
 
-    /** A config entry label: {@code config.respite.<key>}, not the title, a category, or a tooltip. */
+    /** A config entry label: {@code config.respite.<key>}, not the title, a category, a screen banner, or a tooltip. */
     private static boolean isConfigLabel(String key) {
         return key.startsWith("config.respite.")
                 && !key.equals("config.respite.title")
+                && !key.equals("config.respite.server_controlled_note")
                 && !key.contains(".category.")
                 && !key.endsWith(".tooltip");
     }

@@ -9,11 +9,14 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 /**
  * S2C: one effective-rate change ({@code design/SPEC.md} §1). The state picks
- * the action-bar line, the cue picks the start/settle sound; the client
- * honors {@code showTimeLapseMessages} for both. Sent only on change, never
- * per tick.
+ * the action-bar line, the cue picks the start/settle sound. Sent on every
+ * effective-rate edge (never per tick) so the client can glide its sky at the
+ * live rate; {@code announce} carries the server's {@code announceTimeLapse}
+ * gate, and the client shows the line/cue only when it is set and the client's
+ * own {@code showTimeLapseMessages} is on. The smoothing tracks the rate
+ * regardless of either toggle.
  */
-public record TimeLapsePayload(LapseState state, Cue cue, int rate, int sleeping, int total)
+public record TimeLapsePayload(LapseState state, Cue cue, int rate, int sleeping, int total, boolean announce)
         implements CustomPacketPayload {
 
     public static final Type<TimeLapsePayload> TYPE = new Type<>(Respite.id("time_lapse"));
@@ -27,13 +30,14 @@ public record TimeLapsePayload(LapseState state, Cue cue, int rate, int sleeping
         buf.writeVarInt(payload.rate);
         buf.writeVarInt(payload.sleeping);
         buf.writeVarInt(payload.total);
+        buf.writeBoolean(payload.announce);
     }
 
     private static TimeLapsePayload decode(FriendlyByteBuf buf) {
         return new TimeLapsePayload(
                 enumFromOrdinal(LapseState.values(), buf.readVarInt()),
                 enumFromOrdinal(Cue.values(), buf.readVarInt()),
-                buf.readVarInt(), buf.readVarInt(), buf.readVarInt());
+                buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readBoolean());
     }
 
     /** Reject out-of-range ordinals instead of throwing an opaque AIOOBE. */

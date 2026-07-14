@@ -38,7 +38,7 @@ class RespiteConfigTest {
 
         assertEquals(1, config.configVersion);
         assertTrue(config.enableTimeLapse);
-        assertEquals(60, config.maxTimeLapseRate);
+        assertEquals(20, config.maxTimeLapseRate);
         assertEquals(40, config.timeLapseTickBudgetMs);
         assertTrue(config.combatHoldsTime);
         assertTrue(config.announceTimeLapse);
@@ -81,7 +81,7 @@ class RespiteConfigTest {
         for (String key : SPEC_KEYS) {
             assertTrue(written.has(key), "first-launch file missing spec key: " + key);
         }
-        assertEquals(60, config.maxTimeLapseRate);
+        assertEquals(20, config.maxTimeLapseRate);
     }
 
     @Test

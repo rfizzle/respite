@@ -32,7 +32,7 @@ public class RespiteConfig {
 
     // Time-lapse (§1)
     public boolean enableTimeLapse = true;
-    public int maxTimeLapseRate = 60;
+    public int maxTimeLapseRate = 20;
     public int timeLapseTickBudgetMs = 40;
     public boolean combatHoldsTime = true;
     public boolean announceTimeLapse = true;

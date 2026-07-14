@@ -33,8 +33,8 @@ untouched.
 ## Features
 
 - **Continuous Time-Lapse** — sleeping accelerates time instead of skipping it.
-  Each sleeper adds an equal share of the speed (up to 60× with everyone in
-  bed), and the world genuinely runs through the compressed night: furnaces
+  Each sleeper adds an equal share of the speed — the more of you in bed, the
+  faster the night runs — and the world genuinely runs through the compressed night: furnaces
   smelt, crops grow, weather rains itself out, and dawn arrives watched rather
   than skipped. Awake players keep real time in their own body, a nearby fight
   holds time at normal pace until it's settled, and a struggling server
