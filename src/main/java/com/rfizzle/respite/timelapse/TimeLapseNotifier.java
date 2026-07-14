@@ -25,15 +25,21 @@ public final class TimeLapseNotifier {
     private TimeLapseNotifier() {
     }
 
-    /** Feed one real tick's outcome; sends only when something changed. */
+    /** Feed one real tick's outcome; sends only when the effective rate changed. */
     static void announce(ServerLevel overworld, RespiteConfig config,
             LapseState state, int rate, int sleeping, int total) {
         Announcement announcement = TRANSITIONS.evaluate(state, rate, sleeping, total);
-        if (announcement == null || !config.announceTimeLapse) {
+        if (announcement == null) {
             return;
         }
+        // A modded client always gets the payload — it drives the client-side sky
+        // smoothing, which must track the rate whether or not the server announces.
+        // The announce flag carries the server gate; the client shows the line/cue
+        // only when it is set (and the client's own toggle is on). A vanilla client
+        // can't smooth, so it only ever sees the line/cue, and only when announcing.
+        boolean announce = config.announceTimeLapse;
         TimeLapsePayload payload = new TimeLapsePayload(announcement.state(), announcement.cue(),
-                announcement.rate(), announcement.sleeping(), announcement.total());
+                announcement.rate(), announcement.sleeping(), announcement.total(), announce);
         SoundEvent cueSound = switch (announcement.cue()) {
             case START -> RespiteRegistry.TIME_LAPSE_START;
             case END -> RespiteRegistry.TIME_LAPSE_END;
@@ -44,7 +50,7 @@ public final class TimeLapseNotifier {
             ServerPlayer player = players.get(i);
             if (ServerPlayNetworking.canSend(player, TimeLapsePayload.TYPE)) {
                 ServerPlayNetworking.send(player, payload);
-            } else {
+            } else if (announce) {
                 // vanilla-client fallback: same line, same cue, no client toggle
                 player.displayClientMessage(TimeLapseLines.build(announcement.state(),
                         announcement.rate(), announcement.sleeping(), announcement.total()), true);

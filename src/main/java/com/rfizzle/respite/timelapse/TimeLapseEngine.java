@@ -200,20 +200,23 @@ public final class TimeLapseEngine {
 
         int extras = 0;
         if (target > 1 && !held) {
+            // The budget bounds the *whole* real tick — base tick plus every extra —
+            // measured from tick start, so a lapse can never push the server past one
+            // real-tick window: 20 TPS holds and the night stays smooth. A base tick
+            // already over budget runs zero extras (the loop condition is false at
+            // once), so a struggling server degrades to whatever pace it can afford,
+            // never a stall. This is also why the effective rate tracks
+            // maxTimeLapseRate downward: the target governs until the tick fills, and
+            // a lower target simply runs fewer, cheaper extras well inside the window.
             long budgetNanos = config.timeLapseTickBudgetMs * 1_000_000L;
-            // A base tick already over budget runs zero extras — a struggling
-            // server degrades to whatever pace it can afford, never a stall.
-            if (Util.getNanos() - tickStartNanos < budgetNanos) {
-                long extrasStart = Util.getNanos();
-                extraTicksInProgress = true;
-                try {
-                    while (extras < target - 1 && Util.getNanos() - extrasStart < budgetNanos) {
-                        runExtraTick(overworld);
-                        extras++;
-                    }
-                } finally {
-                    extraTicksInProgress = false;
+            extraTicksInProgress = true;
+            try {
+                while (extras < target - 1 && Util.getNanos() - tickStartNanos < budgetNanos) {
+                    runExtraTick(overworld);
+                    extras++;
                 }
+            } finally {
+                extraTicksInProgress = false;
             }
         }
 

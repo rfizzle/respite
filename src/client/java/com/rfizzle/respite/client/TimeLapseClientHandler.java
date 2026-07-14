@@ -26,7 +26,12 @@ public final class TimeLapseClientHandler {
     }
 
     private static void handle(Minecraft client, TimeLapsePayload payload) {
-        if (!RespiteConfig.get().showTimeLapseMessages) {
+        // Feed the sky smoother first — it must track the live rate whether or not
+        // the server announces or the client shows messages.
+        TimeLapseSkySmoother.update(payload.state(), payload.rate());
+        // The line and cue are gated by the server's announce flag and the client's
+        // own toggle; the smoothing above is not.
+        if (!payload.announce() || !RespiteConfig.get().showTimeLapseMessages) {
             return;
         }
         client.gui.setOverlayMessage(

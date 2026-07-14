@@ -10,13 +10,13 @@
     {
       "id": "time-lapse",
       "title": "Continuous Time-Lapse",
-      "intro": "Sleeping no longer teleports the world to morning — it accelerates time, up to 60×, while the world keeps genuinely running.",
+      "intro": "Sleeping no longer teleports the world to morning — it accelerates time, up to 20× by default, while the world keeps genuinely running.",
       "blocks": [
         {
           "type": "prose",
           "html": [
-            "Get into a bed at night and time rushes visibly past: furnaces smelt, crops grow, brewing stands bubble, and the sky wheels overhead. Each sleeper adds an equal share of the speed — alone you get the full 60×; with two of four players in bed, time runs at 30×. A full night passes in about ten seconds with everyone asleep, and a furnace smelts close to a full stack while you dream.",
-            "The acceleration is real ticks under a hard millisecond budget, so a struggling server degrades to a slower night — never a stall. Players still awake share the fast night, and an action-bar line (<code>✦ Time ×30 — 2 of 4 asleep</code>) says why the stars are streaking. The share counts only players actually present: an AFK player (idle five minutes, tunable) drops out of it entirely, so a session left at the keyboard neither speeds the night nor drags it down — and any input rejoins them instantly."
+            "Get into a bed at night and time rushes visibly past: furnaces smelt, crops grow, brewing stands bubble, and the sky wheels overhead. Each sleeper adds an equal share of the speed — alone you get the full 20×; with two of four players in bed, time runs at 10×. A full night passes in about half a minute with everyone asleep, and a furnace smelts close to a full stack while you dream.",
+            "The acceleration is real ticks under a hard millisecond budget that caps the whole tick, so the server holds its tick rate and the night stays smooth — and a struggling server degrades to a slower night rather than stalling. Players still awake share the fast night, and an action-bar line (<code>✦ Time ×10 — 2 of 4 asleep</code>) says why the stars are streaking. The share counts only players actually present: an AFK player (idle five minutes, tunable) drops out of it entirely, so a session left at the keyboard neither speeds the night nor drags it down — and any input rejoins them instantly."
           ]
         },
         {

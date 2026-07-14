@@ -25,7 +25,7 @@ Evaluated once per real server tick, server-side:
 
    `rate = max(1, round(maxTimeLapseRate × k / n))`
 
-   With the default `maxTimeLapseRate = 60` and `n = 4`: 1 sleeper → 15×, 2 → 30×, 3 → 45×, 4 → 60×. A solo player gets the full 60×. `k = 0` (or `n = 0`) → rate 1, time-lapse inactive.
+   With the default `maxTimeLapseRate = 20` and `n = 4`: 1 sleeper → 5×, 2 → 10×, 3 → 15×, 4 → 20×. A solo player gets the full 20×. `k = 0` (or `n = 0`) → rate 1, time-lapse inactive.
 
    **Idle exclusion** — a player idle for `idleThresholdMinutes` of real time (default 5) counts for nothing on either side of the share: dropped from `n`, from `k`, and from the peril check alike, so an absent player neither speeds the night nor drags it down, and an AFK-in-bed body contributes nothing — only a present, sleeping player accelerates time. Idle is vanilla's own signal (`ServerPlayer.getLastActionTime()`, the clock `player-idle-timeout` reads, refreshed on every input packet), so a returning player rejoins the share the instant they move or interact, and going to bed — itself an interaction — refreshes the clock at sleep onset, so a player who deliberately sleeps is never immediately idle. Because any rate above 1 passes the night in seconds of real time, a genuinely sleeping player never trips the threshold except on a night already stalled to ×1 (a budget-starved server, or one sleeper among dozens), where dropping them costs nothing they were getting. The **degenerate cases land sanely**: all players idle → `n = 0` → time-lapse inactive; one active sleeper among idle others → `n = 1, k = 1` → runs; spectators are excluded before the idle check as ever; and solo play is behaviorally identical to today. `excludeIdleFromShare = false` restores strict counting of everyone online.
 
@@ -35,14 +35,15 @@ Evaluated once per real server tick, server-side:
 5. **Natural wake** — players wake through vanilla's own logic when the night (or thunderstorm) ends. Weather is *not* force-cleared; an accelerated storm rains itself out on its own schedule. Morning arrives; no state was skipped.
 6. **Rate changes** — recomputed every real tick. A player leaving their bed, joining, leaving the server, or switching dimension takes effect on the next tick. `RespiteTimeLapseCallback` fires whenever the effective rate changes (§ Public API).
 
-A full night (12,000 ticks ≈ 10 real minutes) passes in ≈10 seconds at 60×. A furnace smelts 60 items over that night — same as vanilla would across a real 10-minute night — because the ticks are real.
+A full night (12,000 ticks ≈ 10 real minutes) passes in ≈30 seconds at the default 20×. A furnace smelts the same items over that night as vanilla would across a real 10-minute night — because the ticks are real. The default is deliberately calm and TPS-stable; a server that wants a faster (or slower) night raises or lowers `maxTimeLapseRate`, bounded by what the tick budget below can afford.
 
 ### Performance governor
 
 Extra ticks are metered, never assumed free:
 
-- Per real server tick, Respite measures wall-clock time spent on extra ticks and stops issuing them once `timeLapseTickBudgetMs` (default 40 ms) is spent, even if fewer than `rate − 1` ran. The **effective rate** that tick is `1 + extras actually run`.
+- The budget bounds the **whole real tick** — the base tick plus every extra — measured from tick start. Respite stops issuing extra ticks once the tick has consumed `timeLapseTickBudgetMs` (default 40 ms), even if fewer than `rate − 1` ran, so an accelerating tick never overruns the 20 TPS window (50 ms) and the server holds its tick rate throughout the lapse. The **effective rate** that tick is `1 + extras actually run`.
 - If the base tick alone is already over budget (a struggling server), zero extras run that tick and the night passes at whatever pace the server can afford — degradation is gradual, never a stall or a death spiral.
+- Because the budget caps total tick time rather than only the extras, `maxTimeLapseRate` tracks night length predictably as long as the target fits the window: lowering it runs fewer, cheaper extras and lengthens the night smoothly, and the default 20× sits comfortably inside the budget on ordinary worlds. Only a target large enough to exhaust the budget is capped below its nominal value; there the effective rate is what the hardware can sustain within one tick.
 - The effective rate (not the target) is what `/respite status`, the action-bar announcement, the API, and the callback report.
 
 ### Multiplayer & fairness
@@ -90,7 +91,7 @@ Extra ticks run for the **Overworld only**. The Nether and End tick at the norma
 | Key | Type | Default | Range |
 |---|---|---|---|
 | `enableTimeLapse` | bool | `true` | — |
-| `maxTimeLapseRate` | int | `60` | 2–100 |
+| `maxTimeLapseRate` | int | `20` | 2–100 |
 | `timeLapseTickBudgetMs` | int | `40` | 5–45 |
 | `combatHoldsTime` | bool | `true` | — |
 | `announceTimeLapse` | bool | `true` | — |
@@ -427,7 +428,7 @@ Single JSON config `config/respite.json`, created with defaults on first launch,
 | Key | Type | Default | Range / values | Feature |
 |---|---|---|---|---|
 | `enableTimeLapse` | bool | `true` | — | §1 |
-| `maxTimeLapseRate` | int | `60` | 2–100 | §1 |
+| `maxTimeLapseRate` | int | `20` | 2–100 | §1 |
 | `timeLapseTickBudgetMs` | int | `40` | 5–45 | §1 |
 | `combatHoldsTime` | bool | `true` | — | §1 |
 | `announceTimeLapse` | bool | `true` | — | §1 |
@@ -462,6 +463,10 @@ Single JSON config `config/respite.json`, created with defaults on first launch,
 | `showTimeLapseMessages` | bool | `true` | Show the time-lapse action-bar lines on this client |
 | `showExhaustionBlink` | bool | `true` | Show the Exhausted eyelid blink on this client (§4) |
 
+### Server → client sync
+
+The server config keys are **server-authoritative**: on a dedicated server the rules are the server's, not each client's local file. The server pushes its active config to a client on join and again on `/respite reload`, and a connected client honors the synced copy over its own file — so a client's own `config/respite.json` gameplay values apply only in singleplayer (where the integrated server owns them) or standalone. The two **client** keys above are never synced; they are always read from the client's own file. The ModMenu/Cloth screen reflects this: connected to a remote server it shows the server-authoritative keys read-only (an operator edits them server-side and runs `/respite reload`), while the client keys stay editable; in singleplayer or from the title screen every key is editable against the local file. A client without the mod (or an older build) simply keeps vanilla behavior — the push is send-guarded and degrades to a silent no-op.
+
 ---
 
 ## Commands
@@ -471,7 +476,7 @@ Root `/respite`, brigadier tree:
 | Command | Permission | Output |
 |---|---|---|
 | `/respite status` | everyone (level 0) | Time-lapse state and effective rate (`Time ×30 — 2 of 4 asleep` / `Time ×1`, or the peril hold), the caller's time awake in days (one decimal), rest stage (rested / Weary / Exhausted), nights until the next new moon, and — if the caller is looking at a Chronometer — its current signal |
-| `/respite reload` | op (level 2) | Reloads `config/respite.json` and re-evaluates recipe conditions; reports what changed |
+| `/respite reload` | op (level 2) | Reloads `config/respite.json`, re-evaluates recipe conditions, and re-pushes the config to connected clients; reports what changed |
 | `/respite rest clear [player]` | op (level 2) | Resets the target's `TIME_SINCE_REST` to 0 (clears Weariness) |
 | `/respite rest set <days> [player]` | op (level 2) | Sets the target's `TIME_SINCE_REST` to `days × 24000` (testing lever for §3/§4) |
 

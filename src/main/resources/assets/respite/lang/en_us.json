@@ -56,6 +56,8 @@
 
   "config.respite.title": "Respite Configuration",
 
+  "config.respite.server_controlled_note": "These settings are controlled by the server you're connected to and shown read-only. An operator edits them server-side, then runs /respite reload.",
+
   "config.respite.category.time_lapse": "Time-Lapse",
   "config.respite.category.restful": "Restful Saturation",
   "config.respite.category.phantoms": "Phantoms",
@@ -70,7 +72,7 @@
   "config.respite.maxTimeLapseRate": "Max Time-Lapse Rate",
   "config.respite.maxTimeLapseRate.tooltip": "Fastest time multiplier when every Overworld player sleeps (2–100).",
   "config.respite.timeLapseTickBudgetMs": "Tick Budget (ms)",
-  "config.respite.timeLapseTickBudgetMs.tooltip": "Millisecond budget per server tick for extra world ticks; the rate degrades before the server does (5–45).",
+  "config.respite.timeLapseTickBudgetMs.tooltip": "Wall-clock budget for the whole accelerated tick; extra ticks stop once it is spent, so the server holds its tick rate and the night stays smooth (5–45).",
   "config.respite.combatHoldsTime": "Combat Holds Time",
   "config.respite.combatHoldsTime.tooltip": "Nearby combat holds the lapse at ×1 until the fight ends.",
   "config.respite.announceTimeLapse": "Announce Time-Lapse",

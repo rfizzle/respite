@@ -33,11 +33,11 @@ every block and item work exactly as before.
 
 ### Continuous Time-Lapse
 
-Sleeping accelerates time — up to **60×** — instead of jumping to morning. The
-world genuinely lives through the night: furnaces smelt (close to a full stack
-over a night), crops grow, brewing stands bubble, and the stars streak
-overhead. On a server every sleeper adds an equal share: 2 of 4 players in bed
-run the night at 30×. Nobody's sleep is wasted, nobody's insomnia vetoes the
+Sleeping accelerates time — up to **20×** by default — instead of jumping to
+morning. The world genuinely lives through the night: furnaces smelt (close to a
+full stack over a night), crops grow, brewing stands bubble, and the stars
+streak overhead. On a server every sleeper adds an equal share: 2 of 4 players
+in bed run the night at 10×. Nobody's sleep is wasted, nobody's insomnia vetoes the
 night, and a performance governor keeps struggling servers degrading gracefully
 instead of stalling. A quiet chat whisper names who climbs into or out of bed
 with the running tally, and an AFK sleeper drops out of the share entirely — a
