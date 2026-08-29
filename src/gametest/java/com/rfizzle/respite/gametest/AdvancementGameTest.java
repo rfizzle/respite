@@ -26,6 +26,13 @@ import net.minecraft.world.item.ItemStack;
  */
 public class AdvancementGameTest implements FabricGameTest {
 
+    // Timeout budgets. A bare number never says why this test needs longer than
+    // the default, and a literal repeated across a suite is one edit per method
+    // when the timing changes.
+    /** Every assertion is synchronous; the budget only covers server spin-up. */
+    private static final int SYNC = 100;
+
+
     private static ServerPlayer spawnListeningPlayer(GameTestHelper helper) {
         ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         player.getAdvancements().reload(helper.getLevel().getServer().getAdvancements());
@@ -55,7 +62,7 @@ public class AdvancementGameTest implements FabricGameTest {
         }
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "advancementLoad", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteAdvancementLoad", timeoutTicks = SYNC)
     public void allSixAdvancementsLoad(GameTestHelper helper) {
         // A codec-invalid predicate (the vanilla-trigger mountain_watch/clockwork
         // JSON especially) loads to a null holder rather than throwing — assert
@@ -68,7 +75,7 @@ public class AdvancementGameTest implements FabricGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "advancementRoot", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteAdvancementRoot", timeoutTicks = SYNC)
     public void rootGrantsForSleepingThroughAnActiveLapse(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         ServerPlayer sleeper = spawnListeningPlayer(helper);
@@ -91,7 +98,7 @@ public class AdvancementGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "advancementBeauty", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteAdvancementBeauty", timeoutTicks = SYNC)
     public void beautySleepGrantsAtEightHeartsRestored(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         ServerPlayer healed = spawnListeningPlayer(helper);
@@ -110,7 +117,7 @@ public class AdvancementGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "advancementDark", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteAdvancementDark", timeoutTicks = SYNC)
     public void darkAndDreamlessGrantsOnANewMoonNight(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         ServerPlayer newMoon = spawnListeningPlayer(helper);
@@ -129,7 +136,7 @@ public class AdvancementGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "advancementNightShift", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteAdvancementNightShift", timeoutTicks = SYNC)
     public void nightShiftGrantsForDrinkingTheBrewWhileWeary(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         ServerPlayer weary = spawnListeningPlayer(helper);

@@ -38,6 +38,21 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  */
 public class RestfulSaturationGameTest implements FabricGameTest {
 
+    // Timeout budgets. A bare number never says why this test needs longer than
+    // the default, and a literal repeated across a suite is one edit per method
+    // when the timing changes.
+    /** Vanilla regen standing down in bed and resuming on wake. */
+    private static final int REGEN_STANDDOWN = 300;
+    /** A sleep through to wake with the feature off, so nothing converts. */
+    private static final int DISABLED_PATH = 400;
+    /** A sleep plus one overnight heal conversion at the moon's multiplier. */
+    private static final int CONVERSION = 500;
+    /** The default 600-tick heal interval, plus setup and the wake line. */
+    private static final int HEAL_INTERVAL = 800;
+    /** A whole night under the time-lapse: real ticks are few, world ticks are not. */
+    private static final int LAPSE_COMPRESSED_NIGHT = 1500;
+
+
     private static final BlockPos BED_HEAD = new BlockPos(1, 2, 1);
     private static final BlockPos BED_FOOT = new BlockPos(1, 2, 2);
     /** An ordinary night — moon phase 0, nowhere near the new moon. */
@@ -132,7 +147,7 @@ public class RestfulSaturationGameTest implements FabricGameTest {
         return keys;
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "restfulInterval", timeoutTicks = 800)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteRestfulInterval", timeoutTicks = HEAL_INTERVAL)
     public void armedSleeperConvertsAtTheDefaultInterval(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper, NIGHT_START);
         MockPlayers.Connected connected = MockPlayers.connectedServerPlayerInLevel(helper);
@@ -191,7 +206,7 @@ public class RestfulSaturationGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "restfulRegen", timeoutTicks = 300)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteRestfulRegen", timeoutTicks = REGEN_STANDDOWN)
     public void vanillaRegenStandsDownInBedAndResumesOnWake(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper, NIGHT_START);
         ServerPlayer sleeper = MockPlayers.serverPlayerInLevel(helper);
@@ -234,7 +249,7 @@ public class RestfulSaturationGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "restfulDeep", timeoutTicks = 500)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteRestfulDeep", timeoutTicks = CONVERSION)
     public void newMoonConversionHealsDoubleAndDeepensTheWakeLine(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper, NEW_MOON_NIGHT);
         int savedInterval = RespiteConfig.get().restfulHealIntervalTicks;
@@ -291,7 +306,7 @@ public class RestfulSaturationGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "restfulGradient", timeoutTicks = 500)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteRestfulGradient", timeoutTicks = CONVERSION)
     public void quarterMoonConversionHealsTheRampedAmountWithoutTheDeepLine(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper, QUARTER_MOON_NIGHT);
         int savedInterval = RespiteConfig.get().restfulHealIntervalTicks;
@@ -352,7 +367,7 @@ public class RestfulSaturationGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "restfulWake", timeoutTicks = 800)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteRestfulWake", timeoutTicks = HEAL_INTERVAL)
     public void wakingThreeHeartsRicherSaysRefreshed(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper, NIGHT_START);
         int savedInterval = RespiteConfig.get().restfulHealIntervalTicks;
@@ -402,7 +417,7 @@ public class RestfulSaturationGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "restfulDisabled", timeoutTicks = 400)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteRestfulDisabled", timeoutTicks = DISABLED_PATH)
     public void disabledConfigLeavesSleepVanilla(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper, NIGHT_START);
         int savedInterval = RespiteConfig.get().restfulHealIntervalTicks;
@@ -461,7 +476,7 @@ public class RestfulSaturationGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "restfulGate", timeoutTicks = 500)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteRestfulGate", timeoutTicks = CONVERSION)
     public void relaxedGateArmsAtEighteenNotSeventeen(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper, NIGHT_START);
         int savedInterval = RespiteConfig.get().restfulHealIntervalTicks;
@@ -510,7 +525,7 @@ public class RestfulSaturationGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "restfulCompression", timeoutTicks = 1500)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteRestfulCompression", timeoutTicks = LAPSE_COMPRESSED_NIGHT)
     public void timeLapseCompressesTheWaitButNotTheTotals(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         helper.getLevel().setDayTime(NIGHT_START);
@@ -573,7 +588,7 @@ public class RestfulSaturationGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "restfulUnarmed", timeoutTicks = 400)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteRestfulUnarmed", timeoutTicks = DISABLED_PATH)
     public void unarmedSleeperRegenStaysFrozenUntilWake(GameTestHelper helper) {
         // Pins the deliberate reading of SPEC §2.4–5: suspension keys on
         // sleeping, not on being armed. Food 19 under the strict default gate

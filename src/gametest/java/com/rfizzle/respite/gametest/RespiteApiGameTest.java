@@ -27,6 +27,13 @@ import net.minecraft.world.level.Level;
  */
 public class RespiteApiGameTest implements FabricGameTest {
 
+    // Timeout budgets. A bare number never says why this test needs longer than
+    // the default, and a literal repeated across a suite is one edit per method
+    // when the timing changes.
+    /** Accessors and the callback fire synchronously; the budget covers spin-up. */
+    private static final int SYNC = 100;
+
+
     // A single recording listener, registered once — Fabric events don't unregister.
     private static volatile ServerPlayer lastRested;
     private static volatile long lastTicksSlept;
@@ -53,7 +60,7 @@ public class RespiteApiGameTest implements FabricGameTest {
         player.getStats().setValue(player, Stats.CUSTOM.get(Stats.TIME_SINCE_REST), (int) ticks);
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "apiAccessors", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteApiAccessors", timeoutTicks = SYNC)
     public void accessorsReflectLiveServerState(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         RespiteConfig config = RespiteConfig.get();
@@ -105,7 +112,7 @@ public class RespiteApiGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "apiRestCallback", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteApiRestCallback", timeoutTicks = SYNC)
     public void restCallbackFiresOnDawnWakeWithPayload(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);

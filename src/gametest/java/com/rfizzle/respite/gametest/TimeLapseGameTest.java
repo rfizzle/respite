@@ -51,6 +51,19 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  */
 public class TimeLapseGameTest implements FabricGameTest {
 
+    // Timeout budgets. A bare number never says why this test needs longer than
+    // the default, and a literal repeated across a suite is one edit per method
+    // when the timing changes.
+    /** The lapse spinning up and the accelerated ticks becoming observable. */
+    private static final int LAPSE_START = 300;
+    /** A rate edge crossing plus the announce/callback that rides on it. */
+    private static final int RATE_EDGE = 400;
+    /** The peril brake clamping and then releasing after its hold window. */
+    private static final int PERIL_WINDOW = 600;
+    /** A deep sleep long enough that vanilla's own night skip would have fired. */
+    private static final int DEEP_SLEEP = 900;
+
+
     private static final BlockPos BED_HEAD = new BlockPos(1, 2, 1);
     private static final BlockPos BED_FOOT = new BlockPos(1, 2, 2);
     private static final long NIGHT_START = 13000L;
@@ -168,7 +181,7 @@ public class TimeLapseGameTest implements FabricGameTest {
         return true;
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "timeLapseAccelerates", timeoutTicks = 300)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteTimeLapseAccelerates", timeoutTicks = LAPSE_START)
     public void sleeperAcceleratesTheNightContinuously(GameTestHelper helper) {
         ServerLevel overworld = helper.getLevel();
         int savedRate = setUpNight(helper);
@@ -222,7 +235,7 @@ public class TimeLapseGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "timeLapseSuppression", timeoutTicks = 900)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteTimeLapseSuppression", timeoutTicks = DEEP_SLEEP)
     public void vanillaSkipStaysSuppressedThroughDeepSleep(GameTestHelper helper) {
         ServerLevel overworld = helper.getLevel();
         int savedRate = setUpNight(helper);
@@ -270,7 +283,7 @@ public class TimeLapseGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "timeLapseGovernor", timeoutTicks = 300)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteTimeLapseGovernor", timeoutTicks = LAPSE_START)
     public void tinyBudgetStarvesTheRateAndSleeperRemovalSettles(GameTestHelper helper) {
         int savedRate = setUpNight(helper);
         ServerPlayer sleeper = MockPlayers.serverPlayerInLevel(helper);
@@ -321,7 +334,7 @@ public class TimeLapseGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "timeLapsePeril", timeoutTicks = 600)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteTimeLapsePeril", timeoutTicks = PERIL_WINDOW)
     public void perilBrakeClampsAndReleasesAfterTheWindow(GameTestHelper helper) {
         int savedRate = setUpNight(helper);
         ServerPlayer sleeper = MockPlayers.serverPlayerInLevel(helper);
@@ -377,7 +390,7 @@ public class TimeLapseGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "timeLapseTimers", timeoutTicks = 400)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteTimeLapseTimers", timeoutTicks = RATE_EDGE)
     public void awakeBodyTimersHoldWhileSleepersAdvance(GameTestHelper helper) {
         int savedRate = setUpNight(helper);
         // Isolate §1's body-timer split: Restful Saturation (§2) freezes a
@@ -449,7 +462,7 @@ public class TimeLapseGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "timeLapseDisabled", timeoutTicks = 300)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteTimeLapseDisabled", timeoutTicks = LAPSE_START)
     public void disabledConfigRestoresTheVanillaSkip(GameTestHelper helper) {
         ServerLevel overworld = helper.getLevel();
         MockPlayers.retireLeaked(helper);
@@ -500,7 +513,7 @@ public class TimeLapseGameTest implements FabricGameTest {
      * mock's fallback channel; waking the sleeper settles the rate, firing the
      * end edge (→ 1) and the settle line.
      */
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "timeLapseNotifier", timeoutTicks = 400)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteTimeLapseNotifier", timeoutTicks = RATE_EDGE)
     public void notifierAndCallbackReportRateEdges(GameTestHelper helper) {
         int savedRate = setUpNight(helper);
         boolean savedAnnounce = RespiteConfig.get().announceTimeLapse;
@@ -564,7 +577,7 @@ public class TimeLapseGameTest implements FabricGameTest {
      * with it off, a genuine lapse fires the public callback exactly as before
      * but sends no action-bar line to any client.
      */
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "timeLapseNotifierGate", timeoutTicks = 400)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteTimeLapseNotifierGate", timeoutTicks = RATE_EDGE)
     public void announceToggleOffKeepsTheCallbackButSuppressesTheLine(GameTestHelper helper) {
         int savedRate = setUpNight(helper);
         boolean savedAnnounce = RespiteConfig.get().announceTimeLapse;

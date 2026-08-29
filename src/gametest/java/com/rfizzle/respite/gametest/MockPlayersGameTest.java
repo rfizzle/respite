@@ -1,5 +1,6 @@
-package com.rfizzle.respite.gametest.util;
+package com.rfizzle.respite.gametest;
 
+import com.rfizzle.respite.gametest.util.MockPlayers;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
@@ -15,9 +16,10 @@ import net.minecraft.stats.Stats;
 public class MockPlayersGameTest implements FabricGameTest {
 
     /** Every assertion here is synchronous — the budget only covers server spin-up. */
-    private static final int TIMEOUT = 100;
+    private static final int SYNC = 100;
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteMockPlayerReplica",
+            timeoutTicks = SYNC)
     public void connectedReplicaIsFaithful(GameTestHelper helper) {
         ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         try {
@@ -44,7 +46,7 @@ public class MockPlayersGameTest implements FabricGameTest {
      * and must not move on the second.
      */
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteMockPlayerRetireIdempotent",
-            timeoutTicks = TIMEOUT)
+            timeoutTicks = SYNC)
     public void retireIsIdempotent(GameTestHelper helper) {
         ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
 
@@ -74,7 +76,7 @@ public class MockPlayersGameTest implements FabricGameTest {
      * passes as {@code true}.
      */
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteMockPlayerRetireWakes",
-            timeoutTicks = TIMEOUT)
+            timeoutTicks = SYNC)
     public void retireWakesASleepingMock(GameTestHelper helper) {
         ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
         BlockPos bed = player.blockPosition();
@@ -95,7 +97,7 @@ public class MockPlayersGameTest implements FabricGameTest {
      * tested into the same level.
      */
     @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteMockPlayerLeakSweep",
-            timeoutTicks = TIMEOUT)
+            timeoutTicks = SYNC)
     public void retireLeakedClaimsOnlyThisModsMocks(GameTestHelper helper) {
         helper.assertTrue(MockPlayers.MOCK_NAME.startsWith("respite"),
                 "the mock profile name must be mod-scoped, was " + MockPlayers.MOCK_NAME);

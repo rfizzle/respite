@@ -49,6 +49,13 @@ import java.util.Optional;
  */
 public class CaffeinatedBrewGameTest implements FabricGameTest {
 
+    // Timeout budgets. A bare number never says why this test needs longer than
+    // the default, and a literal repeated across a suite is one edit per method
+    // when the timing changes.
+    /** Every assertion is synchronous; the budget only covers server spin-up. */
+    private static final int SYNC = 100;
+
+
     private static final BlockPos CAMPFIRE = new BlockPos(1, 2, 1);
 
     private static ItemStack waterBottle() {
@@ -77,7 +84,7 @@ public class CaffeinatedBrewGameTest implements FabricGameTest {
 
     // --- Recipes -----------------------------------------------------------
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "brewCrafting", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBrewCrafting", timeoutTicks = SYNC)
     public void shapelessRecipeAssemblesTheUnsteepedBrew(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         CraftingInput input = CraftingInput.of(2, 2, List.of(
@@ -98,7 +105,7 @@ public class CaffeinatedBrewGameTest implements FabricGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "brewSteeping", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBrewSteeping", timeoutTicks = SYNC)
     public void litCampfireSteepsUnsteepedIntoCaffeinatedInSixHundredTicks(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(CAMPFIRE, Blocks.CAMPFIRE.defaultBlockState().setValue(CampfireBlock.LIT, true));
@@ -131,7 +138,7 @@ public class CaffeinatedBrewGameTest implements FabricGameTest {
 
     // --- Drinking ----------------------------------------------------------
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "brewDrinkExhausted", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBrewDrinkExhausted", timeoutTicks = SYNC)
     public void drinkingClearsExhaustedResetsRestGrantsHasteAndReturnsABottle(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         RespiteConfig config = RespiteConfig.get();
@@ -166,7 +173,7 @@ public class CaffeinatedBrewGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "brewFullInventory", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBrewFullInventory", timeoutTicks = SYNC)
     public void aFullInventoryDropsTheReturnedBottleRatherThanLosingIt(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
@@ -191,7 +198,7 @@ public class CaffeinatedBrewGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "brewDrinkWeary", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBrewDrinkWeary", timeoutTicks = SYNC)
     public void drinkingClearsWeary(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         RespiteConfig config = RespiteConfig.get();
@@ -212,7 +219,7 @@ public class CaffeinatedBrewGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "brewPreventive", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBrewPreventive", timeoutTicks = SYNC)
     public void drinkingWhileRestedStillResetsTheClock(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         RespiteConfig config = RespiteConfig.get();
@@ -234,7 +241,7 @@ public class CaffeinatedBrewGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "brewHasteStronger", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBrewHasteStronger", timeoutTicks = SYNC)
     public void strongerBeaconHasteSurvivesTheBrew(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
@@ -253,7 +260,7 @@ public class CaffeinatedBrewGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "brewHasteEqual", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBrewHasteEqual", timeoutTicks = SYNC)
     public void equalHasteTakesTheLongerDurationNeverEscalates(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
@@ -275,7 +282,7 @@ public class CaffeinatedBrewGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "brewDisabled", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBrewDisabled", timeoutTicks = SYNC)
     public void brewStillDrinksWithTheFeatureDisabled(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         RespiteConfig config = RespiteConfig.get();

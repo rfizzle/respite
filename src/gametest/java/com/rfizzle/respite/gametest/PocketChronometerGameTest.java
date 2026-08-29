@@ -24,6 +24,15 @@ import net.minecraft.world.item.ItemStack;
  */
 public class PocketChronometerGameTest implements FabricGameTest {
 
+    // Timeout budgets. A bare number never says why this test needs longer than
+    // the default, and a literal repeated across a suite is one edit per method
+    // when the timing changes.
+    /** Synchronous recipe and lang assertions; the budget only covers server spin-up. */
+    private static final int SYNC = 100;
+    /** One carry-refresh cycle of the item's stored reading. */
+    private static final int REFRESH = 200;
+
+
     private static void setTimeSinceRest(ServerPlayer player, long ticks) {
         player.getStats().setValue(player, Stats.CUSTOM.get(Stats.TIME_SINCE_REST), (int) ticks);
     }
@@ -32,7 +41,7 @@ public class PocketChronometerGameTest implements FabricGameTest {
         return stack.getOrDefault(RespiteRegistry.AWAKE_TICKS, 0);
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "pocketChronometerRecipe", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respitePocketChronometerRecipe", timeoutTicks = SYNC)
     public void recipeAndUnlockAdvancementShipUnderDefaultConfig(GameTestHelper helper) {
         var server = helper.getLevel().getServer();
         helper.assertTrue(server.getRecipeManager().byKey(Respite.id("pocket_chronometer")).isPresent(),
@@ -42,7 +51,7 @@ public class PocketChronometerGameTest implements FabricGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "pocketChronometerCarry", timeoutTicks = 200)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respitePocketChronometerCarry", timeoutTicks = REFRESH)
     public void refreshCarriesDaysAwakeAndHoldsWithinATenth(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         ServerPlayer player = MockPlayers.serverPlayerInLevel(helper);
