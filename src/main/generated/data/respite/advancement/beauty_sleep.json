@@ -1,0 +1,27 @@
+{
+  "parent": "respite:root",
+  "criteria": {
+    "beauty_sleep": {
+      "trigger": "respite:beauty_sleep"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.respite.beauty_sleep.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:golden_apple"
+    },
+    "title": {
+      "translate": "advancements.respite.beauty_sleep.title"
+    }
+  },
+  "requirements": [
+    [
+      "beauty_sleep"
+    ]
+  ]
+}

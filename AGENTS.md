@@ -38,6 +38,8 @@ in the local workspace. Normative for this repo:
 ./gradlew runGametest    # Fabric gametests (headless server)
 ./gradlew runClient      # launch dev client
 ./gradlew runServer      # launch dev server
+./gradlew runDatagen     # regenerate src/main/generated
+./gradlew verifyDatagenIdempotent  # runDatagen + assert the generated tree is clean
 ./gradlew genSources     # decompile MC sources for IDE nav
 ```
 
@@ -61,6 +63,18 @@ Loom's `splitEnvironmentSourceSets()` is enabled — three source sets:
 JUnit tests go in the standard `src/test/java` directory. The test classpath
 includes `fabric-loader-junit` but excludes `fabric-api` — tests that need
 Fabric APIs must use gametests instead.
+
+Resources come from two `main` roots, both processed into the jar and onto the
+test classpath as one merged tree:
+
+| Root | Holds |
+|---|---|
+| `src/main/resources` | Hand-authored: manifest, mixin config, lang, textures, sounds, and the one model datagen cannot express (`models/block/bedroll.json` — a custom `elements` box) |
+| `src/main/generated` | Datagen output: recipes, advancements, block loot tables, blockstates, item and Chronometer block models. **Never hand-edit** — `./gradlew runDatagen` overwrites it, and `verifyDatagenIdempotent` fails the build if the committed tree drifts from what the providers emit |
+
+The providers live in `src/main/java/com/rfizzle/respite/data/`, wired through
+the `fabric-datagen` entrypoint in `fabric.mod.json`. Change a recipe or an
+advancement there, not in the JSON — then re-run datagen and commit the result.
 
 ## Key conventions
 

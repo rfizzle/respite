@@ -10,6 +10,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * The one loader every {@code *ResourceContractTest} reads shipped resources
@@ -26,15 +27,20 @@ import java.nio.file.Path;
  *
  * <p>The path fallback exists for IDE runners that launch without the processed
  * resources directory on the classpath. It is a fallback, never the primary read
- * — which is why every method reaches for {@code getResource*} first.
+ * — which is why every method reaches for {@code getResource*} first. It searches
+ * both {@code main} resource roots in {@code build.gradle} source-set order:
+ * hand-authored {@code src/main/resources} and datagen's {@code src/main/generated}.
+ * {@code processResources} merges the two into one {@code build/resources/main}
+ * tree, so the classpath read cannot tell them apart and neither should this.
  *
  * <p>Paths are classpath paths, leading slash included:
  * {@code /assets/respite/lang/en_us.json}.
  */
 public final class ShippedResources {
 
-    /** Where the fallback reads from when the classpath has no copy. */
-    private static final Path SOURCE_ROOT = Path.of("src/main/resources");
+    /** Where the fallback reads from when the classpath has no copy, in source-set order. */
+    private static final List<Path> SOURCE_ROOTS =
+            List.of(Path.of("src/main/resources"), Path.of("src/main/generated"));
 
     private ShippedResources() {
     }
@@ -62,7 +68,17 @@ public final class ShippedResources {
         return url != null || Files.exists(fallback(resource));
     }
 
+    /**
+     * The first source root that holds the resource, or the first root — so a
+     * genuinely absent resource still reports a path in its failure rather than
+     * an empty Optional.
+     */
     private static Path fallback(String resource) {
-        return SOURCE_ROOT.resolve(resource.startsWith("/") ? resource.substring(1) : resource);
+        String relative = resource.startsWith("/") ? resource.substring(1) : resource;
+        return SOURCE_ROOTS.stream()
+                .map(root -> root.resolve(relative))
+                .filter(Files::exists)
+                .findFirst()
+                .orElseGet(() -> SOURCE_ROOTS.get(0).resolve(relative));
     }
 }

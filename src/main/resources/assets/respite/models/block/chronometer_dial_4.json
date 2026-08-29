@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/cube_column",
-  "textures": {
-    "end": "respite:block/chronometer_top",
-    "side": "respite:block/chronometer_dial_4"
-  }
-}

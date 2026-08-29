@@ -16,6 +16,7 @@
     "entrypoints": {
         "main": ["com.rfizzle.respite.Respite"],
         "client": ["com.rfizzle.respite.client.RespiteClient"],
+        "fabric-datagen": ["com.rfizzle.respite.data.RespiteDataGenerator"],
         "modmenu": ["com.rfizzle.respite.compat.modmenu.ModMenuIntegration"],
         "jade": ["com.rfizzle.respite.compat.jade.RespiteJadePlugin"]
     },
