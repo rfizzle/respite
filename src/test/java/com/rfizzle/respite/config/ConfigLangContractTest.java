@@ -1,14 +1,12 @@
 // Tier: 1 (pure JUnit)
 package com.rfizzle.respite.config;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.rfizzle.respite.resources.ShippedResources;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -26,12 +24,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ConfigLangContractTest {
 
-    private static final Path LANG =
+    /** Classpath path — read through the classpath-first loader so a lang edit reruns this task. */
+    private static final String LANG = "/assets/respite/lang/en_us.json";
+
+    /** The source path, asserted about directly by {@link #langFileShipsOnTheMainResourcePath}. */
+    private static final Path LANG_SOURCE =
             Path.of("src/main/resources/assets/respite/lang/en_us.json");
 
-    private static JsonObject loadLang() throws IOException {
-        String json = Files.readString(LANG, StandardCharsets.UTF_8);
-        return new Gson().fromJson(json, JsonObject.class);
+    private static JsonObject loadLang() {
+        return ShippedResources.json(LANG);
     }
 
     /** Config fields the screen exposes — every public instance field except the schema version. */
@@ -46,7 +47,7 @@ class ConfigLangContractTest {
     }
 
     @Test
-    void everyConfigFieldHasALabelAndTooltip() throws IOException {
+    void everyConfigFieldHasALabelAndTooltip() {
         JsonObject lang = loadLang();
         List<String> missing = new ArrayList<>();
         for (String key : configKeys()) {
@@ -58,7 +59,7 @@ class ConfigLangContractTest {
     }
 
     @Test
-    void everyConfigLabelPointsAtARealField() throws IOException {
+    void everyConfigLabelPointsAtARealField() {
         JsonObject lang = loadLang();
         List<String> fields = configKeys();
         List<String> orphaned = new ArrayList<>();
@@ -73,7 +74,7 @@ class ConfigLangContractTest {
     }
 
     @Test
-    void noLabelOrTooltipIsBlank() throws IOException {
+    void noLabelOrTooltipIsBlank() {
         JsonObject lang = loadLang();
         List<String> blank = new ArrayList<>();
         for (Map.Entry<String, ?> e : lang.entrySet()) {
@@ -88,7 +89,8 @@ class ConfigLangContractTest {
 
     @Test
     void langFileShipsOnTheMainResourcePath() {
-        assertTrue(Files.exists(LANG), "en_us.json must live in src/main/resources so it ships in the jar");
+        assertTrue(Files.exists(LANG_SOURCE),
+                "en_us.json must live in src/main/resources so it ships in the jar");
         assertFalse(Files.exists(Path.of("src/client/resources/assets/respite/lang/en_us.json")),
                 "lang must not fork into the client resource root");
     }

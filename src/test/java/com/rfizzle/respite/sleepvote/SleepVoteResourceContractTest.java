@@ -1,14 +1,11 @@
 // Tier: 1 (pure JUnit)
 package com.rfizzle.respite.sleepvote;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.rfizzle.respite.resources.ShippedResources;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,13 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SleepVoteResourceContractTest {
 
-    private static final Path LANG = Path.of("src/main/resources/assets/respite/lang/en_us.json");
-
-    private static final Gson GSON = new Gson();
+    private static final String LANG = "/assets/respite/lang/en_us.json";
 
     @Test
     void everyChatKeyExistsWithItsArgCount() throws IOException {
-        JsonObject lang = GSON.fromJson(Files.readString(LANG, StandardCharsets.UTF_8), JsonObject.class);
+        JsonObject lang = ShippedResources.json(LANG);
         List<String> problems = new ArrayList<>();
         // key → %s count SleepVoteLines passes to Component.translatable
         String[][] expectations = {

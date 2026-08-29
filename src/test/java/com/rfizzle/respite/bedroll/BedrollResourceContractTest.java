@@ -1,14 +1,11 @@
 // Tier: 1 (pure JUnit)
 package com.rfizzle.respite.bedroll;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.rfizzle.respite.resources.ShippedResources;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,12 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class BedrollResourceContractTest {
 
-    private static final Path RESOURCES = Path.of("src/main/resources");
-    private static final Path LANG = RESOURCES.resolve("assets/respite/lang/en_us.json");
-    private static final Gson GSON = new Gson();
+    /** Classpath root of the shipped resources — see {@link ShippedResources}. */
+    private static final String RESOURCES = "/";
+    private static final String LANG = RESOURCES + ("assets/respite/lang/en_us.json");
 
-    private static JsonObject load(Path path) throws IOException {
-        return GSON.fromJson(Files.readString(path, StandardCharsets.UTF_8), JsonObject.class);
+    private static JsonObject load(String path) {
+        return ShippedResources.json(path);
     }
 
     @Test
@@ -51,7 +48,7 @@ class BedrollResourceContractTest {
 
     @Test
     void recipeIsStringOverWoolAndFeatureGated() throws IOException {
-        JsonObject recipe = load(RESOURCES.resolve("data/respite/recipe/bedroll.json"));
+        JsonObject recipe = load(RESOURCES + ("data/respite/recipe/bedroll.json"));
         assertConditionGated(recipe, "recipe");
         assertEquals("minecraft:crafting_shaped", recipe.get("type").getAsString());
         var pattern = recipe.getAsJsonArray("pattern");
@@ -70,7 +67,7 @@ class BedrollResourceContractTest {
     @Test
     void recipeUnlockAdvancementCarriesTheSameFeatureGate() throws IOException {
         JsonObject advancement =
-                load(RESOURCES.resolve("data/respite/advancement/recipes/misc/bedroll.json"));
+                load(RESOURCES + ("data/respite/advancement/recipes/misc/bedroll.json"));
         assertConditionGated(advancement, "unlock advancement");
         assertEquals("respite:bedroll",
                 advancement.getAsJsonObject("rewards").getAsJsonArray("recipes").get(0).getAsString(),
@@ -79,7 +76,7 @@ class BedrollResourceContractTest {
 
     @Test
     void lootTableDropsItself() throws IOException {
-        JsonObject loot = load(RESOURCES.resolve("data/respite/loot_table/blocks/bedroll.json"));
+        JsonObject loot = load(RESOURCES + ("data/respite/loot_table/blocks/bedroll.json"));
         String dropped = loot.getAsJsonArray("pools").get(0).getAsJsonObject()
                 .getAsJsonArray("entries").get(0).getAsJsonObject()
                 .get("name").getAsString();
@@ -88,7 +85,7 @@ class BedrollResourceContractTest {
 
     @Test
     void blockstateMapsEveryFacingToTheBedrollModelWithTexturesPresent() throws IOException {
-        JsonObject variants = load(RESOURCES.resolve("assets/respite/blockstates/bedroll.json"))
+        JsonObject variants = load(RESOURCES + ("assets/respite/blockstates/bedroll.json"))
                 .getAsJsonObject("variants");
         List<String> problems = new ArrayList<>();
         for (String facing : List.of("north", "east", "south", "west")) {
@@ -102,7 +99,7 @@ class BedrollResourceContractTest {
         }
         assertEquals(4, variants.size(), "exactly the four facing variants");
 
-        JsonObject textures = load(RESOURCES.resolve("assets/respite/models/block/bedroll.json"))
+        JsonObject textures = load(RESOURCES + ("assets/respite/models/block/bedroll.json"))
                 .getAsJsonObject("textures");
         for (String slot : textures.keySet()) {
             String texture = textures.get(slot).getAsString();
@@ -110,9 +107,9 @@ class BedrollResourceContractTest {
                 problems.add("model texture slot '" + slot + "' points outside the bedroll set: " + texture);
                 continue;
             }
-            Path texturePath = RESOURCES.resolve(
+            String texturePath = RESOURCES + (
                     "assets/respite/textures/block/" + texture.substring("respite:block/".length()) + ".png");
-            if (!Files.exists(texturePath)) {
+            if (!ShippedResources.exists(texturePath)) {
                 problems.add("model references missing texture " + texture);
             }
         }
@@ -121,14 +118,14 @@ class BedrollResourceContractTest {
 
     @Test
     void itemModelIsAFlatIconWithItsTexturePresent() throws IOException {
-        Path itemModel = RESOURCES.resolve("assets/respite/models/item/bedroll.json");
-        assertTrue(Files.exists(itemModel), "the item needs an item model");
+        String itemModel = RESOURCES + ("assets/respite/models/item/bedroll.json");
+        assertTrue(ShippedResources.exists(itemModel), "the item needs an item model");
         JsonObject model = load(itemModel);
         assertEquals("minecraft:item/generated", model.get("parent").getAsString());
         String layer0 = model.getAsJsonObject("textures").get("layer0").getAsString();
         assertEquals("respite:item/bedroll", layer0);
-        Path texture = RESOURCES.resolve("assets/respite/textures/item/bedroll.png");
-        assertTrue(Files.exists(texture), "the item texture must ship: " + texture);
+        String texture = RESOURCES + ("assets/respite/textures/item/bedroll.png");
+        assertTrue(ShippedResources.exists(texture), "the item texture must ship: " + texture);
     }
 
     /** Both datapack entries must gate on {@code respite:feature_enabled} for the bedroll. */

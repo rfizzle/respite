@@ -1,14 +1,11 @@
 // Tier: 1 (pure JUnit)
 package com.rfizzle.respite.weariness;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.rfizzle.respite.resources.ShippedResources;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,14 +19,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class WearinessResourceContractTest {
 
-    private static final Path RESOURCES = Path.of("src/main/resources");
-    private static final Path LANG = RESOURCES.resolve("assets/respite/lang/en_us.json");
-    private static final Path ICONS = RESOURCES.resolve("assets/respite/textures/mob_effect");
+    /** Classpath root of the shipped resources — see {@link ShippedResources}. */
+    private static final String RESOURCES = "/";
+    private static final String LANG = RESOURCES + ("assets/respite/lang/en_us.json");
+    private static final String ICONS = RESOURCES + ("assets/respite/textures/mob_effect");
 
     @Test
     void bothEffectsHaveANonBlankName() throws IOException {
-        JsonObject lang = new Gson().fromJson(
-                Files.readString(LANG, StandardCharsets.UTF_8), JsonObject.class);
+        JsonObject lang = ShippedResources.json(LANG);
         List<String> problems = new ArrayList<>();
         for (String key : new String[] {"effect.respite.weary", "effect.respite.exhausted"}) {
             if (!lang.has(key) || lang.get(key).getAsString().trim().isEmpty()) {
@@ -43,7 +40,7 @@ class WearinessResourceContractTest {
     void bothEffectsHaveAnIconOnDisk() {
         List<String> problems = new ArrayList<>();
         for (String icon : new String[] {"weary.png", "exhausted.png"}) {
-            if (!Files.exists(ICONS.resolve(icon))) {
+            if (!ShippedResources.exists(ICONS + ("/" + icon))) {
                 problems.add("missing mob_effect texture " + icon);
             }
         }

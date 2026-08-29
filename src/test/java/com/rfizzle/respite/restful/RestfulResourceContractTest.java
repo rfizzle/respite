@@ -1,14 +1,11 @@
 // Tier: 1 (pure JUnit)
 package com.rfizzle.respite.restful;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.rfizzle.respite.resources.ShippedResources;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,12 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class RestfulResourceContractTest {
 
-    private static final Path LANG = Path.of("src/main/resources/assets/respite/lang/en_us.json");
+    private static final String LANG = "/assets/respite/lang/en_us.json";
 
     @Test
     void bothWakeLinesExistAsMarkedZeroArgNotifications() throws IOException {
-        JsonObject lang = new Gson().fromJson(
-                Files.readString(LANG, StandardCharsets.UTF_8), JsonObject.class);
+        JsonObject lang = ShippedResources.json(LANG);
         List<String> problems = new ArrayList<>();
         for (String key : new String[] {
                 "notification.respite.rested",

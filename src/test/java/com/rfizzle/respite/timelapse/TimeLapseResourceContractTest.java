@@ -1,12 +1,11 @@
 // Tier: 1 (pure JUnit)
 package com.rfizzle.respite.timelapse;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.rfizzle.respite.resources.ShippedResources;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -23,14 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class TimeLapseResourceContractTest {
 
-    private static final Path RESOURCES = Path.of("src/main/resources");
-    private static final Path LANG = RESOURCES.resolve("assets/respite/lang/en_us.json");
-    private static final Path SOUNDS = RESOURCES.resolve("assets/respite/sounds.json");
+    /** Classpath root of the shipped resources — see {@link ShippedResources}. */
+    private static final String RESOURCES = "/";
+    private static final String LANG = RESOURCES + ("assets/respite/lang/en_us.json");
+    private static final String SOUNDS = RESOURCES + ("assets/respite/sounds.json");
 
-    private static final Gson GSON = new Gson();
-
-    private static JsonObject load(Path path) throws IOException {
-        return GSON.fromJson(Files.readString(path, StandardCharsets.UTF_8), JsonObject.class);
+    private static JsonObject load(String path) {
+        return ShippedResources.json(path);
     }
 
     @Test
@@ -79,9 +77,9 @@ class TimeLapseResourceContractTest {
             }
             for (var sound : entry.getAsJsonArray("sounds")) {
                 String name = sound.getAsString();
-                Path ogg = RESOURCES.resolve("assets/respite/sounds/"
+                String ogg = RESOURCES + ("assets/respite/sounds/"
                         + name.substring("respite:".length()) + ".ogg");
-                if (!Files.exists(ogg)) {
+                if (!ShippedResources.exists(ogg)) {
                     problems.add(event + " references " + name + " but " + ogg + " does not exist");
                 }
             }

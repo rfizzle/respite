@@ -1,14 +1,11 @@
 // Tier: 1 (pure JUnit)
 package com.rfizzle.respite.advancement;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.rfizzle.respite.resources.ShippedResources;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,9 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class AdvancementResourceContractTest {
 
-    private static final Path ADVANCEMENTS = Path.of("src/main/resources/data/respite/advancement");
-    private static final Path LANG = Path.of("src/main/resources/assets/respite/lang/en_us.json");
-    private static final Gson GSON = new Gson();
+    private static final String ADVANCEMENTS = "/data/respite/advancement";
+    private static final String LANG = "/assets/respite/lang/en_us.json";
 
     private static final String[] IDS = {
             "root", "beauty_sleep", "night_shift", "mountain_watch", "clockwork", "dark_and_dreamless",
@@ -33,15 +29,15 @@ class AdvancementResourceContractTest {
 
     @Test
     void everyAdvancementParsesAndWiresItsLangKeys() throws IOException {
-        JsonObject lang = GSON.fromJson(Files.readString(LANG, StandardCharsets.UTF_8), JsonObject.class);
+        JsonObject lang = ShippedResources.json(LANG);
         List<String> problems = new ArrayList<>();
         for (String id : IDS) {
-            Path file = ADVANCEMENTS.resolve(id + ".json");
-            if (!Files.exists(file)) {
+            String file = ADVANCEMENTS + ("/" + id + ".json");
+            if (!ShippedResources.exists(file)) {
                 problems.add("missing advancement file " + id + ".json");
                 continue;
             }
-            JsonObject advancement = GSON.fromJson(Files.readString(file, StandardCharsets.UTF_8), JsonObject.class);
+            JsonObject advancement = ShippedResources.json(file);
             if (advancement == null || !advancement.has("display")) {
                 problems.add(id + " has no display block");
                 continue;

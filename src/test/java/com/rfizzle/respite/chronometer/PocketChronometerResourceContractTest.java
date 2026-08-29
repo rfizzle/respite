@@ -1,14 +1,11 @@
 // Tier: 1 (pure JUnit)
 package com.rfizzle.respite.chronometer;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.rfizzle.respite.resources.ShippedResources;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,13 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class PocketChronometerResourceContractTest {
 
-    private static final Path RESOURCES = Path.of("src/main/resources");
-    private static final Path LANG = RESOURCES.resolve("assets/respite/lang/en_us.json");
+    /** Classpath root of the shipped resources — see {@link ShippedResources}. */
+    private static final String RESOURCES = "/";
+    private static final String LANG = RESOURCES + ("assets/respite/lang/en_us.json");
 
-    private static final Gson GSON = new Gson();
-
-    private static JsonObject load(Path path) throws IOException {
-        return GSON.fromJson(Files.readString(path, StandardCharsets.UTF_8), JsonObject.class);
+    private static JsonObject load(String path) {
+        return ShippedResources.json(path);
     }
 
     @Test
@@ -67,21 +63,21 @@ class PocketChronometerResourceContractTest {
 
     @Test
     void itemModelIsAFlatIconWithItsTexturePresent() throws IOException {
-        Path model = RESOURCES.resolve("assets/respite/models/item/pocket_chronometer.json");
-        assertTrue(Files.exists(model), "the pocket chronometer needs an item model");
+        String model = RESOURCES + ("assets/respite/models/item/pocket_chronometer.json");
+        assertTrue(ShippedResources.exists(model), "the pocket chronometer needs an item model");
         JsonObject json = load(model);
         assertEquals("minecraft:item/generated", json.get("parent").getAsString(),
                 "a carried timepiece is a flat generated icon, not a block model");
         String layer0 = json.getAsJsonObject("textures").get("layer0").getAsString();
         assertEquals("respite:item/pocket_chronometer", layer0);
-        Path texture = RESOURCES.resolve(
+        String texture = RESOURCES + (
                 "assets/respite/textures/item/" + layer0.substring("respite:item/".length()) + ".png");
-        assertTrue(Files.exists(texture), "layer0 texture must ship: " + texture);
+        assertTrue(ShippedResources.exists(texture), "layer0 texture must ship: " + texture);
     }
 
     @Test
     void recipeIsTheCopperFramedClockAndCarriesTheFeatureGate() throws IOException {
-        JsonObject recipe = load(RESOURCES.resolve("data/respite/recipe/pocket_chronometer.json"));
+        JsonObject recipe = load(RESOURCES + ("data/respite/recipe/pocket_chronometer.json"));
         assertConditionGated(recipe, "recipe");
         assertEquals("minecraft:crafting_shaped", recipe.get("type").getAsString());
         var pattern = recipe.getAsJsonArray("pattern");
@@ -99,7 +95,7 @@ class PocketChronometerResourceContractTest {
     @Test
     void recipeUnlockAdvancementCarriesTheSameFeatureGate() throws IOException {
         JsonObject advancement =
-                load(RESOURCES.resolve("data/respite/advancement/recipes/misc/pocket_chronometer.json"));
+                load(RESOURCES + ("data/respite/advancement/recipes/misc/pocket_chronometer.json"));
         assertConditionGated(advancement, "unlock advancement");
         assertEquals("respite:pocket_chronometer",
                 advancement.getAsJsonObject("rewards").getAsJsonArray("recipes").get(0).getAsString(),
