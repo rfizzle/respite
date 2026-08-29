@@ -1,14 +1,11 @@
 // Tier: 1 (pure JUnit)
 package com.rfizzle.respite.chronometer;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.rfizzle.respite.resources.ShippedResources;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,14 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ChronometerResourceContractTest {
 
-    private static final Path RESOURCES = Path.of("src/main/resources");
-    private static final Path LANG = RESOURCES.resolve("assets/respite/lang/en_us.json");
-    private static final Path BLOCKSTATE = RESOURCES.resolve("assets/respite/blockstates/chronometer.json");
+    /** Classpath root of the shipped resources — see {@link ShippedResources}. */
+    private static final String RESOURCES = "/";
+    private static final String LANG = RESOURCES + ("assets/respite/lang/en_us.json");
+    private static final String BLOCKSTATE = RESOURCES + ("assets/respite/blockstates/chronometer.json");
 
-    private static final Gson GSON = new Gson();
-
-    private static JsonObject load(Path path) throws IOException {
-        return GSON.fromJson(Files.readString(path, StandardCharsets.UTF_8), JsonObject.class);
+    private static JsonObject load(String path) {
+        return ShippedResources.json(path);
     }
 
     @Test
@@ -111,9 +107,9 @@ class ChronometerResourceContractTest {
         List<String> problems = new ArrayList<>();
         for (String variant : variants.keySet()) {
             String model = variants.getAsJsonObject(variant).get("model").getAsString();
-            Path modelPath = RESOURCES.resolve(
+            String modelPath = RESOURCES + (
                     "assets/respite/models/block/" + model.substring("respite:block/".length()) + ".json");
-            if (!Files.exists(modelPath)) {
+            if (!ShippedResources.exists(modelPath)) {
                 problems.add(variant + " references missing model " + model);
                 continue;
             }
@@ -124,9 +120,9 @@ class ChronometerResourceContractTest {
                     problems.add(model + " texture slot '" + slot + "' points outside the chronometer set: " + texture);
                     continue;
                 }
-                Path texturePath = RESOURCES.resolve(
+                String texturePath = RESOURCES + (
                         "assets/respite/textures/block/" + texture.substring("respite:block/".length()) + ".png");
-                if (!Files.exists(texturePath)) {
+                if (!ShippedResources.exists(texturePath)) {
                     problems.add(model + " references missing texture " + texture);
                 }
             }
@@ -136,7 +132,7 @@ class ChronometerResourceContractTest {
 
     @Test
     void recipeMatchesTheSpecGridAndCarriesTheFeatureGate() throws IOException {
-        JsonObject recipe = load(RESOURCES.resolve("data/respite/recipe/chronometer.json"));
+        JsonObject recipe = load(RESOURCES + ("data/respite/recipe/chronometer.json"));
         assertConditionGated(recipe, "recipe");
         assertEquals("minecraft:crafting_shaped", recipe.get("type").getAsString());
         var pattern = recipe.getAsJsonArray("pattern");
@@ -156,7 +152,7 @@ class ChronometerResourceContractTest {
     @Test
     void recipeUnlockAdvancementCarriesTheSameFeatureGate() throws IOException {
         JsonObject advancement =
-                load(RESOURCES.resolve("data/respite/advancement/recipes/redstone/chronometer.json"));
+                load(RESOURCES + ("data/respite/advancement/recipes/redstone/chronometer.json"));
         assertConditionGated(advancement, "unlock advancement");
         assertEquals("respite:chronometer",
                 advancement.getAsJsonObject("rewards").getAsJsonArray("recipes").get(0).getAsString(),
@@ -173,8 +169,8 @@ class ChronometerResourceContractTest {
 
     @Test
     void itemModelParentsABlockModel() throws IOException {
-        Path itemModel = RESOURCES.resolve("assets/respite/models/item/chronometer.json");
-        assertTrue(Files.exists(itemModel), "the BlockItem needs an item model");
+        String itemModel = RESOURCES + ("assets/respite/models/item/chronometer.json");
+        assertTrue(ShippedResources.exists(itemModel), "the BlockItem needs an item model");
         String parent = load(itemModel).get("parent").getAsString();
         assertTrue(parent.startsWith("respite:block/chronometer_"),
                 "item model should parent a chronometer block model, got " + parent);

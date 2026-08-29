@@ -1,15 +1,12 @@
 // Tier: 1 (pure JUnit)
 package com.rfizzle.respite.brew;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.rfizzle.respite.resources.ShippedResources;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,13 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class BrewResourceContractTest {
 
-    private static final Path RESOURCES = Path.of("src/main/resources");
-    private static final Path LANG = RESOURCES.resolve("assets/respite/lang/en_us.json");
+    /** Classpath root of the shipped resources — see {@link ShippedResources}. */
+    private static final String RESOURCES = "/";
+    private static final String LANG = RESOURCES + ("assets/respite/lang/en_us.json");
 
-    private static final Gson GSON = new Gson();
-
-    private static JsonObject load(Path path) throws IOException {
-        return GSON.fromJson(Files.readString(path, StandardCharsets.UTF_8), JsonObject.class);
+    private static JsonObject load(String path) {
+        return ShippedResources.json(path);
     }
 
     @Test
@@ -45,21 +41,21 @@ class BrewResourceContractTest {
     @Test
     void bothItemModelsAreFlatAndPointAtAnItemTextureOnDisk() throws IOException {
         for (String name : new String[]{"unsteeped_brew", "caffeinated_brew"}) {
-            Path model = RESOURCES.resolve("assets/respite/models/item/" + name + ".json");
-            assertTrue(Files.exists(model), name + " needs an item model");
+            String model = RESOURCES + ("assets/respite/models/item/" + name + ".json");
+            assertTrue(ShippedResources.exists(model), name + " needs an item model");
             JsonObject json = load(model);
             assertEquals("minecraft:item/generated", json.get("parent").getAsString(),
                     name + " item model must parent the flat 2D item model");
             String layer0 = json.getAsJsonObject("textures").get("layer0").getAsString();
             assertEquals("respite:item/" + name, layer0, name + " layer0 must point at its own texture");
-            Path texture = RESOURCES.resolve("assets/respite/textures/item/" + name + ".png");
-            assertTrue(Files.exists(texture), name + " references missing texture " + layer0);
+            String texture = RESOURCES + ("assets/respite/textures/item/" + name + ".png");
+            assertTrue(ShippedResources.exists(texture), name + " references missing texture " + layer0);
         }
     }
 
     @Test
     void unsteepedRecipeIsAGatedShapelessOfWaterCocoaAndLeaves() throws IOException {
-        JsonObject recipe = load(RESOURCES.resolve("data/respite/recipe/unsteeped_brew.json"));
+        JsonObject recipe = load(RESOURCES + ("data/respite/recipe/unsteeped_brew.json"));
         assertGated(recipe, "unsteeped recipe");
         assertEquals("minecraft:crafting_shapeless", recipe.get("type").getAsString());
 
@@ -94,7 +90,7 @@ class BrewResourceContractTest {
 
     @Test
     void caffeinatedRecipeIsAGatedCampfireCookAt600Ticks() throws IOException {
-        JsonObject recipe = load(RESOURCES.resolve("data/respite/recipe/caffeinated_brew.json"));
+        JsonObject recipe = load(RESOURCES + ("data/respite/recipe/caffeinated_brew.json"));
         assertGated(recipe, "caffeinated recipe");
         assertEquals("minecraft:campfire_cooking", recipe.get("type").getAsString());
         assertEquals("respite:unsteeped_brew", recipe.getAsJsonObject("ingredient").get("item").getAsString());
@@ -106,7 +102,7 @@ class BrewResourceContractTest {
     void bothUnlockAdvancementsCarryTheGateAndRewardTheirRecipe() throws IOException {
         for (String name : new String[]{"unsteeped_brew", "caffeinated_brew"}) {
             JsonObject advancement =
-                    load(RESOURCES.resolve("data/respite/advancement/recipes/misc/" + name + ".json"));
+                    load(RESOURCES + ("data/respite/advancement/recipes/misc/" + name + ".json"));
             assertGated(advancement, name + " unlock advancement");
             assertEquals("respite:" + name,
                     advancement.getAsJsonObject("rewards").getAsJsonArray("recipes").get(0).getAsString(),

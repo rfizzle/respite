@@ -203,6 +203,33 @@ configurations.testRuntimeClasspath {
 test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
+
+    // GametestRegistrationTest reads the gametest source tree, because the gametest
+    // source set is not on the test classpath and its classes cannot be enumerated
+    // from there. Gradle therefore sees no dependency between the two — without this
+    // block the guard reports UP-TO-DATE exactly when registration has drifted, which
+    // is the one moment it exists to fire. The shipped manifest is listed because the
+    // guard's fourth assertion reads it; it also arrives transitively through
+    // processResources, so it is not a live staleness hole, but declaring all three
+    // keeps the block readable as "what this guard reads".
+    //
+    // The cost is that any edit under src/gametest/java invalidates the whole test
+    // task, so the full Tier-1 suite reruns. That is the price of a guard that reads a
+    // source tree Gradle otherwise has no reason to watch. Every other Tier-1 guard
+    // reads its resources off the classpath instead and gets its tracking for free.
+    inputs.files(fileTree('src/gametest/java'),
+                 file('src/gametest/resources/fabric.mod.json'),
+                 file('src/main/resources/fabric.mod.json'))
+            .withPropertyName('gametestRegistration')
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    // The .sfx specs are committed build sources, not shipped resources — art/ is on
+    // no classpath, so TimeLapseResourceContractTest's repeatability check cannot read
+    // them the way every other guard reads its input. Declared for the same reason as
+    // the block above: without it, deleting a .sfx source leaves the check UP-TO-DATE.
+    inputs.files(fileTree('art/audio'))
+            .withPropertyName('committedSfxSources')
+            .withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 jacocoTestReport {
