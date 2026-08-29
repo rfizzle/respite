@@ -44,25 +44,27 @@ class LangResourceContractTest {
     private static final Set<String> REGISTRY_DERIVED = Set.of(
             "block", "item", "entity", "effect", "enchantment", "attribute", "death", "container");
 
-    /** Every §10 surface respite is allowed to author on, registry-derived rows included. */
+    /**
+     * Every §10 surface respite is allowed to author on, registry-derived rows included.
+     *
+     * <p>{@code fragment} is a §10 row in its own right, not an exception: a shared value
+     * fragment — a localized 12-hour clock, a moon-phase name — is nested as a {@code %s}
+     * argument into keys on two surfaces at once ({@code notification.respite.chronometer*}
+     * on the action bar and {@code tooltip.respite.chronometer*} in Jade/WTHIT; see
+     * {@code ChronometerLines}), so it has no surface of its own and any single surface
+     * prefix would be false on the other. Ruled in concord's DESIGN-SYSTEM §10.
+     */
     private static final Set<String> KNOWN_PREFIXES = Set.of(
             "config", "command", "hud", "gui", "tooltip", "message", "notification",
-            "advancements", "info", "key", "stat", "itemGroup", "subtitles",
+            "advancements", "info", "key", "stat", "itemGroup", "subtitles", "fragment",
             "block", "item", "entity", "effect", "enchantment", "attribute", "death", "container");
 
     /**
-     * Off-table prefixes respite ships today, tracked rather than silently
-     * tolerated. {@code time.respite.*} and {@code moon.respite.*} are shared
-     * value fragments — a localized 12-hour clock, a moon-phase name — nested as
-     * {@code %s} arguments into keys on two different surfaces at once
-     * ({@code notification.respite.chronometer*} on the action bar and
-     * {@code tooltip.respite.chronometer*} in Jade/WTHIT; see
-     * {@code ChronometerLines}). §10's vocabulary is one prefix per surface and
-     * has no row for a fragment that is deliberately surface-agnostic, so any
-     * single surface prefix would be false on the other surface. Awaiting a hub
-     * ruling; listed here so a <em>new</em> off-table prefix still fails.
+     * No off-table prefixes remain: {@code time.*} and {@code moon.*} moved to
+     * {@code fragment.respite.*} once §10 gained the row. Kept as an empty set so a
+     * <em>new</em> off-table prefix still fails loudly rather than being quietly added here.
      */
-    private static final Set<String> TRACKED_OFF_TABLE_PREFIXES = Set.of("time", "moon");
+    private static final Set<String> TRACKED_OFF_TABLE_PREFIXES = Set.of();
 
     private static final Pattern SNAKE_SEGMENT = Pattern.compile("[a-z0-9]+(_[a-z0-9]+)*");
     private static final Pattern CAMEL_SEGMENT = Pattern.compile("[a-z][a-zA-Z0-9]*");

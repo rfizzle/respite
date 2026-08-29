@@ -69,13 +69,13 @@ class ChronometerTimeTest {
 
     @ParameterizedTest
     @CsvSource({
-            "0, time.respite.am",       // 6 am
-            "5999, time.respite.am",    // last tick before noon
-            "6000, time.respite.pm",    // noon reads pm
-            "13200, time.respite.pm",   // 7:12 pm
-            "17999, time.respite.pm",   // last tick before midnight
-            "18000, time.respite.am",   // midnight reads am
-            "23999, time.respite.am",   // 5:59 am
+            "0, fragment.respite.time.am",       // 6 am
+            "5999, fragment.respite.time.am",    // last tick before noon
+            "6000, fragment.respite.time.pm",    // noon reads pm
+            "13200, fragment.respite.time.pm",   // 7:12 pm
+            "17999, fragment.respite.time.pm",   // last tick before midnight
+            "18000, fragment.respite.time.am",   // midnight reads am
+            "23999, fragment.respite.time.am",   // 5:59 am
     })
     void meridiemKeyMarksNoon(long dayTime, String expectedKey) {
         assertEquals(expectedKey, ChronometerTime.meridiemKey(dayTime));
@@ -120,7 +120,7 @@ class ChronometerTimeTest {
             "7, waxing_gibbous",
     })
     void moonPhaseKeys(int moonPhase, String suffix) {
-        assertEquals("moon.respite." + suffix, ChronometerTime.moonPhaseKey(moonPhase));
+        assertEquals("fragment.respite.moon." + suffix, ChronometerTime.moonPhaseKey(moonPhase));
     }
 
     @ParameterizedTest
@@ -201,12 +201,12 @@ class ChronometerTimeTest {
 
     @ParameterizedTest
     @CsvSource({
-            "0, 12:00, time.respite.am",    // midnight
-            "6, 6:00, time.respite.am",
-            "11, 11:00, time.respite.am",
-            "12, 12:00, time.respite.pm",   // noon
-            "18, 6:00, time.respite.pm",
-            "23, 11:00, time.respite.pm",
+            "0, 12:00, fragment.respite.time.am",    // midnight
+            "6, 6:00, fragment.respite.time.am",
+            "11, 11:00, fragment.respite.time.am",
+            "12, 12:00, fragment.respite.time.pm",   // noon
+            "18, 6:00, fragment.respite.time.pm",
+            "23, 11:00, fragment.respite.time.pm",
     })
     void wholeHourLabelSplitsNumericAndMeridiem(int hour, String expectedTime, String expectedKey) {
         long boundary = ChronometerTime.alarmBoundary(hour);
