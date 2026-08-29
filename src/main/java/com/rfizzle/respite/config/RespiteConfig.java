@@ -83,8 +83,12 @@ public class RespiteConfig {
     public record IntBound(int min, int max) {
     }
 
-    /** Inclusive [min, max] range for a double config field. */
-    public record DoubleBound(double min, double max) {
+    /**
+     * Inclusive [min, max] range for a double config field, plus the field's
+     * default — the value a non-finite hand-edit is healed to (see
+     * {@link #clampDouble}).
+     */
+    public record DoubleBound(double min, double max, double def) {
     }
 
     /**
@@ -98,16 +102,16 @@ public class RespiteConfig {
         public static final IntBound TIME_LAPSE_TICK_BUDGET_MS = new IntBound(5, 45);
         public static final IntBound IDLE_THRESHOLD_MINUTES = new IntBound(1, 60);
         public static final IntBound RESTFUL_HEAL_INTERVAL_TICKS = new IntBound(100, 2400);
-        public static final DoubleBound NEW_MOON_HEAL_MULTIPLIER = new DoubleBound(1.0, 4.0);
+        public static final DoubleBound NEW_MOON_HEAL_MULTIPLIER = new DoubleBound(1.0, 4.0, 2.0);
         public static final IntBound PHANTOM_ALTITUDE_MIN = new IntBound(-64, 320);
         public static final IntBound WEARINESS_THRESHOLD_DAYS = new IntBound(1, 30);
-        public static final DoubleBound WEARINESS_REGEN_PENALTY = new DoubleBound(0.0, 0.95);
+        public static final DoubleBound WEARINESS_REGEN_PENALTY = new DoubleBound(0.0, 0.95, 0.25);
         public static final IntBound EXHAUSTED_THRESHOLD_DAYS = new IntBound(2, 60);
-        public static final DoubleBound EXHAUSTED_REGEN_PENALTY = new DoubleBound(0.0, 0.95);
+        public static final DoubleBound EXHAUSTED_REGEN_PENALTY = new DoubleBound(0.0, 0.95, 0.50);
         public static final IntBound WELL_RESTED_SECONDS = new IntBound(0, 600);
-        public static final DoubleBound WELL_RESTED_REGEN_BONUS = new DoubleBound(0.0, 2.0);
+        public static final DoubleBound WELL_RESTED_REGEN_BONUS = new DoubleBound(0.0, 2.0, 0.5);
         public static final IntBound BREW_HASTE_SECONDS = new IntBound(0, 600);
-        public static final DoubleBound BEDROLL_RESTFUL_MULTIPLIER = new DoubleBound(0.0, 1.0);
+        public static final DoubleBound BEDROLL_RESTFUL_MULTIPLIER = new DoubleBound(0.0, 1.0, 0.5);
 
         private Bounds() {
         }
@@ -151,14 +155,63 @@ public class RespiteConfig {
         return clamped;
     }
 
-    /** Double counterpart of {@link #clampInt}. */
+    /**
+     * Double counterpart of {@link #clampInt}, with the non-finite guard the int
+     * flavor does not need: Gson rejects {@code NaN} into an {@code int} before
+     * any clamp runs, but yields a non-finite {@code double} from a bare
+     * {@code NaN}/{@code Infinity} token, from their quoted forms, and from any
+     * legal-JSON overflow like {@code 1e400}. {@code NaN} is false against every
+     * <em>ordering</em> comparison, so {@link Math#clamp} passes it straight
+     * through and it then poisons every arithmetic it reaches.
+     *
+     * <p>A non-finite value is healed to the field's {@linkplain DoubleBound#def()
+     * default} rather than folded to the minimum: four of respite's five double
+     * bounds start at 0, where the minimum silently <em>disables</em> the feature
+     * (no weariness penalty, no well-rested bonus, no bedroll restfulness) and
+     * the default keeps it working.
+     */
     private static double clampDouble(String name, double value, DoubleBound bound) {
+        if (!Double.isFinite(value)) {
+            Respite.LOGGER.warn("Config '{}' value {} is not a finite number; restored to the default {}",
+                    name, value, bound.def());
+            return bound.def();
+        }
         double clamped = Math.clamp(value, bound.min(), bound.max());
         if (clamped != value) {
             Respite.LOGGER.warn("Config '{}' value {} out of range [{}, {}]; clamped to {}",
                     name, value, bound.min(), bound.max(), clamped);
         }
         return clamped;
+    }
+
+    /**
+     * This config serialized to its canonical JSON — the same shape written to
+     * disk. The config-sync payload's wire form ({@code network/ConfigSyncPayload}).
+     */
+    public String toJson() {
+        return GSON.toJson(this);
+    }
+
+    /**
+     * Rebuilds a config from a synced JSON blob produced by {@link #toJson()}.
+     * Already current-schema (built from a live config, not read from disk), so
+     * no migration runs; clamped defensively so a malformed frame can never seat
+     * out-of-range gameplay values on the client. Falls back to defaults if the
+     * JSON is unusable.
+     */
+    public static RespiteConfig fromSyncedJson(String json) {
+        RespiteConfig config;
+        try {
+            config = GSON.fromJson(json, RespiteConfig.class);
+        } catch (Exception e) {
+            Respite.LOGGER.warn("Malformed synced config from server; using defaults", e);
+            config = null;
+        }
+        if (config == null) {
+            config = new RespiteConfig();
+        }
+        config.clamp();
+        return config;
     }
 
     /**

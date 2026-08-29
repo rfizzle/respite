@@ -1,5 +1,6 @@
-package com.rfizzle.respite.config;
+package com.rfizzle.respite.network;
 
+import com.rfizzle.respite.config.RespiteConfig;
 import java.util.List;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -18,21 +19,21 @@ import net.minecraft.server.level.ServerPlayer;
  * <p>Registers the S2C payload type — which runs in common init, so both sides
  * know the type — while the receiver lives in client code.
  */
-public final class RespiteConfigSync {
+public final class RespiteNetworking {
 
-    private RespiteConfigSync() {
+    private RespiteNetworking() {
     }
 
     public static void register() {
         // S2C only; the type must be known on both sides, the receiver is client wiring.
-        PayloadTypeRegistry.playS2C().register(RespiteConfigPayload.TYPE, RespiteConfigPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(ConfigSyncPayload.TYPE, ConfigSyncPayload.CODEC);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> sendTo(handler.player));
     }
 
     /** Push the server's current config to one player, if their client can receive it. */
     public static void sendTo(ServerPlayer player) {
-        if (ServerPlayNetworking.canSend(player, RespiteConfigPayload.TYPE)) {
-            ServerPlayNetworking.send(player, RespiteConfigPayload.of(RespiteConfig.get()));
+        if (ServerPlayNetworking.canSend(player, ConfigSyncPayload.TYPE)) {
+            ServerPlayNetworking.send(player, ConfigSyncPayload.of(RespiteConfig.get()));
         }
     }
 

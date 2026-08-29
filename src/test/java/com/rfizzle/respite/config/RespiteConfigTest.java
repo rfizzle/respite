@@ -397,4 +397,64 @@ class RespiteConfigTest {
         assertEquals(1, written.get("configVersion").getAsInt(), "the migrated schema must be persisted back");
         assertEquals(30, written.get("maxTimeLapseRate").getAsInt(), "existing tuning must be carried forward");
     }
+
+    /**
+     * Gson yields a non-finite double from a bare {@code NaN}/{@code Infinity}
+     * token, from their quoted forms, and from a legal-JSON overflow like
+     * {@code 1e400}. {@code Math.clamp} passes NaN straight through — it is false
+     * against every ordering comparison — so the clamp needs an explicit finite
+     * gate, and a non-finite value must heal to the field's default rather than
+     * to its minimum, which for four of the five bounds means "feature off".
+     */
+    @Test
+    void nonFiniteDoublesAreHealedToTheFieldDefault(@TempDir Path dir) throws IOException {
+        Path path = dir.resolve("respite.json");
+        Files.writeString(path, """
+                {
+                  "configVersion": 1,
+                  "wearinessRegenPenalty": NaN,
+                  "exhaustedRegenPenalty": Infinity,
+                  "wellRestedRegenBonus": "-Infinity",
+                  "bedrollRestfulMultiplier": 1e400,
+                  "newMoonHealMultiplier": NaN
+                }
+                """);
+
+        RespiteConfig config = RespiteConfig.load(path);
+
+        assertEquals(0.25, config.wearinessRegenPenalty, "NaN must not survive the clamp");
+        assertEquals(0.50, config.exhaustedRegenPenalty);
+        assertEquals(0.5, config.wellRestedRegenBonus);
+        assertEquals(0.5, config.bedrollRestfulMultiplier, "1e400 overflows to +Infinity in Gson");
+        assertEquals(2.0, config.newMoonHealMultiplier);
+    }
+
+    /**
+     * The healing default only helps if it is the field's actual default. Nothing
+     * else pins the two together, and a drifted pair fails silently — a
+     * hand-edited NaN would seat a value the player never chose.
+     */
+    @Test
+    void everyDoubleBoundDefaultMatchesThePojoDefault() {
+        RespiteConfig defaults = new RespiteConfig();
+        assertEquals(defaults.newMoonHealMultiplier, RespiteConfig.Bounds.NEW_MOON_HEAL_MULTIPLIER.def());
+        assertEquals(defaults.wearinessRegenPenalty, RespiteConfig.Bounds.WEARINESS_REGEN_PENALTY.def());
+        assertEquals(defaults.exhaustedRegenPenalty, RespiteConfig.Bounds.EXHAUSTED_REGEN_PENALTY.def());
+        assertEquals(defaults.wellRestedRegenBonus, RespiteConfig.Bounds.WELL_RESTED_REGEN_BONUS.def());
+        assertEquals(defaults.bedrollRestfulMultiplier, RespiteConfig.Bounds.BEDROLL_RESTFUL_MULTIPLIER.def());
+    }
+
+    /** Each default must itself sit inside its own stated range. */
+    @Test
+    void everyDoubleBoundDefaultSitsInsideItsOwnRange() {
+        for (RespiteConfig.DoubleBound bound : List.of(
+                RespiteConfig.Bounds.NEW_MOON_HEAL_MULTIPLIER,
+                RespiteConfig.Bounds.WEARINESS_REGEN_PENALTY,
+                RespiteConfig.Bounds.EXHAUSTED_REGEN_PENALTY,
+                RespiteConfig.Bounds.WELL_RESTED_REGEN_BONUS,
+                RespiteConfig.Bounds.BEDROLL_RESTFUL_MULTIPLIER)) {
+            assertTrue(bound.def() >= bound.min() && bound.def() <= bound.max(),
+                    bound + " default sits outside its own range");
+        }
+    }
 }

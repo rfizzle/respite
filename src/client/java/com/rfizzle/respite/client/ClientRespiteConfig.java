@@ -1,7 +1,7 @@
 package com.rfizzle.respite.client;
 
 import com.rfizzle.respite.config.RespiteConfig;
-import com.rfizzle.respite.config.RespiteConfigPayload;
+import com.rfizzle.respite.network.ConfigSyncPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +26,7 @@ public final class ClientRespiteConfig {
     }
 
     public static void register() {
-        ClientPlayNetworking.registerGlobalReceiver(RespiteConfigPayload.TYPE, (payload, context) -> {
+        ClientPlayNetworking.registerGlobalReceiver(ConfigSyncPayload.TYPE, (payload, context) -> {
             RespiteConfig synced = payload.toConfig();
             context.client().execute(() -> serverConfig = synced);
         });

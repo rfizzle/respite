@@ -6,7 +6,7 @@ import com.rfizzle.respite.Respite;
 import com.rfizzle.respite.block.ChronometerBlock;
 import com.rfizzle.respite.chronometer.ChronometerTime;
 import com.rfizzle.respite.config.RespiteConfig;
-import com.rfizzle.respite.config.RespiteConfigSync;
+import com.rfizzle.respite.network.RespiteNetworking;
 import com.rfizzle.respite.timelapse.LapseState;
 import com.rfizzle.respite.timelapse.TimeLapseEngine;
 import com.rfizzle.respite.weariness.WearinessHandler;
@@ -147,7 +147,7 @@ public final class RespiteCommand {
         }
         // Push the reloaded config to every connected client so their gameplay
         // reads and config screen follow the server's new authoritative values.
-        RespiteConfigSync.broadcast(source.getServer());
+        RespiteNetworking.broadcast(source.getServer());
         // Re-evaluate the config-bound resource conditions (recipe/advancement
         // feature gates load at datapack time), mirroring vanilla /reload.
         MinecraftServer server = source.getServer();

@@ -1,10 +1,11 @@
 // Tier: 1 (pure JUnit)
-package com.rfizzle.respite.config;
+package com.rfizzle.respite.network;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.rfizzle.respite.command.ConfigDiff;
+import com.rfizzle.respite.config.RespiteConfig;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -13,7 +14,7 @@ import org.junit.jupiter.api.Test;
  * the server's values field-for-field, that a hostile or corrupt frame is clamped
  * rather than trusted, and that unparseable JSON degrades to defaults.
  */
-class RespiteConfigPayloadTest {
+class ConfigSyncPayloadTest {
 
     @Test
     void roundTripReproducesEveryField() {
@@ -33,7 +34,7 @@ class RespiteConfigPayloadTest {
         source.bedrollRestfulMultiplier = 0.25;
         source.showTimeLapseMessages = false;
 
-        RespiteConfig restored = RespiteConfigPayload.of(source).toConfig();
+        RespiteConfig restored = ConfigSyncPayload.of(source).toConfig();
 
         assertTrue(ConfigDiff.changedFields(source, restored).isEmpty(),
                 "synced config must match the source field-for-field; differed: "
@@ -45,7 +46,7 @@ class RespiteConfigPayloadTest {
         // A frame carrying a value past the field's range must not seat it verbatim.
         String json = "{\"maxTimeLapseRate\": 999, \"phantomAltitudeMin\": 5000,"
                 + " \"wearinessRegenPenalty\": 9.0}";
-        RespiteConfig config = new RespiteConfigPayload(json).toConfig();
+        RespiteConfig config = new ConfigSyncPayload(json).toConfig();
 
         assertEquals(RespiteConfig.Bounds.MAX_TIME_LAPSE_RATE.max(), config.maxTimeLapseRate);
         assertEquals(RespiteConfig.Bounds.PHANTOM_ALTITUDE_MIN.max(), config.phantomAltitudeMin);
@@ -55,7 +56,7 @@ class RespiteConfigPayloadTest {
     @Test
     void malformedJsonFallsBackToDefaults() {
         RespiteConfig defaults = new RespiteConfig();
-        RespiteConfig config = new RespiteConfigPayload("not json at all {{{").toConfig();
+        RespiteConfig config = new ConfigSyncPayload("not json at all {{{").toConfig();
 
         assertTrue(ConfigDiff.changedFields(defaults, config).isEmpty(),
                 "an unparseable frame must degrade to a clean default config");
