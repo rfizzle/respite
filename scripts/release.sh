@@ -13,7 +13,8 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 NO_PUSH=0
 
 # --- Parse arguments ---
-# One positional: a bump keyword (patch|minor|major) or an explicit X.Y.Z.
+# One positional: a bump keyword (patch|minor|major) or an explicit SemVer version,
+# which may carry a pre-release suffix — v1.0.0-beta.1 is how a beta is cut.
 TARGET=""
 for arg in "$@"; do
   case "$arg" in
@@ -27,15 +28,15 @@ for arg in "$@"; do
       ;;
     *)
       echo "Error: unknown argument '$arg'" >&2
-      echo "Usage: $0 <patch|minor|major|X.Y.Z> [--no-push]" >&2
+      echo "Usage: $0 <patch|minor|major|X.Y.Z[-prerelease]> [--no-push]" >&2
       exit 1
       ;;
   esac
 done
 
 if [[ -z "$TARGET" ]]; then
-  echo "Error: a version target is required (patch, minor, major, or X.Y.Z)" >&2
-  echo "Usage: $0 <patch|minor|major|X.Y.Z> [--no-push]" >&2
+  echo "Error: a version target is required (patch, minor, major, or X.Y.Z[-prerelease])" >&2
+  echo "Usage: $0 <patch|minor|major|X.Y.Z[-prerelease]> [--no-push]" >&2
   exit 1
 fi
 
@@ -52,12 +53,18 @@ if [[ -n "$(git -C "$PROJECT_ROOT" ls-files --others --exclude-standard)" ]]; th
 fi
 
 # --- Determine the new version ---
-if [[ "$TARGET" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+# Full SemVer, pre-release and build metadata included: a beta is cut as an explicit
+# 1.0.0-beta.1, and a target the bump branch below cannot parse must land here rather
+# than falling through it.
+if [[ "$TARGET" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
   NEW_VERSION="$TARGET"
   echo "Explicit version: $NEW_VERSION"
 else
   # Current version comes from the latest v* tag, not gradle.properties (which
   # holds only the dev base). No tags yet → the first release starts from 0.0.0.
+  # Pre-release tags are excluded from the base on purpose: SemVer precedence for
+  # them is not something `sort -V` gets right, and a pre-release should not advance
+  # the release line. Cut the release that follows a beta as an explicit X.Y.Z.
   CURRENT_VERSION="$(git -C "$PROJECT_ROOT" tag --list 'v*' | sed 's/^v//' \
     | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)"
   if [[ -z "$CURRENT_VERSION" ]]; then
@@ -74,6 +81,15 @@ else
     major) NEW_VERSION="$((MAJOR + 1)).0.0" ;;
   esac
   echo "Bumping $TARGET: $CURRENT_VERSION -> $NEW_VERSION"
+fi
+
+# Belt and braces. Every branch above either assigns NEW_VERSION or exits, but an
+# unassigned one would tag a bare "v" — a wrong tag created silently, which the
+# release workflow would then build and publish from. Refuse instead.
+if [[ -z "$NEW_VERSION" ]]; then
+  echo "Error: could not derive a version from '$TARGET'." >&2
+  echo "Usage: $0 <patch|minor|major|X.Y.Z[-prerelease]> [--no-push]" >&2
+  exit 1
 fi
 
 TAG="v$NEW_VERSION"
