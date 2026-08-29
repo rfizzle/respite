@@ -518,6 +518,8 @@ Events (server-side, array-backed Fabric `Event`s):
 - **`RespiteTimeLapseCallback`** — `onRateChanged(ServerLevel level, int oldRate, int newRate, int sleeping, int total)`; fires on every effective-rate change, including start (old 1) and end (new 1). `sleeping`/`total` are the active `k`/`n` the rate is computed over — non-spectator, non-idle (§1 Idle exclusion) — not the full online roster.
 - **`RespiteRestCallback`** — `onPlayerRested(ServerPlayer player, long ticksSlept, float healthRestored)`; fires when a player wakes at dawn having slept (not on interrupted sleep).
 
+Both invokers isolate per listener: a listener that throws is caught, logged once at `WARN` naming the offending class, and skipped — it can never break the firing operation or the listeners registered after it. `VirtualMachineError` is rethrown (the JVM is gone, not the guest).
+
 Consumption is the suite pattern: `modCompileOnly` against the published jar, every call site guarded by `FabricLoader.getInstance().isModLoaded("respite")`.
 
 ---

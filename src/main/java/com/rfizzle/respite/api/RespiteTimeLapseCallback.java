@@ -1,5 +1,7 @@
 package com.rfizzle.respite.api;
 
+import com.rfizzle.respite.Respite;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.level.ServerLevel;
@@ -18,16 +20,35 @@ import net.minecraft.server.level.ServerLevel;
  * fires regardless of the {@code announceTimeLapse} config toggle (that toggle
  * gates the player-facing action bar, not this API event).
  *
- * <p>A listener that throws is not isolated by Respite; keep listener bodies
- * cheap and exception-free — this fires on the server tick loop's hot path.
+ * <p>The rate is <em>evaluated</em> every real server tick, but the fire is
+ * gated on an integer rate edge, so a listener runs a handful of times per
+ * night rather than at 20 Hz.
+ *
+ * <p>A listener that throws is caught, logged, and skipped — it can never break
+ * the time-lapse evaluation or the listeners registered after it.
  */
 @Stable
 public interface RespiteTimeLapseCallback {
 
+    /** One-shot gate so a listener that throws on every edge logs its stack trace once. */
+    AtomicBoolean LISTENER_FAILURE_LOGGED = new AtomicBoolean(false);
+
     Event<RespiteTimeLapseCallback> EVENT = EventFactory.createArrayBacked(RespiteTimeLapseCallback.class,
             listeners -> (level, oldRate, newRate, sleeping, total) -> {
                 for (RespiteTimeLapseCallback listener : listeners) {
-                    listener.onRateChanged(level, oldRate, newRate, sleeping, total);
+                    try {
+                        listener.onRateChanged(level, oldRate, newRate, sleeping, total);
+                    } catch (VirtualMachineError e) {
+                        throw e; // OOME/SOE: the JVM is gone, not the guest
+                    } catch (Throwable t) {
+                        // Throwable, not Exception: a listener compiled against an older
+                        // signature throws Error (AbstractMethodError, NoClassDefFoundError),
+                        // which an Exception catch would let escape and kill the server tick.
+                        if (LISTENER_FAILURE_LOGGED.compareAndSet(false, true)) {
+                            Respite.LOGGER.warn("A RespiteTimeLapseCallback listener {} threw; skipping",
+                                    listener.getClass().getName(), t);
+                        }
+                    }
                 }
             });
 

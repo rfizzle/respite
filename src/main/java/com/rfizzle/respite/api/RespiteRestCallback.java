@@ -1,5 +1,7 @@
 package com.rfizzle.respite.api;
 
+import com.rfizzle.respite.Respite;
+import java.util.concurrent.atomic.AtomicBoolean;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,16 +18,32 @@ import net.minecraft.server.level.ServerPlayer;
  * armed for Restful Saturation; an unarmed sleeper simply reports
  * {@code healthRestored} of 0.
  *
- * <p>A listener that throws is not isolated by Respite; keep listener bodies
- * cheap and exception-free.
+ * <p>A listener that throws is caught, logged, and skipped — it can never break
+ * the dawn-wake dispatch (the rest-derived advancement criteria still grant) or
+ * the listeners registered after it.
  */
 @Stable
 public interface RespiteRestCallback {
 
+    /** One-shot gate so a listener that throws every night logs its stack trace once. */
+    AtomicBoolean LISTENER_FAILURE_LOGGED = new AtomicBoolean(false);
+
     Event<RespiteRestCallback> EVENT = EventFactory.createArrayBacked(RespiteRestCallback.class,
             listeners -> (player, ticksSlept, healthRestored) -> {
                 for (RespiteRestCallback listener : listeners) {
-                    listener.onPlayerRested(player, ticksSlept, healthRestored);
+                    try {
+                        listener.onPlayerRested(player, ticksSlept, healthRestored);
+                    } catch (VirtualMachineError e) {
+                        throw e; // OOME/SOE: the JVM is gone, not the guest
+                    } catch (Throwable t) {
+                        // Throwable, not Exception: a listener compiled against an older
+                        // signature throws Error (AbstractMethodError, NoClassDefFoundError),
+                        // which an Exception catch would let escape and kill the server tick.
+                        if (LISTENER_FAILURE_LOGGED.compareAndSet(false, true)) {
+                            Respite.LOGGER.warn("A RespiteRestCallback listener {} threw; skipping",
+                                    listener.getClass().getName(), t);
+                        }
+                    }
                 }
             });
 

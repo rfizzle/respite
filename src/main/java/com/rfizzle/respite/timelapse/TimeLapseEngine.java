@@ -129,14 +129,12 @@ public final class TimeLapseEngine {
         // Fire the public API callback on every effective-rate edge, independent
         // of the announce toggle (that gates only the player-facing action bar).
         // Cheap on the hot path: primitive compare, and the array-backed invoker
-        // is a no-op when no mod has registered a listener.
+        // is a no-op when no mod has registered a listener. No wrap here — the
+        // invoker isolates each listener, so a wrap could only re-introduce the
+        // abandon-the-rest semantics it replaced.
         if (effectiveRate != previousEffectiveRate) {
-            try {
-                RespiteTimeLapseCallback.EVENT.invoker()
-                        .onRateChanged(overworld, previousEffectiveRate, effectiveRate, sleeping, total);
-            } catch (Exception e) {
-                Respite.LOGGER.error("Time-lapse rate callback failed", e);
-            }
+            RespiteTimeLapseCallback.EVENT.invoker()
+                    .onRateChanged(overworld, previousEffectiveRate, effectiveRate, sleeping, total);
             previousEffectiveRate = effectiveRate;
         }
 
