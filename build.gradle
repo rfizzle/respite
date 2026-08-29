@@ -1,3 +1,5 @@
+import java.util.concurrent.TimeUnit
+
 plugins {
     id 'fabric-loom' version "${loom_version}"
     id 'jacoco'
@@ -61,7 +63,20 @@ def runGitDescribe(String tagPrefix) {
                 .directory(rootDir)
                 .redirectErrorStream(true)
                 .start()
-        proc.waitFor()
+        // Bounded, never a bare waitFor(): this runs in the configuration phase, so a
+        // hung git wedges every task in the build, not just the version computation.
+        // Git does hang — a stale index.lock from a killed process, an unresponsive
+        // network filesystem, a credential helper waiting on a prompt with no terminal.
+        def finished = proc.waitFor(10, TimeUnit.SECONDS)
+        if (!finished) {
+            // destroyForcibly so the orphaned git process cannot outlive the daemon.
+            proc.destroyForcibly()
+            // Degrading to the mod_version base is right; doing it silently is not. On a
+            // machine where git is merely slow, every invocation pays the full ten seconds
+            // and then produces a jar versioned from the base with nothing in the log.
+            logger.warn('git describe timed out after 10s — version falls back to the mod_version base')
+            return null
+        }
         def out = proc.inputStream.text.trim()
         if (proc.exitValue() != 0) return null
         return out
@@ -272,13 +287,19 @@ tasks.register('jacocoMergedReport', JacocoReport) {
     sourceSets sourceSets.main
     // A sweep that never ran leaves its exec file absent, and one that was
     // interrupted leaves it empty — Gradle deletes the file before the run and the
-    // agent only dumps at JVM exit. Either way the result is a partial number under
-    // the "merged" label with no indication, so say so.
+    // agent only dumps at JVM exit. A sweep that ran before the last recompile is
+    // worse: JaCoCo matches execution data by class id, so a stale exec contributes
+    // nothing and its classes read 0% rather than failing. Every one of those is a
+    // partial number under the "merged" label with no indication, so say so.
     doFirst {
+        def newestClass = classDirectories.asFileTree.files*.lastModified().max() ?: 0L
         ['test.exec', 'runGametest.exec'].each { name ->
             def execFile = layout.buildDirectory.file("jacoco/${name}").get().asFile
             if (!execFile.exists() || execFile.length() == 0) {
                 logger.warn("jacocoMergedReport: ${name} is missing or empty — this report is NOT merged coverage")
+            } else if (execFile.lastModified() < newestClass) {
+                logger.warn("jacocoMergedReport: ${name} predates the compiled classes — anything recompiled " +
+                        'since that sweep reads 0%; re-run `make coverage`')
             }
         }
     }
