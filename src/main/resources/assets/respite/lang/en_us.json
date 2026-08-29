@@ -23,9 +23,9 @@
   "subtitles.respite.time_lapse_start": "Time quickens",
   "subtitles.respite.time_lapse_end": "Time settles",
 
-  "time.respite.clock": "%s %s",
-  "time.respite.am": "am",
-  "time.respite.pm": "pm",
+  "fragment.respite.time.clock": "%s %s",
+  "fragment.respite.time.am": "am",
+  "fragment.respite.time.pm": "pm",
 
   "notification.respite.chronometer": "✦ %s — signal %s",
   "notification.respite.chronometer_night": "✦ %s — signal %s — %s, new moon in %s nights",
@@ -45,14 +45,14 @@
   "tooltip.respite.pocket_chronometer_still": "— still —",
   "tooltip.respite.pocket_chronometer_awake": "Awake %s days",
 
-  "moon.respite.full": "full moon",
-  "moon.respite.waning_gibbous": "waning gibbous",
-  "moon.respite.third_quarter": "third quarter",
-  "moon.respite.waning_crescent": "waning crescent",
-  "moon.respite.new": "new moon",
-  "moon.respite.waxing_crescent": "waxing crescent",
-  "moon.respite.first_quarter": "first quarter",
-  "moon.respite.waxing_gibbous": "waxing gibbous",
+  "fragment.respite.moon.full": "full moon",
+  "fragment.respite.moon.waning_gibbous": "waning gibbous",
+  "fragment.respite.moon.third_quarter": "third quarter",
+  "fragment.respite.moon.waning_crescent": "waning crescent",
+  "fragment.respite.moon.new": "new moon",
+  "fragment.respite.moon.waxing_crescent": "waxing crescent",
+  "fragment.respite.moon.first_quarter": "first quarter",
+  "fragment.respite.moon.waxing_gibbous": "waxing gibbous",
 
   "config.respite.title": "Respite Configuration",
 

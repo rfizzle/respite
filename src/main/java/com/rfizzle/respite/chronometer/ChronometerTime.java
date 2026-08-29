@@ -25,10 +25,10 @@ public final class ChronometerTime {
     public static final int ALARM_OFF = 24;
 
     /** Lang key for the pre-noon meridiem marker — resolved on the client, never baked in. */
-    public static final String AM_KEY = "time.respite.am";
+    public static final String AM_KEY = "fragment.respite.time.am";
 
     /** Lang key for the post-noon meridiem marker. */
-    public static final String PM_KEY = "time.respite.pm";
+    public static final String PM_KEY = "fragment.respite.time.pm";
 
     /** Moon-phase lang-key suffixes, indexed by the vanilla phase number (0 = full moon). */
     private static final String[] MOON_PHASE_KEYS = {
@@ -96,9 +96,9 @@ public final class ChronometerTime {
         return Math.floorMod(4 - moonPhase, 8);
     }
 
-    /** The lang key for a vanilla moon phase, {@code moon.respite.<phase>}. */
+    /** The lang key for a vanilla moon phase, {@code fragment.respite.moon.<phase>}. */
     public static String moonPhaseKey(int moonPhase) {
-        return "moon.respite." + MOON_PHASE_KEYS[Math.floorMod(moonPhase, 8)];
+        return "fragment.respite.moon." + MOON_PHASE_KEYS[Math.floorMod(moonPhase, 8)];
     }
 
     /**

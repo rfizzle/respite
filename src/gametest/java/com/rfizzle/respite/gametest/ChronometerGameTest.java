@@ -245,7 +245,7 @@ public class ChronometerGameTest implements FabricGameTest {
             // meridiem, so a non-English client renders its own "am"/"pm".
             Component clock = (Component) contents.getArgs()[0];
             TranslatableContents clockContents = (TranslatableContents) clock.getContents();
-            helper.assertTrue("time.respite.clock".equals(clockContents.getKey()),
+            helper.assertTrue("fragment.respite.time.clock".equals(clockContents.getKey()),
                     "clock arg key was " + clockContents.getKey());
             helper.assertTrue(ChronometerTime.hourMinute(dayTime).equals(clockContents.getArgs()[0]),
                     "clock numeric arg was " + clockContents.getArgs()[0]);
@@ -264,7 +264,7 @@ public class ChronometerGameTest implements FabricGameTest {
         assertInspectLine(helper, dayTime, "notification.respite.chronometer_night", contents -> {
             Component moon = (Component) contents.getArgs()[2];
             String moonKey = ((TranslatableContents) moon.getContents()).getKey();
-            helper.assertTrue("moon.respite.full".equals(moonKey), "moon arg key was " + moonKey);
+            helper.assertTrue("fragment.respite.moon.full".equals(moonKey), "moon arg key was " + moonKey);
             helper.assertTrue(Integer.valueOf(4).equals(contents.getArgs()[3]),
                     "countdown arg was " + contents.getArgs()[3]);
         });

@@ -26,7 +26,7 @@ public final class ChronometerLines {
      * {@code %s} argument inside any line key.
      */
     public static Component clock(long dayTime) {
-        return Component.translatable("time.respite.clock",
+        return Component.translatable("fragment.respite.time.clock",
                 ChronometerTime.hourMinute(dayTime),
                 Component.translatable(ChronometerTime.meridiemKey(dayTime)));
     }
