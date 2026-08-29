@@ -35,6 +35,13 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  */
 public class SleepVoteGameTest implements FabricGameTest {
 
+    // Timeout budgets. A bare number never says why this test needs longer than
+    // the default, and a literal repeated across a suite is one edit per method
+    // when the timing changes.
+    /** One vote broadcast round trip: enter or leave the bed, then read the packets. */
+    private static final int WHISPER = 200;
+
+
     private static final BlockPos BED_HEAD = new BlockPos(1, 2, 1);
     private static final BlockPos BED_FOOT = new BlockPos(1, 2, 2);
     /** An ordinary night — sleep is eligible, the time-lapse holds the night still. */
@@ -116,7 +123,7 @@ public class SleepVoteGameTest implements FabricGameTest {
         return keys;
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "sleepVoteEnterLeave", timeoutTicks = 200)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteSleepVoteEnterLeave", timeoutTicks = WHISPER)
     public void enterAndLeaveWhisperTheShareExcludingTheLeaver(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper);
         MockPlayers.Connected sleeperC = MockPlayers.connectedServerPlayerInLevel(helper);
@@ -166,7 +173,7 @@ public class SleepVoteGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "sleepVoteDayLeave", timeoutTicks = 200)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteSleepVoteDayLeave", timeoutTicks = WHISPER)
     public void leavingAfterTheNightEndsIsSilent(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper);
         MockPlayers.Connected sleeperC = MockPlayers.connectedServerPlayerInLevel(helper);
@@ -216,7 +223,7 @@ public class SleepVoteGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "sleepVoteDisabled", timeoutTicks = 200)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteSleepVoteDisabled", timeoutTicks = WHISPER)
     public void disabledConfigWhispersNothing(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper);
         boolean savedEnable = RespiteConfig.get().announceSleepVote;
@@ -252,7 +259,7 @@ public class SleepVoteGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "sleepVoteSpectator", timeoutTicks = 200)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteSleepVoteSpectator", timeoutTicks = WHISPER)
     public void spectatorsAreNeitherCountedNorNotified(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper);
         MockPlayers.Connected sleeperC = MockPlayers.connectedServerPlayerInLevel(helper);
@@ -294,7 +301,7 @@ public class SleepVoteGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "sleepVoteSolo", timeoutTicks = 200)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteSleepVoteSolo", timeoutTicks = WHISPER)
     public void aSoloWorldWhispersNothing(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper);
         MockPlayers.Connected soloC = MockPlayers.connectedServerPlayerInLevel(helper);

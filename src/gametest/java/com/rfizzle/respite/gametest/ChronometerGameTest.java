@@ -40,6 +40,19 @@ import net.minecraft.world.phys.Vec3;
  */
 public class ChronometerGameTest implements FabricGameTest {
 
+    // Timeout budgets. A bare number never says why this test needs longer than
+    // the default, and a literal repeated across a suite is one edit per method
+    // when the timing changes.
+    /** Synchronous state and lang assertions; the budget only covers server spin-up. */
+    private static final int SYNC = 100;
+    /** A couple of block-state refresh ticks for the dial to settle. */
+    private static final int STATE_SETTLE = 200;
+    /** A redstone update propagating to the comparator output. */
+    private static final int COMPARATOR_READ = 300;
+    /** One /time set sweep across all fifteen signal levels. */
+    private static final int SIGNAL_SWEEP = 700;
+
+
     private static final BlockPos FLOOR = new BlockPos(1, 1, 1);
     private static final BlockPos CHRONO = new BlockPos(1, 2, 1);
     private static final BlockPos WIRE = new BlockPos(2, 2, 1);
@@ -73,7 +86,7 @@ public class ChronometerGameTest implements FabricGameTest {
         helper.assertTrue(wire == level, "adjacent wire read " + wire + ", expected " + level);
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerSweep", timeoutTicks = 700)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteChronometerSweep", timeoutTicks = SIGNAL_SWEEP)
     public void timeSetSweepDrivesAllFifteenLevels(GameTestHelper helper) {
         helper.getLevel().setDayTime(midBand(1));
         buildRig(helper);
@@ -88,7 +101,7 @@ public class ChronometerGameTest implements FabricGameTest {
         sequence.thenSucceed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerSteady", timeoutTicks = 200)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteChronometerSteady", timeoutTicks = STATE_SETTLE)
     public void sameBandHoldsTheStateSteady(GameTestHelper helper) {
         helper.getLevel().setDayTime(midBand(6));
         buildRig(helper);
@@ -107,7 +120,7 @@ public class ChronometerGameTest implements FabricGameTest {
                 .thenSucceed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerComparator", timeoutTicks = 300)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteChronometerComparator", timeoutTicks = COMPARATOR_READ)
     public void comparatorReadsMoonFullness(GameTestHelper helper) {
         helper.getLevel().setDayTime(0);
         buildRig(helper);
@@ -135,7 +148,7 @@ public class ChronometerGameTest implements FabricGameTest {
         sequence.thenSucceed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerAlarm", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteChronometerAlarm", timeoutTicks = SYNC)
     public void alarmCyclesWithSneakAndPersistsAcrossTick(GameTestHelper helper) {
         helper.setBlock(FLOOR, Blocks.SMOOTH_STONE.defaultBlockState());
         helper.setBlock(CHRONO, RespiteRegistry.CHRONOMETER.defaultBlockState());
@@ -170,7 +183,7 @@ public class ChronometerGameTest implements FabricGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerPlace", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteChronometerPlace", timeoutTicks = SYNC)
     public void placementSetsTheCorrectLevelImmediately(GameTestHelper helper) {
         helper.getLevel().setDayTime(midBand(11));
         helper.setBlock(FLOOR, Blocks.SMOOTH_STONE.defaultBlockState());
@@ -196,7 +209,7 @@ public class ChronometerGameTest implements FabricGameTest {
                 .thenSucceed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerNether", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteChronometerNether", timeoutTicks = SYNC)
     public void fixedTimeDimensionReadsZero(GameTestHelper helper) {
         ServerLevel nether = helper.getLevel().getServer().getLevel(Level.NETHER);
         if (nether == null) {
@@ -224,7 +237,7 @@ public class ChronometerGameTest implements FabricGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerInspectDay", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteChronometerInspectDay", timeoutTicks = SYNC)
     public void inspectShowsClockAndSignalByDay(GameTestHelper helper) {
         long dayTime = 6800L; // 12:48 pm, level 5
         assertInspectLine(helper, dayTime, "notification.respite.chronometer", contents -> {
@@ -245,7 +258,7 @@ public class ChronometerGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerInspectNight", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteChronometerInspectNight", timeoutTicks = SYNC)
     public void inspectAddsTheMoonAtNight(GameTestHelper helper) {
         long dayTime = 18000L; // midnight of day 0 — a full moon, 4 nights out
         assertInspectLine(helper, dayTime, "notification.respite.chronometer_night", contents -> {
@@ -257,7 +270,7 @@ public class ChronometerGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerInspectNewMoon", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteChronometerInspectNewMoon", timeoutTicks = SYNC)
     public void inspectAnnouncesTheNewMoon(GameTestHelper helper) {
         long dayTime = 4 * 24000L + 18000L; // midnight, moon phase 4 — the new moon
         assertInspectLine(helper, dayTime, "notification.respite.chronometer_new_moon", contents -> {
@@ -300,7 +313,7 @@ public class ChronometerGameTest implements FabricGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerConfig", timeoutTicks = 200)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteChronometerConfig", timeoutTicks = STATE_SETTLE)
     public void disabledConfigLeavesPlacedBlocksFunctioning(GameTestHelper helper) {
         boolean saved = RespiteConfig.get().enableChronometer;
         RespiteConfig.get().enableChronometer = false;
@@ -331,7 +344,7 @@ public class ChronometerGameTest implements FabricGameTest {
                 .thenSucceed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "chronometerRecipe", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteChronometerRecipe", timeoutTicks = SYNC)
     public void recipeAndUnlockAdvancementShipUnderDefaultConfig(GameTestHelper helper) {
         var server = helper.getLevel().getServer();
         helper.assertTrue(server.getRecipeManager().byKey(Respite.id("chronometer")).isPresent(),

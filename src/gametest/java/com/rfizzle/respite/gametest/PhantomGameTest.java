@@ -29,7 +29,7 @@ public class PhantomGameTest implements FabricGameTest {
         level.getGameRules().getRule(GameRules.RULE_DOINSOMNIA).set(value, level.getServer());
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "phantomReworkOff")
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respitePhantomReworkOff")
     public void reworkOffKeepsRespiteSpawnerInert(GameTestHelper helper) {
         RespiteConfig config = RespiteConfig.get();
         boolean saved = config.enablePhantomRework;
@@ -48,7 +48,7 @@ public class PhantomGameTest implements FabricGameTest {
         }
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "phantomNoEnemies")
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respitePhantomNoEnemies")
     public void spawnEnemiesFalseYieldsNoSpawns(GameTestHelper helper) {
         RespiteConfig config = RespiteConfig.get();
         boolean saved = config.enablePhantomRework;
@@ -66,7 +66,7 @@ public class PhantomGameTest implements FabricGameTest {
         }
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "phantomInsomniaOff")
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respitePhantomInsomniaOff")
     public void doInsomniaOffSuppressesRespiteSpawner(GameTestHelper helper) {
         RespiteConfig config = RespiteConfig.get();
         ServerLevel level = helper.getLevel();
@@ -89,7 +89,7 @@ public class PhantomGameTest implements FabricGameTest {
         }
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "phantomVanillaSuppressed")
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respitePhantomVanillaSuppressed")
     public void vanillaPhantomSpawnerIsSuppressedWhileReworkOn(GameTestHelper helper) {
         RespiteConfig config = RespiteConfig.get();
         ServerLevel level = helper.getLevel();
@@ -121,7 +121,7 @@ public class PhantomGameTest implements FabricGameTest {
         }
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "phantomWiring")
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respitePhantomWiring")
     public void respiteSpawnerIsRegisteredInTheOverworldList(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         List<CustomSpawner> spawners =

@@ -23,7 +23,7 @@
             "com.rfizzle.respite.gametest.RespiteCommandGameTest",
             "com.rfizzle.respite.gametest.AdvancementGameTest",
             "com.rfizzle.respite.gametest.RespiteApiGameTest",
-            "com.rfizzle.respite.gametest.util.MockPlayersGameTest"
+            "com.rfizzle.respite.gametest.MockPlayersGameTest"
         ]
     },
     "depends": {

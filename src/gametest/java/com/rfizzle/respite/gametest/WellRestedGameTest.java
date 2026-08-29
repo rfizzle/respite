@@ -24,6 +24,15 @@ import net.minecraft.world.effect.MobEffectInstance;
  */
 public class WellRestedGameTest implements FabricGameTest {
 
+    // Timeout budgets. A bare number never says why this test needs longer than
+    // the default, and a literal repeated across a suite is one edit per method
+    // when the timing changes.
+    /** Grant and compose assertions are synchronous; the budget covers spin-up. */
+    private static final int SYNC = 100;
+    /** A natural-regen tick landing with the bonus applied. */
+    private static final int REGEN_TICK = 300;
+
+
     private static void guarded(Runnable cleanup, Runnable body) {
         try {
             body.run();
@@ -33,7 +42,7 @@ public class WellRestedGameTest implements FabricGameTest {
         }
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wellRestedGrant", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteWellRestedGrant", timeoutTicks = SYNC)
     public void dawnWakeGrantsTheGraceForTheConfiguredDuration(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         RespiteConfig config = RespiteConfig.get();
@@ -52,7 +61,7 @@ public class WellRestedGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wellRestedDisabled", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteWellRestedDisabled", timeoutTicks = SYNC)
     public void theGrantNoOpsWhenTheFeatureIsOffOrZeroDuration(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         RespiteConfig config = RespiteConfig.get();
@@ -84,7 +93,7 @@ public class WellRestedGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wellRestedRegen", timeoutTicks = 300)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteWellRestedRegen", timeoutTicks = REGEN_TICK)
     public void naturalRegenIsBoostedWhileWellRested(GameTestHelper helper) {
         // Fast regen (food≥20, saturation>0) heals a full 1.0 every 10 ticks; the
         // +50% bonus lifts the first heal to 1.5.
@@ -92,7 +101,7 @@ public class WellRestedGameTest implements FabricGameTest {
         runFirstHealTest(helper, expected, false, "Well-Rested heals ×(1 + bonus)");
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wellRestedCompose", timeoutTicks = 300)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteWellRestedCompose", timeoutTicks = REGEN_TICK)
     public void theBonusComposesWithAWearinessPenalty(GameTestHelper helper) {
         // The rare admin-forced overlap: Exhausted (×0.50) and Well-Rested (×1.50)
         // compose multiplicatively to ×0.75, not one silently dropping the other.

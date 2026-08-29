@@ -29,6 +29,19 @@ import net.minecraft.world.effect.MobEffectInstance;
  */
 public class WearinessGameTest implements FabricGameTest {
 
+    // Timeout budgets. A bare number never says why this test needs longer than
+    // the default, and a literal repeated across a suite is one edit per method
+    // when the timing changes.
+    /** Stage application is synchronous; the budget only covers server spin-up. */
+    private static final int SYNC = 100;
+    /** One weariness sweep applying or clearing a stage. */
+    private static final int STAGE_SWEEP = 200;
+    /** The fast natural-regen branch firing at least once per stage. */
+    private static final int REGEN_FAST = 300;
+    /** The slow natural-regen branch, which fires at a quarter of the fast one's rate. */
+    private static final int REGEN_SLOW = 600;
+
+
     /** Food/saturation/health that keep the fast-regen branch (food≥20, sat>0, hurt) live. */
     private static void primeForFastRegen(ServerPlayer player) {
         player.getFoodData().setFoodLevel(20);
@@ -55,7 +68,7 @@ public class WearinessGameTest implements FabricGameTest {
         }
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wearinessLadder", timeoutTicks = 200)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteWearinessLadder", timeoutTicks = STAGE_SWEEP)
     public void stageLadderAppliesTheMatchingEffectAndStripsTheOther(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         RespiteConfig config = RespiteConfig.get();
@@ -82,7 +95,7 @@ public class WearinessGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wearinessReset", timeoutTicks = 200)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteWearinessReset", timeoutTicks = STAGE_SWEEP)
     public void statResetClearsBothStages(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         RespiteConfig config = RespiteConfig.get();
@@ -103,13 +116,13 @@ public class WearinessGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wearinessRegenFast", timeoutTicks = 300)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteWearinessRegenFast", timeoutTicks = REGEN_FAST)
     public void naturalRegenScalesTheFastBranchByStage(GameTestHelper helper) {
         // Fast regen (food≥20, saturation>0): heals f/6 = 1.0 every 10 ticks.
         runRegenScalingTest(helper, 20, 6.0f, 40);
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wearinessRegenSlow", timeoutTicks = 600)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteWearinessRegenSlow", timeoutTicks = REGEN_SLOW)
     public void naturalRegenScalesTheSlowBranchByStage(GameTestHelper helper) {
         // Slow regen (food 18–19, no saturation): heals 1.0 every 80 ticks — the
         // second FoodData#tick heal call site the un-ordinal'd wrap must also catch
@@ -180,7 +193,7 @@ public class WearinessGameTest implements FabricGameTest {
         }));
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wearinessDisableClears", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteWearinessDisableClears", timeoutTicks = SYNC)
     public void disablingLiftsAnExistingStage(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         RespiteConfig config = RespiteConfig.get();
@@ -205,7 +218,7 @@ public class WearinessGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wearinessScope", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteWearinessScope", timeoutTicks = SYNC)
     public void directHealingIsNeverScaled(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         RespiteConfig config = RespiteConfig.get();
@@ -227,7 +240,7 @@ public class WearinessGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "wearinessDisabled", timeoutTicks = 200)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteWearinessDisabled", timeoutTicks = STAGE_SWEEP)
     public void disabledAppliesNothingAndLeavesRegenUntouched(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         RespiteConfig config = RespiteConfig.get();

@@ -22,6 +22,15 @@ import net.minecraft.stats.Stats;
  */
 public class RespiteCommandGameTest implements FabricGameTest {
 
+    // Timeout budgets. A bare number never says why this test needs longer than
+    // the default, and a literal repeated across a suite is one edit per method
+    // when the timing changes.
+    /** Command dispatch is synchronous; the budget only covers server spin-up. */
+    private static final int SYNC = 100;
+    /** A full config + resource reload round trip. */
+    private static final int RELOAD = 200;
+
+
     private static void guarded(Runnable cleanup, Runnable body) {
         try {
             body.run();
@@ -31,7 +40,7 @@ public class RespiteCommandGameTest implements FabricGameTest {
         }
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "commandTree", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteCommandTree", timeoutTicks = SYNC)
     public void treeRegistersWithPerNodePermissionGating(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         CommandNode<CommandSourceStack> root = server.getCommands().getDispatcher().getRoot().getChild("respite");
@@ -48,7 +57,7 @@ public class RespiteCommandGameTest implements FabricGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "commandStatus", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteCommandStatus", timeoutTicks = SYNC)
     public void statusExecutesTheReadForAnyPlayer(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         MinecraftServer server = helper.getLevel().getServer();
@@ -71,7 +80,7 @@ public class RespiteCommandGameTest implements FabricGameTest {
         });
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "commandReload", timeoutTicks = 200)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteCommandReload", timeoutTicks = RELOAD)
     public void reloadRunsTheConfigAndResourceReload(GameTestHelper helper) {
         // reload rereads the config from disk, diffs it, and re-fires the vanilla
         // resource reload (the config-bound recipe/advancement gates). Run the whole
@@ -89,7 +98,7 @@ public class RespiteCommandGameTest implements FabricGameTest {
         helper.succeed();
     }
 
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "commandRest", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteCommandRest", timeoutTicks = SYNC)
     public void restSetAndClearDriveTheStatAndLadder(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         MinecraftServer server = helper.getLevel().getServer();

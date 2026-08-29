@@ -35,6 +35,19 @@ import net.minecraft.world.phys.Vec3;
  */
 public class BedrollGameTest implements FabricGameTest {
 
+    // Timeout budgets. A bare number never says why this test needs longer than
+    // the default, and a literal repeated across a suite is one edit per method
+    // when the timing changes.
+    /** Synchronous placement assertions; the budget only covers server spin-up. */
+    private static final int SYNC = 100;
+    /** One auto-use round trip: place the bedroll, enter it, assert. */
+    private static final int AUTO_USE = 200;
+    /** A full night in the bedroll through to the dawn wake. */
+    private static final int SLEEP_CYCLE = 300;
+    /** A night's sleep plus the overnight heal conversion that follows it. */
+    private static final int HEAL_CONVERSION = 400;
+
+
     private static final BlockPos BEDROLL_POS = new BlockPos(1, 2, 1);
     /** An ordinary night — moon phase 0. */
     private static final long NIGHT_START = 13000L;
@@ -103,7 +116,7 @@ public class BedrollGameTest implements FabricGameTest {
      * vanilla's {@code checkBedExists} eject satisfied across real ticks with no
      * mixin. Waking then rolls the bedroll back into the inventory.
      */
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "bedrollSleep", timeoutTicks = 300)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBedrollSleep", timeoutTicks = SLEEP_CYCLE)
     public void bedrollSleepSetsNoSpawnClearsRestAndRollsUp(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper, NIGHT_START);
         ServerPlayer sleeper = MockPlayers.serverPlayerInLevel(helper);
@@ -157,7 +170,7 @@ public class BedrollGameTest implements FabricGameTest {
      * replaceable tile that shifts the sleep one block into the air, where
      * vanilla's per-tick eject then wakes the player.
      */
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "bedrollAutoUse", timeoutTicks = 200)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBedrollAutoUse", timeoutTicks = AUTO_USE)
     public void itemAutoUseSleepsAtTheBedrollOnReplaceableGround(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         helper.getLevel().setDayTime(NIGHT_START);
@@ -211,7 +224,7 @@ public class BedrollGameTest implements FabricGameTest {
     }
 
     /** The promised "not obstructed" bed rule (§7.3): a blocked space above refuses sleep. */
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "bedrollObstructed", timeoutTicks = 100)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBedrollObstructed", timeoutTicks = SYNC)
     public void obstructedBedrollRefusesSleep(GameTestHelper helper) {
         MockPlayers.retireLeaked(helper);
         helper.getLevel().setDayTime(NIGHT_START);
@@ -236,7 +249,7 @@ public class BedrollGameTest implements FabricGameTest {
     }
 
     /** Half strength on an ordinary night: 0.5 HP per conversion vs a bed's 1.0 (§7). */
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "bedrollHalf", timeoutTicks = 400)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBedrollHalf", timeoutTicks = HEAL_CONVERSION)
     public void bedrollHealsAtHalfStrength(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper, NIGHT_START);
         int savedInterval = RespiteConfig.get().restfulHealIntervalTicks;
@@ -281,7 +294,7 @@ public class BedrollGameTest implements FabricGameTest {
     }
 
     /** New-moon stacking: a bedroll's 0.5 × Deep Sleep's 2.0 = 1.0 HP (§7). */
-    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "bedrollDeep", timeoutTicks = 400)
+    @GameTest(template = FabricGameTest.EMPTY_STRUCTURE, batch = "respiteBedrollDeep", timeoutTicks = HEAL_CONVERSION)
     public void bedrollHalfStrengthStacksWithDeepSleep(GameTestHelper helper) {
         int savedBudget = setUpStillNight(helper, NEW_MOON_NIGHT);
         int savedInterval = RespiteConfig.get().restfulHealIntervalTicks;
