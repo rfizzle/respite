@@ -318,6 +318,76 @@ tasks.register('jacocoMergedReport', JacocoReport) {
     }
 }
 
+tasks.register('verifyDatagenIdempotent') {
+    description = 'Runs datagen and asserts git reports no changes in src/main/generated/'
+    group = 'verification'
+    dependsOn 'runDatagen'
+    // The check reads live working-tree state, which Gradle cannot model as task inputs.
+    // Declaring the incompatibility keeps the intent explicit rather than leaving a hard
+    // failure for whoever enables the configuration cache. Only invocations whose task graph
+    // contains this task discard their entry, and those fork a Minecraft server anyway.
+    notCompatibleWithConfigurationCache('shells out to git against live working-tree state')
+    doLast {
+        def genDir = file('src/main/generated').absolutePath
+        // Fail with an actionable message when git itself cannot run. ignoreExitValue covers a
+        // nonzero exit, not a process that never starts, so without forcing resolution inside
+        // the try an absent binary surfaces as a bare process-start exception naming neither
+        // datagen nor a remedy.
+        def runGit = { List<String> argv ->
+            try {
+                def out = providers.exec {
+                    commandLine argv
+                    ignoreExitValue = true
+                }
+                // providers.exec is lazy — the process starts on the first result read, so force
+                // it here to keep a failure to start inside this catch rather than at the use site.
+                out.result.get()
+                return out
+            } catch (Exception e) {
+                throw new GradleException(
+                        'verifyDatagenIdempotent needs git on PATH to inspect src/main/generated/, ' +
+                        'and could not run it: ' + e.message, e)
+            }
+        }
+        // Cap both git outputs, and say so when truncating: a run that rewrites a large provider's
+        // output lists hundreds of files, and git's own diagnostics are unbounded too.
+        def firstLines = { String text ->
+            def lines = text.trim().readLines()
+            lines.size() > 5 ? lines.take(5).join('\n') + "\n… (${lines.size()} lines total)"
+                             : lines.join('\n')
+        }
+        // --no-optional-locks keeps a read-only check from taking .git/index.lock: git status
+        // rewrites the index when cached stat info is stale, which is exactly the state
+        // runDatagen leaves behind after rewriting every generated file.
+        //
+        // The '--' separator is required: without it git parses the path as a revision-or-path
+        // and aborts with exit 128 ("ambiguous argument") whenever src/main/generated is neither
+        // tracked nor present. With it, a missing directory is an empty pathspec and exits 0.
+        //
+        // --porcelain reports all three drift shapes in one machine-readable listing: staged
+        // ('M '), unstaged (' M'), and untracked ('??'). A git diff check sees only the
+        // worktree-versus-index delta, so drift that has been git add-ed slips past it — a
+        // verification task passing on real drift. Reading stdout also frees every nonzero exit
+        // to mean git itself failed, and unlike 'git diff HEAD' this works with no commits yet.
+        def statusResult = runGit(['git', '--no-optional-locks', 'status', '--porcelain', '--', genDir])
+        // A failing git writes nothing to stdout, so an unchecked exit code would read as
+        // "no changes" — a verification task reporting clean because its tool broke.
+        def statusExit = statusResult.result.get().exitValue
+        if (statusExit != 0) {
+            throw new GradleException(
+                    "git status failed with exit ${statusExit} while checking src/main/generated/:\n" +
+                    firstLines(statusResult.standardError.asText.get()))
+        }
+        def dirty = statusResult.standardOutput.asText.get().trim()
+        if (!dirty.isEmpty()) {
+            throw new GradleException(
+                    'src/main/generated/ is not clean after runDatagen:\n' + firstLines(dirty) +
+                    '\nRun ./gradlew runDatagen, then git add src/main/generated/ and commit the ' +
+                    'results (staged-but-uncommitted output also fails this check).')
+        }
+    }
+}
+
 processResources {
     inputs.property "version", project.version
 

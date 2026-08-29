@@ -71,3 +71,7 @@ art/audio/**/*.report.png
 # Repo-owned (outside the concord block): glyph render previews beside art/ masters
 art/*@*x.png
 __pycache__/
+
+# The generated assets/data under src/main/generated are committed; datagen's own
+# hash cache beside them is not — it is per-machine state, rewritten every run.
+src/main/generated/.cache/

@@ -1,0 +1,38 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "respite:feature_enabled",
+      "feature": "caffeinated_brew"
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "respite:caffeinated_brew"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_unsteeped_brew": {
+      "conditions": {
+        "items": [
+          {
+            "items": "respite:unsteeped_brew"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_unsteeped_brew"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "respite:caffeinated_brew"
+    ]
+  }
+}

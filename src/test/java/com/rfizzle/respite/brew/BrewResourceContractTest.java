@@ -2,6 +2,7 @@
 package com.rfizzle.respite.brew;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.rfizzle.respite.resources.ShippedResources;
 import org.junit.jupiter.api.Test;
@@ -74,8 +75,8 @@ class BrewResourceContractTest {
             // The water bottle is constrained to the water potion via a Fabric
             // components ingredient — a plain minecraft:potion would match any potion.
             if (ing.has("components")
-                    && "minecraft:water".equals(ing.getAsJsonObject("components")
-                            .get("minecraft:potion_contents").getAsString())) {
+                    && "minecraft:water".equals(
+                            potionOf(ing.getAsJsonObject("components").get("minecraft:potion_contents")))) {
                 water = true;
             }
         }
@@ -108,6 +109,24 @@ class BrewResourceContractTest {
                     advancement.getAsJsonObject("rewards").getAsJsonArray("recipes").get(0).getAsString(),
                     name + " unlock advancement must reward its own recipe");
         }
+    }
+
+    /**
+     * The potion id out of a {@code minecraft:potion_contents} value, in either
+     * encoding.
+     *
+     * <p>{@code PotionContents.CODEC} is a {@code withAlternative} of the full
+     * record over a bare potion id, so it <em>decodes</em> both {@code
+     * "minecraft:water"} and {@code {"potion": "minecraft:water"}} to the same
+     * contents but always <em>encodes</em> the record form — which is what
+     * datagen writes. Accepting both keeps this guard on the thing that matters
+     * (the ingredient is pinned to water, not to any potion) rather than on
+     * which of two equivalent spellings produced the file.
+     */
+    private static String potionOf(JsonElement contents) {
+        return contents.isJsonObject()
+                ? contents.getAsJsonObject().get("potion").getAsString()
+                : contents.getAsString();
     }
 
     /** Every brew datapack entry gates on {@code respite:feature_enabled} for {@code caffeinated_brew}. */
