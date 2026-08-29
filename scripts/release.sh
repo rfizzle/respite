@@ -16,6 +16,10 @@ NO_PUSH=0
 # One positional: a bump keyword (patch|minor|major) or an explicit SemVer version,
 # which may carry a pre-release suffix — v1.0.0-beta.1 is how a beta is cut.
 TARGET=""
+# Initialised so the unassigned-version guard below can test it: under set -u a
+# reference to an unset variable aborts first, with a worse message than the
+# usage error the guard is there to print.
+NEW_VERSION=""
 for arg in "$@"; do
   case "$arg" in
     --no-push) NO_PUSH=1 ;;
