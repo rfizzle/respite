@@ -1,6 +1,7 @@
-package com.rfizzle.respite.config;
+package com.rfizzle.respite.network;
 
 import com.rfizzle.respite.Respite;
+import com.rfizzle.respite.config.RespiteConfig;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -15,30 +16,30 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
  * <p>The config travels as its canonical JSON — the same shape
  * {@link RespiteConfig} serializes to disk — so a new field costs nothing here:
  * the payload never drifts from the config's field set. The JSON is already at
- * {@link ConfigMigrator#CURRENT_VERSION}, so the receiver deserializes without
+ * the current schema version, so the receiver deserializes without
  * migrating and clamps defensively.
  */
-public record RespiteConfigPayload(String json) implements CustomPacketPayload {
+public record ConfigSyncPayload(String json) implements CustomPacketPayload {
 
     /** Bounds the on-wire string so a hostile or corrupt frame can't allocate unboundedly. */
     private static final int MAX_JSON_BYTES = 16 * 1024;
 
-    public static final Type<RespiteConfigPayload> TYPE = new Type<>(Respite.id("config_sync"));
+    public static final Type<ConfigSyncPayload> TYPE = new Type<>(Respite.id("config_sync"));
 
-    public static final StreamCodec<FriendlyByteBuf, RespiteConfigPayload> CODEC =
-            StreamCodec.of(RespiteConfigPayload::encode, RespiteConfigPayload::decode);
+    public static final StreamCodec<FriendlyByteBuf, ConfigSyncPayload> CODEC =
+            StreamCodec.of(ConfigSyncPayload::encode, ConfigSyncPayload::decode);
 
-    private static void encode(FriendlyByteBuf buf, RespiteConfigPayload payload) {
+    private static void encode(FriendlyByteBuf buf, ConfigSyncPayload payload) {
         buf.writeUtf(payload.json, MAX_JSON_BYTES);
     }
 
-    private static RespiteConfigPayload decode(FriendlyByteBuf buf) {
-        return new RespiteConfigPayload(buf.readUtf(MAX_JSON_BYTES));
+    private static ConfigSyncPayload decode(FriendlyByteBuf buf) {
+        return new ConfigSyncPayload(buf.readUtf(MAX_JSON_BYTES));
     }
 
     /** The payload carrying {@code config}'s current JSON. */
-    public static RespiteConfigPayload of(RespiteConfig config) {
-        return new RespiteConfigPayload(RespiteConfig.GSON.toJson(config));
+    public static ConfigSyncPayload of(RespiteConfig config) {
+        return new ConfigSyncPayload(config.toJson());
     }
 
     /**
@@ -48,18 +49,7 @@ public record RespiteConfigPayload(String json) implements CustomPacketPayload {
      * Falls back to defaults if the JSON is unusable.
      */
     public RespiteConfig toConfig() {
-        RespiteConfig config;
-        try {
-            config = RespiteConfig.GSON.fromJson(json, RespiteConfig.class);
-        } catch (Exception e) {
-            Respite.LOGGER.warn("Malformed synced config from server; using defaults", e);
-            config = null;
-        }
-        if (config == null) {
-            config = new RespiteConfig();
-        }
-        config.clamp();
-        return config;
+        return RespiteConfig.fromSyncedJson(json);
     }
 
     @Override
