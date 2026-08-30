@@ -116,14 +116,6 @@ bundled** — install whichever you already use.
 - [Jade](https://modrinth.com/mod/jade) / [WTHIT](https://modrinth.com/mod/wthit)
   — Chronometer clock time and signal at a glance
 
-**Enhanced by** its Concord siblings, never required: with
-[Tribulation](https://modrinth.com/mod/tribulation-difficulty-overhaul) its
-difficulty scaling reaches Respite's phantoms automatically; with
-[Mercantile](https://modrinth.com/mod/mercantile-villager-overhaul) village
-standing can put cocoa and brews on a trader's counter; with
-[Prosperity](https://modrinth.com/mod/prosperity-loot-overhaul) a Chronometer
-may turn up in a far-flung chest.
-
 ## Requirements
 
 - Minecraft **1.21.1**
