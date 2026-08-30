@@ -209,8 +209,22 @@ HUD accessors.
 ### Gradle Setup
 
 ```gradle
+repositories {
+    // Sibling jars resolve from GitHub Releases through an artifact-only `rfizzle:` ivy
+    // repo while the Modrinth projects are not publicly resolvable. See API-STANDARD §4.
+    ivy {
+        name = 'GitHubReleases'
+        url = 'https://github.com'
+        patternLayout {
+            artifact '/[organisation]/[module]/releases/download/v[revision]/[module]-[revision].jar'
+        }
+        metadataSources { artifact() }
+        content { includeGroup 'rfizzle' }
+    }
+}
+
 dependencies {
-    modCompileOnly "maven.modrinth:respite-vitality-overhaul:<version>"
+    modCompileOnly "rfizzle:respite:<version>"
 }
 ```
 
