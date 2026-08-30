@@ -120,12 +120,19 @@
       ]
     },
     {
-      "title": "Better Together",
-      "intro": "With siblings from the Concord collection installed, Respite lights up further — never required, and with none installed nothing is missing.",
+      "title": "Part of Concord",
+      "intro": "Respite is one of eight independent overhauls in the Concord collection. Install any, combine all — each stands alone, and with none of the others installed nothing here is missing.",
       "blocks": [
         {
           "type": "list",
           "items": [
+            "<strong class='text-bone'>Meridian</strong> — Chart your enchantments.",
+            "<strong class='text-bone'>Mercantile</strong> — Every villager remembers.",
+            "<strong class='text-bone'>Tribulation</strong> — Survive what comes next.",
+            "<strong class='text-bone'>Prosperity</strong> — Every chest, yours to discover.",
+            "<strong class='text-bone'>Distillation</strong> — Every drop counts.",
+            "<strong class='text-bone'>Cultivation</strong> — Worth growing.",
+            "<strong class='text-bone'>Instinct</strong> — Worth raising."
           ]
         }
       ]
