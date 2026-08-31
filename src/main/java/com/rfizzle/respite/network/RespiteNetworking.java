@@ -1,6 +1,8 @@
 package com.rfizzle.respite.network;
 
+import com.rfizzle.respite.bedroll.BedrollSleepPayload;
 import com.rfizzle.respite.config.RespiteConfig;
+import com.rfizzle.respite.timelapse.TimeLapsePayload;
 import java.util.List;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -25,8 +27,11 @@ public final class RespiteNetworking {
     }
 
     public static void register() {
-        // S2C only; the type must be known on both sides, the receiver is client wiring.
+        // All S2C payload types register here, in one place (mc-networking) —
+        // common init, so both sides know each type; receivers are client wiring.
         PayloadTypeRegistry.playS2C().register(ConfigSyncPayload.TYPE, ConfigSyncPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(BedrollSleepPayload.TYPE, BedrollSleepPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(TimeLapsePayload.TYPE, TimeLapsePayload.CODEC);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> sendTo(handler.player));
     }
 

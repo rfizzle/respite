@@ -318,10 +318,25 @@ tasks.register('jacocoMergedReport', JacocoReport) {
     }
 }
 
+tasks.register('cleanDatagenCache', Delete) {
+    description = 'Removes the Fabric datagen hash cache so the next runDatagen rewrites every file'
+    group = 'verification'
+    delete 'src/main/generated/.cache'
+}
+
+// Fabric datagen skips rewriting files whose provider hash is unchanged in
+// src/main/generated/.cache — so a hand-edited-and-committed generated file
+// would survive runDatagen and verifyDatagenIdempotent would compare the edit
+// to itself. Clearing the cache first makes the local check see what a fresh
+// CI checkout sees.
+tasks.matching { it.name == 'runDatagen' }.configureEach {
+    mustRunAfter 'cleanDatagenCache'
+}
+
 tasks.register('verifyDatagenIdempotent') {
     description = 'Runs datagen and asserts git reports no changes in src/main/generated/'
     group = 'verification'
-    dependsOn 'runDatagen'
+    dependsOn 'cleanDatagenCache', 'runDatagen'
     // The check reads live working-tree state, which Gradle cannot model as task inputs.
     // Declaring the incompatibility keeps the intent explicit rather than leaving a hard
     // failure for whoever enables the configuration cache. Only invocations whose task graph

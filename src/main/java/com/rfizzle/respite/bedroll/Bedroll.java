@@ -3,7 +3,6 @@ package com.rfizzle.respite.bedroll;
 import java.util.List;
 import java.util.Optional;
 import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -49,9 +48,8 @@ public final class Bedroll {
     }
 
     public static void register() {
-        // The screen-open nudge (S2C) — the type must be known on both sides.
-        PayloadTypeRegistry.playS2C().register(BedrollSleepPayload.TYPE, BedrollSleepPayload.CODEC);
-        // Roll the bedroll back up whenever its sleeper wakes.
+        // Roll the bedroll back up whenever its sleeper wakes. The sleep-nudge
+        // payload type is registered centrally in RespiteNetworking.
         EntitySleepEvents.STOP_SLEEPING.register(Bedroll::onStopSleeping);
     }
 

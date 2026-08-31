@@ -10,7 +10,6 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.CrashReport;
 import net.minecraft.ReportedException;
@@ -72,9 +71,7 @@ public final class TimeLapseEngine {
     }
 
     public static void register() {
-        // S2C only; the type must be known on both sides, the receiver is client wiring.
-        PayloadTypeRegistry.playS2C().register(TimeLapsePayload.TYPE, TimeLapsePayload.CODEC);
-
+        // The lapse payload type is registered centrally in RespiteNetworking.
         ServerTickEvents.START_SERVER_TICK.register(server -> tickStartNanos = Util.getNanos());
         ServerTickEvents.END_SERVER_TICK.register(TimeLapseEngine::onEndServerTick);
         ServerLivingEntityEvents.AFTER_DAMAGE.register(TimeLapseEngine::onAfterDamage);
