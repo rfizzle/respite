@@ -3,6 +3,8 @@
 # A copper-cased pocket watch in the Chronometer's palette: copper case,
 # night-slate dial, candleglow hands, moonlight hour ticks, redstone pin, fob loop.
 size: 32
+kind: sprite
+ships: src/main/resources/assets/respite/textures/item/pocket_chronometer.png
 
 legend:
   . transparent

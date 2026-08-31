@@ -3,6 +3,8 @@
 # respite.* tokens are not yet registered in the concord glyph palette — hex used
 # with the DESIGN.md role named beside each entry.
 size: 16
+kind: sprite
+ships: art/hud-icon-16.png
 
 legend:
   . transparent

@@ -4,6 +4,8 @@
 # Glass and cork read vanilla; the murk carries no sibling accent. Native 16x16
 # to match vanilla item-sprite weight, 1px ink outline.
 size: 16
+kind: sprite
+ships: src/main/resources/assets/respite/textures/item/unsteeped_brew.png
 
 legend:
   . transparent

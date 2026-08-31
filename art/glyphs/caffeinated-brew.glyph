@@ -4,6 +4,8 @@
 # rising off the cork — finished and inviting. Glass and cork read vanilla; the
 # warmth is Respite's own candleglow, no sibling accent. Native 16x16, 1px ink.
 size: 16
+kind: sprite
+ships: src/main/resources/assets/respite/textures/item/caffeinated_brew.png
 
 legend:
   . transparent

@@ -4,6 +4,7 @@
   "peak_dbfs": -1.0,
   "subtitle": "subtitles.respite.time_lapse_start",
   "seed": 5,
+  "ships": "src/main/resources/assets/respite/sounds/ui/time_lapse_start.ogg",
   "layers": [
     {
       "waveform": "sine",

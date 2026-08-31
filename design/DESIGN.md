@@ -68,7 +68,7 @@ The asset inventory — every source under `art/` and the final file it ships as
 
 ## 4. Generation Prompts
 
-The full logo is the one prompt-sourced master, Gemini-illustrated like its siblings'. The mod icon is composed deterministically by `art/glyphs/icon.gen.py` and the lantern glyph is `.glyph`-authored (`art/hud-icon-16.glyph`) — re-render either through its generator or the pipeline, per DESIGN-SYSTEM §8.
+The full logo is the one prompt-sourced master, Gemini-illustrated like its siblings'. The mod icon is composed deterministically by `art/glyphs/icon.gen.py` and the lantern glyph is `.glyph`-authored (`art/glyphs/hud-icon-16.glyph`) — re-render either through its generator or the pipeline, per DESIGN-SYSTEM §8.
 
 **`art/logo.png`:**
 
