@@ -1,5 +1,7 @@
 # respite — chronometer dial phase 6 (crescent moon, arc 65°)
 size: 32
+kind: block
+ships: src/main/resources/assets/respite/textures/block/chronometer_dial_6.png
 
 legend:
   K ink                      # #0a0a0a selective outline

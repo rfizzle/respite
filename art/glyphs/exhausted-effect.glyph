@@ -3,6 +3,8 @@
 # hanging down, a deeper eyebag. No iris shows — the difference from Weary is
 # that the eye is closed. Bone/ash on transparent. Native 18x18.
 size: 18
+kind: sprite
+ships: src/main/resources/assets/respite/textures/mob_effect/exhausted.png
 
 legend:
   . transparent

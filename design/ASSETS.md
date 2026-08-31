@@ -13,7 +13,7 @@
 |---|---|---|
 | Full logo | Gemini (prompt in `DESIGN.md` §4) | `art/logo.png` (master, 3172×1344) → README embed, `site/assets/logo.png` (1600×678 web copy), `site/assets/og-image.png` (1200×630 on Ink) |
 | Mod icon (128 + 512) | `art/glyphs/icon.gen.py` → `art/glyphs/icon.glyph` (generated 128px grid; 512 via `--scale-to 512`) | `art/icon-128.png`, `art/icon-512.png` (masters) → `assets/respite/icon.png` (shipped), `site/assets/icon.png`, store listings |
-| Lantern glyph 16×16 (Jade/recipe viewers — no HUD slot) | `art/hud-icon-16.glyph` | `art/hud-icon-16.png` (master, not yet shipped — see "Not yet created") |
+| Lantern glyph 16×16 (Jade/recipe viewers — no HUD slot) | `art/glyphs/hud-icon-16.glyph` | `art/hud-icon-16.png` (master, not yet shipped — see "Not yet created") |
 
 ## In-game pixel art
 

@@ -1,5 +1,7 @@
 # respite — chronometer top/bottom cap (copper ring, redstone core)
 size: 32
+kind: cap
+ships: src/main/resources/assets/respite/textures/block/chronometer_top.png
 
 legend:
   K ink                      # #0a0a0a selective outline

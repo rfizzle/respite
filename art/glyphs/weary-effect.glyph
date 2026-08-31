@@ -3,6 +3,8 @@
 # showing beneath, a tired bag underneath. Bone/ash on transparent, one
 # moonlight accent. Native 18x18 to match vanilla mob_effect framing.
 size: 18
+kind: sprite
+ships: src/main/resources/assets/respite/textures/mob_effect/weary.png
 
 legend:
   . transparent

@@ -1,5 +1,7 @@
 # bedroll — respite (design/SPEC.md §7)
 size: 16
+kind: block
+ships: src/main/resources/assets/respite/textures/block/bedroll_side.png
 legend:
   . transparent
   K ink                 # #0a0a0a outline / occlusion

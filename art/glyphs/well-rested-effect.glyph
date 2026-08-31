@@ -4,6 +4,8 @@
 # catchlight glint and an ink pupil, a soft eyebag beneath. Bone/ash on
 # transparent, one warm accent. Native 18x18 to match vanilla mob_effect framing.
 size: 18
+kind: sprite
+ships: src/main/resources/assets/respite/textures/mob_effect/well_rested.png
 
 legend:
   . transparent

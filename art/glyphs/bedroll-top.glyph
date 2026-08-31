@@ -1,5 +1,7 @@
 # bedroll — respite (design/SPEC.md §7)
 size: 32
+kind: cap
+ships: src/main/resources/assets/respite/textures/block/bedroll_top.png
 legend:
   . transparent
   K ink                 # #0a0a0a outline / occlusion

@@ -1,5 +1,7 @@
 # respite — chronometer dial phase 1 (sun, arc 115°)
 size: 32
+kind: block
+ships: src/main/resources/assets/respite/textures/block/chronometer_dial_1.png
 
 legend:
   K ink                      # #0a0a0a selective outline
