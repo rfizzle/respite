@@ -25,10 +25,10 @@ This mod is a member of Concord, a modular collection of system overhauls. Suite
 the [concord repo](https://github.com/rfizzle/concord) — checked out at `../concord/`
 in the local workspace. Normative for this repo:
 
-- [API-STANDARD.md](https://github.com/rfizzle/concord/blob/master/API-STANDARD.md) — the `api` package conventions (`design/SPEC.md` §Public API conforms)
+- [API-STANDARD.md](https://github.com/rfizzle/concord/blob/master/API-STANDARD.md) — the `api` package conventions
 - [HUD-STANDARD.md](https://github.com/rfizzle/concord/blob/master/HUD-STANDARD.md) — Respite has **no HUD slot, by design** (`design/DESIGN.md` §2); it ships no HUD element and no HUD accessors
 - [DESIGN-SYSTEM.md](https://github.com/rfizzle/concord/blob/master/design/DESIGN-SYSTEM.md) — palette, typography, logo rules, texture/audio pipelines
-- [REPO-LAYOUT.md](https://github.com/rfizzle/concord/blob/master/REPO-LAYOUT.md) — where non-code files live (conforms)
+- [REPO-LAYOUT.md](https://github.com/rfizzle/concord/blob/master/REPO-LAYOUT.md) — where non-code files live
 
 ## Build commands
 
@@ -42,6 +42,11 @@ in the local workspace. Normative for this repo:
 ./gradlew verifyDatagenIdempotent  # runDatagen + assert the generated tree is clean
 ./gradlew genSources     # decompile MC sources for IDE nav
 ```
+
+The build wiring (version, gametest/datagen runs, JaCoCo, packaging) lives in the
+hub-owned `gradle/concord-common.gradle`, and `make` targets in `concord.mk`;
+both are synced verbatim, so change them in concord, not here. `make ci` runs
+what CI runs.
 
 Run a single JUnit test:
 `./gradlew test --tests "com.rfizzle.respite.SomeTest"`

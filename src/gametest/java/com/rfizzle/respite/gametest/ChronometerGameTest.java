@@ -4,7 +4,7 @@ import com.rfizzle.respite.Respite;
 import com.rfizzle.respite.block.ChronometerBlock;
 import com.rfizzle.respite.chronometer.ChronometerTime;
 import com.rfizzle.respite.config.RespiteConfig;
-import com.rfizzle.respite.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.respite.registry.RespiteRegistry;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.core.BlockPos;

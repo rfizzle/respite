@@ -1,7 +1,7 @@
 package com.rfizzle.respite.gametest;
 
 import com.rfizzle.respite.config.RespiteConfig;
-import com.rfizzle.respite.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.respite.mixin.PhantomSpawnerAccessor;
 import com.rfizzle.respite.mixin.RespitePhantomSpawnerAccessor;
 import com.rfizzle.respite.mixin.ServerLevelCustomSpawnersAccessor;
