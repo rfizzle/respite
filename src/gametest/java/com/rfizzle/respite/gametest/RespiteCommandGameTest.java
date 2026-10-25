@@ -3,7 +3,7 @@ package com.rfizzle.respite.gametest;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.CommandNode;
 import com.rfizzle.respite.config.RespiteConfig;
-import com.rfizzle.respite.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.respite.registry.RespiteRegistry;
 import com.rfizzle.respite.weariness.WearinessMath;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;

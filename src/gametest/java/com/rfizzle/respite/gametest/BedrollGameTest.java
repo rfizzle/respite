@@ -3,7 +3,7 @@ package com.rfizzle.respite.gametest;
 import com.rfizzle.respite.bedroll.Bedroll;
 import com.rfizzle.respite.bedroll.BedrollBlock;
 import com.rfizzle.respite.config.RespiteConfig;
-import com.rfizzle.respite.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.respite.registry.RespiteRegistry;
 import com.rfizzle.respite.timelapse.TimeLapseEngine;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;

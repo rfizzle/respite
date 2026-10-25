@@ -3,7 +3,7 @@ package com.rfizzle.respite.gametest;
 import com.rfizzle.respite.Respite;
 import com.rfizzle.respite.chronometer.PocketChronometerItem;
 import com.rfizzle.respite.command.StatusFormat;
-import com.rfizzle.respite.gametest.util.MockPlayers;
+import com.rfizzle.concord.gametest.MockPlayers;
 import com.rfizzle.respite.registry.RespiteRegistry;
 import net.fabricmc.fabric.api.gametest.v1.FabricGameTest;
 import net.minecraft.gametest.framework.GameTest;
