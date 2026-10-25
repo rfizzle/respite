@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   release:
-    uses: rfizzle/concord/.github/workflows/mod-release.yml@master
+    uses: rfizzle/concord/.github/workflows/mod-release.yml@stable
     with:
       modrinth-id: "Mz4an5lJ"
       curseforge-id: "1608507"
